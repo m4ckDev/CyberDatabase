@@ -1,0 +1,78 @@
+# ~/ids/ids.py
+import scapy.all as scapy
+import time
+from datetime import datetime
+import smtplib
+from email.mime.text import MIMEText
+
+class NetworkIDS:
+    def __init__(self):
+        self.suspicious_ips = set()
+        self.port_scan_threshold = 10  # Ports per minute
+        self.port_scans = {}
+        
+    def detect_port_scan(self, packet):
+        if packet.haslayer(scapy.TCP):
+            src_ip = packet[scapy.IP].src
+            dst_port = packet[scapy.TCP].dport
+            
+            current_minute = int(time.time() / 60)
+            
+            if src_ip not in self.port_scans:
+                self.port_scans[src_ip] = {}
+            
+            if current_minute not in self.port_scans[src_ip]:
+                self.port_scans[src_ip][current_minute] = set()
+            
+            self.port_scans[src_ip][current_minute].add(dst_port)
+            
+            # Check threshold
+            if len(self.port_scans[src_ip][current_minute]) > self.port_scan_threshold:
+                self.alert(f"Port scan detected from {src_ip}")
+                self.suspicious_ips.add(src_ip)
+    
+    def detect_arp_spoofing(self, packet):
+        if packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 2:  # ARP reply
+            real_mac = self.get_real_mac(packet[scapy.ARP].psrc)
+            if real_mac and packet[scapy.ARP].hwsrc != real_mac:
+                self.alert(f"ARP spoofing detected! {packet[scapy.ARP].psrc} is being spoofed")
+    
+    def alert(self, message):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[ALERT] {timestamp}: {message}")
+        
+        # Send email alert
+        self.send_email_alert(message)
+        
+        # Log to file
+        with open("/home/pi/ids/alerts.log", "a") as f:
+            f.write(f"{timestamp} - {message}\n")
+    
+    def send_email_alert(self, message):
+        try:
+            msg = MIMEText(message)
+            msg['Subject'] = 'Network Intrusion Alert'
+            msg['From'] = 'pi@yourhome.local'
+            msg['To'] = 'your-email@gmail.com'
+            
+            # Configure with your email
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login('your-email@gmail.com', 'your-app-password')
+            server.send_message(msg)
+            server.quit()
+        except:
+            pass
+    
+    def start(self):
+        print("[+] Starting network IDS...")
+        scapy.sniff(prn=self.packet_callback, store=0)
+    
+    def packet_callback(self, packet):
+        self.detect_port_scan(packet)
+        self.detect_arp_spoofing(packet)
+        self.detect_dos_attempt(packet)
+
+# Run it
+ids = NetworkIDS()
+ids.start()
