@@ -1,0 +1,94 @@
+# ~/honeypot/honeypot.py
+import socket
+import threading
+import logging
+from datetime import datetime
+
+class Honeypot:
+    def __init__(self):
+        self.services = {
+            22: self.handle_ssh,
+            23: self.handle_telnet,
+            80: self.handle_http,
+            443: self.handle_https,
+            445: self.handle_smb,
+            3389: self.handle_rdp,
+            5900: self.handle_vnc
+        }
+        
+        logging.basicConfig(
+            filename='/home/pi/honeypot/attacks.log',
+            level=logging.INFO,
+            format='%(asctime)s - %(message)s'
+        )
+    
+    def handle_ssh(self, client_socket, client_ip):
+        """Fake SSH server"""
+        banner = "SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.3\r\n"
+        client_socket.send(banner.encode())
+        
+        while True:
+            try:
+                data = client_socket.recv(1024)
+                if data:
+                    logging.info(f"SSH attempt from {client_ip}: {data.decode('utf-8', errors='ignore')}")
+                    # Send fake authentication failure
+                    client_socket.send(b"Permission denied (publickey,password).\r\n")
+                else:
+                    break
+            except:
+                break
+    
+    def handle_http(self, client_socket, client_ip):
+        """Fake HTTP server"""
+        response = """HTTP/1.1 200 OK
+Content-Type: text/html
+
+<html>
+<head><title>Apache2 Ubuntu Default Page</title></head>
+<body>
+<h1>It works!</h1>
+<p>This is the default welcome page.</p>
+</body>
+</html>"""
+        
+        client_socket.send(response.encode())
+        logging.info(f"HTTP request from {client_ip}")
+    
+    def start_service(self, port):
+        """Start a fake service on specified port"""
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind(('0.0.0.0', port))
+        sock.listen(5)
+        
+        print(f"[+] Honeypot listening on port {port}")
+        
+        while True:
+            client, addr = sock.accept()
+            client_ip = addr[0]
+            
+            logging.info(f"Connection from {client_ip} to port {port}")
+            
+            handler = self.services.get(port)
+            if handler:
+                threading.Thread(target=handler, args=(client, client_ip)).start()
+    
+    def start_all(self):
+        """Start all honeypot services"""
+        threads = []
+        for port in self.services.keys():
+            thread = threading.Thread(target=self.start_service, args=(port,))
+            thread.daemon = True
+            thread.start()
+            threads.append(thread)
+        
+        print("[+] All honeypot services started")
+        
+        # Keep main thread alive
+        for thread in threads:
+            thread.join()
+
+# Run it
+honeypot = Honeypot()
+honeypot.start_all()
