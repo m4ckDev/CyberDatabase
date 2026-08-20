@@ -1,0 +1,29 @@
+# ~/dashboard/web_dashboard.py
+from flask import Flask, render_template, jsonify
+import json
+import os
+
+app = Flask(__name__)
+
+@app.route('/')
+def dashboard():
+    return render_template('dashboard.html')
+
+@app.route('/api/network_stats')
+def network_stats():
+    stats = {
+        'total_hosts': len(os.listdir('/home/pi/scans/results')),
+        'alerts_today': sum(1 for _ in open('/home/pi/ids/alerts.log')),
+        'honeypot_hits': sum(1 for _ in open('/home/pi/honeypot/attacks.log')),
+        'c2_clients': len(json.load(open('/home/pi/c2/clients.json', 'r')))
+    }
+    return jsonify(stats)
+
+@app.route('/api/recent_alerts')
+def recent_alerts():
+    with open('/home/pi/ids/alerts.log', 'r') as f:
+        alerts = f.readlines()[-10:]  # Last 10 alerts
+    return jsonify({'alerts': alerts})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=False)
