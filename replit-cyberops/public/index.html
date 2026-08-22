@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#080d12" />
+  <title>m4ckDev CyberOps</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">M4</div>
+        <div><strong>m4ckDev</strong><span>CYBEROPS</span></div>
+      </div>
+      <nav>
+        <button class="nav-item active" data-view="dashboard">Dashboard</button>
+        <button class="nav-item" data-view="labs">Labs</button>
+        <button class="nav-item" data-view="findings">Findings</button>
+        <button class="nav-item" data-view="commands">Command Journal</button>
+        <button class="nav-item" data-view="roadmap">Roadmap</button>
+      </nav>
+      <div class="scope-card">
+        <span class="status-dot"></span>
+        <div><strong>Authorized Mode</strong><small>Only test systems you own or have permission to assess.</small></div>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div><p class="eyebrow">PERSONAL CYBER RANGE</p><h1 id="page-title">Operations Dashboard</h1></div>
+        <div class="top-actions"><span id="db-status" class="pill">Checking storage…</span><button class="primary" id="new-lab-btn">+ New Lab</button></div>
+      </header>
+
+      <section id="dashboard-view" class="view active">
+        <div class="stats">
+          <article class="stat"><span>ACTIVE LABS</span><strong id="active-labs">0</strong><small>authorized environments</small></article>
+          <article class="stat"><span>OPEN FINDINGS</span><strong id="open-findings">0</strong><small>require follow-up</small></article>
+          <article class="stat"><span>COMMANDS LOGGED</span><strong id="commands-count">0</strong><small>reproducible notes</small></article>
+          <article class="stat"><span>JOURNEY LEVEL</span><strong>07</strong><small>1,840 XP</small></article>
+        </div>
+
+        <div class="grid-two">
+          <article class="panel">
+            <div class="panel-head"><div><p class="eyebrow">CURRENT OPERATIONS</p><h2>Active Labs</h2></div><button class="ghost" data-jump="labs">View all</button></div>
+            <div id="dashboard-labs" class="stack"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head"><div><p class="eyebrow">LEARNING PROGRESS</p><h2>Skill Tracks</h2></div></div>
+            <div class="skill"><div><span>Network Enumeration</span><b>82%</b></div><progress max="100" value="82"></progress></div>
+            <div class="skill"><div><span>Linux Operations</span><b>74%</b></div><progress max="100" value="74"></progress></div>
+            <div class="skill"><div><span>Web Application Security</span><b>56%</b></div><progress max="100" value="56"></progress></div>
+            <div class="skill"><div><span>Active Directory</span><b>31%</b></div><progress max="100" value="31"></progress></div>
+          </article>
+        </div>
+
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">RECENT ACTIVITY</p><h2>Command Journal</h2></div><button class="ghost" data-jump="commands">Open journal</button></div>
+          <div id="recent-commands" class="terminal-list"></div>
+        </article>
+      </section>
+
+      <section id="labs-view" class="view">
+        <div class="section-head"><div><p class="eyebrow">AUTHORIZED TARGETS</p><h2>Lab Manager</h2></div><button class="primary" id="new-lab-btn-2">+ New Lab</button></div>
+        <div id="labs-grid" class="cards"></div>
+      </section>
+
+      <section id="findings-view" class="view">
+        <div class="section-head"><div><p class="eyebrow">ASSESSMENT NOTES</p><h2>Findings Tracker</h2></div><button class="primary" id="new-finding-btn">+ Add Finding</button></div>
+        <div id="findings-list" class="stack"></div>
+      </section>
+
+      <section id="commands-view" class="view">
+        <div class="section-head"><div><p class="eyebrow">REPRODUCIBLE WORK</p><h2>Command Journal</h2></div><button class="primary" id="new-command-btn">+ Log Command</button></div>
+        <div id="commands-list" class="terminal-list"></div>
+      </section>
+
+      <section id="roadmap-view" class="view">
+        <div class="section-head"><div><p class="eyebrow">CYBER JOURNEY</p><h2>Learning Roadmap</h2></div></div>
+        <div class="roadmap">
+          <article class="roadmap-card done"><span>01</span><div><h3>Foundations</h3><p>TCP/IP, Linux, Windows, virtualization, basic scripting.</p></div></article>
+          <article class="roadmap-card active"><span>02</span><div><h3>Enumeration</h3><p>Nmap, service discovery, SMB, DNS, HTTP, SSH and evidence collection.</p></div></article>
+          <article class="roadmap-card"><span>03</span><div><h3>Web Security</h3><p>Burp Suite, OWASP Top 10, authentication, input validation and safe lab testing.</p></div></article>
+          <article class="roadmap-card"><span>04</span><div><h3>Enterprise Labs</h3><p>Windows Server, Active Directory, identity, policy, logging and defensive validation.</p></div></article>
+          <article class="roadmap-card"><span>05</span><div><h3>Professional Reporting</h3><p>Findings, impact, evidence, remediation and verification.</p></div></article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="lab-dialog">
+    <form id="lab-form" method="dialog" class="modal-form">
+      <div class="modal-head"><div><p class="eyebrow">NEW OPERATION</p><h2>Create Authorized Lab</h2></div><button type="button" class="icon" data-close="lab-dialog">×</button></div>
+      <label>Lab name<input name="name" required placeholder="Metasploitable2" /></label>
+      <div class="form-row"><label>Platform<input name="platform" placeholder="Home Lab / HTB / THM" /></label><label>Target<input name="target" placeholder="10.10.10.50" /></label></div>
+      <label>Authorized scope<input name="scope" required placeholder="Owned Proxmox lab VM only" /></label>
+      <label>Notes<textarea name="notes" rows="3" placeholder="Objective, snapshot status, constraints…"></textarea></label>
+      <button class="primary" type="submit">Create Lab</button>
+    </form>
+  </dialog>
+
+  <dialog id="finding-dialog">
+    <form id="finding-form" method="dialog" class="modal-form">
+      <div class="modal-head"><div><p class="eyebrow">NEW FINDING</p><h2>Document Evidence</h2></div><button type="button" class="icon" data-close="finding-dialog">×</button></div>
+      <label>Title<input name="title" required placeholder="Anonymous FTP access enabled" /></label>
+      <div class="form-row"><label>Lab<select name="lab_id" id="finding-lab-select"><option value="">Unassigned</option></select></label><label>Severity<select name="severity"><option>Info</option><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></label></div>
+      <label>Evidence<textarea name="evidence" rows="3" placeholder="What directly proves the observation?"></textarea></label>
+      <label>Remediation<textarea name="remediation" rows="3" placeholder="Specific corrective action and verification step"></textarea></label>
+      <button class="primary" type="submit">Save Finding</button>
+    </form>
+  </dialog>
+
+  <dialog id="command-dialog">
+    <form id="command-form" method="dialog" class="modal-form">
+      <div class="modal-head"><div><p class="eyebrow">COMMAND JOURNAL</p><h2>Log Reproducible Work</h2></div><button type="button" class="icon" data-close="command-dialog">×</button></div>
+      <div class="form-row"><label>Lab<select name="lab_id" id="command-lab-select"><option value="">Unassigned</option></select></label><label>Tool<input name="tool" placeholder="nmap" /></label></div>
+      <label>Command<textarea class="mono" name="command" required rows="3" placeholder="nmap -sV 10.10.10.50"></textarea></label>
+      <label>Result / lesson learned<textarea name="result" rows="3" placeholder="Observed ports and what the result means"></textarea></label>
+      <button class="primary" type="submit">Log Command</button>
+    </form>
+  </dialog>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
