@@ -364,6 +364,15 @@ def install_platform(app, current_user, database_url, password_hasher):
         notes: str = ""
 
 
+    class AssetUpdate(BaseModel):
+
+        name: str
+        address: str
+        operating_system: str = ""
+        tags: str = ""
+        notes: str = ""
+
+
     class PasswordChange(BaseModel):
 
         current_password: str
@@ -2168,6 +2177,69 @@ def install_platform(app, current_user, database_url, password_hasher):
 
 
         return {
+            "id": asset_id
+        }
+
+
+    @router.put("/api/assets/{asset_id}")
+    def update_asset(
+        asset_id: int,
+        data: AssetUpdate,
+        user=Depends(current_user)
+    ):
+
+        user_id = uid(user)
+
+        name = data.name.strip()[:150]
+        address = data.address.strip()[:255]
+
+        if not name or not address:
+            raise HTTPException(
+                status_code=400,
+                detail="Name and address required"
+            )
+
+        with psycopg2.connect(
+            database_url
+        ) as conn:
+
+            with conn.cursor() as cur:
+
+                cur.execute(
+                    """
+                    UPDATE assets
+                    SET
+                        name=%s,
+                        address=%s,
+                        operating_system=%s,
+                        tags=%s,
+                        notes=%s,
+                        updated_at=NOW()
+                    WHERE id=%s
+                    AND user_id=%s
+                    RETURNING id
+                    """,
+                    (
+                        name,
+                        address,
+                        data.operating_system[:150],
+                        data.tags[:500],
+                        data.notes,
+                        asset_id,
+                        user_id
+                    )
+                )
+
+                row = cur.fetchone()
+
+                if not row:
+                    raise HTTPException(
+                        status_code=404,
+                        detail="Machine not found"
+                    )
+
+        return {
+            "updated": True,
             "id": asset_id
         }
 
