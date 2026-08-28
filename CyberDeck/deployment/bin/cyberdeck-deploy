@@ -1,0 +1,503 @@
+#!/bin/bash
+
+set -Eeuo pipefail
+
+REPO="git@github.com:m4ckDev/CyberDatabase.git"
+BRANCH="main"
+
+SOURCE="/opt/cyberdeck-source"
+PROJECT="$SOURCE/CyberDeck"
+LIVE="/opt/cyberdeck"
+PYTHON="$LIVE/venv/bin/python"
+
+STAMP=$(date +%Y%m%d%H%M%S)
+ROLLBACK="$LIVE/backups/deploy-$STAMP"
+
+DEPLOY_STARTED=0
+
+log() {
+    printf '[%s] %s\n' "$(date '+%H:%M:%S')" "$*"
+}
+
+die() {
+    echo "[FAIL] $*" >&2
+    exit 1          
+}
+
+backup_dir() {
+    local target="$1"
+    local backup="$2"
+
+    if [ -d "$target" ]; then
+        mkdir -p "$backup"
+        rsync -a "$target/" "$backup/"
+    else
+        mkdir -p "$(dirname "$backup")"        touch "${backup}/.MISSING"
+    fi
+}
+
+restore_dir() {
+    local target="$1"
+    local backup="$2"
+
+    if [ -f "${backup}.MISSING" ]; then
+        rm -rf "$target"
+    elif [ -d "$backup" ]; then
+        mkdir -p "$target"
+        rsync -a --delete "$backup/" "$target/"
+    fi
+}
+
+backup_file() {
+    local target="$1"
+    local backup="$2"
+
+    mkdir -p "$(dirname "$backup")"
+
+    if [ -f "$target" ]; then
+        cp "$target" "$backup"
+    else
+        touch "${backup}.MISSING"
+    fi
+}
+
+restore_file() {
+    local target="$1"
+    local backup="$2"
+
+    if [ -f "${backup}.MISSING" ]; then
+        rm -f "$target"
+    elif [ -f "$backup" ]; then
+        mkdir -p "$(dirname "$target")"
+        cp "$backup" "$target"
+    fi
+}
+
+rollback() {
+    trap -ERR
+    set +e
+
+    echo
+    log "DEPLOYMENT FAILED - ROLLING BACK"
+
+    for dir in api frontend mobile knowledge; do
+        restore_dir \
+            "$LIVE/$dir" \
+            "$ROLLBACK/live/$dir"
+    done
+
+    for file in README.md .gitignore; do
+        restore_file \ 
+            "$LIVE/$file" \
+            "$ROLLBACK/live/$file"
+    done
+
+    if [ -d "$ROLLBACK/systemd" ]; then
+        for backup in "$ROLLBACK/systemd/"*; do
+            [ -e "$backup" ] || continue
+
+            name="$(basename "$backup")"
+
+            case "$name" in 
+                *.MISSING)
+                    original=${name%.MISSING}"
+                    rm -f "/etc/systemd/system/$original"
+                    ;;
+                *)
+                    cp -a \
+                        "$backup" \
+                        "/etc/systemd/system/$name"
+                    ;;
+            esac
+        done
+    fi
+
+    if [ -d "$ROLLBACK/bin" ]; then
+        for backup in "$ROLLBACK/bin/"*; do
+            [ -e "$backup" ] || continue
+
+            name ="$(basename "$backup")"
+
+            case "$name" in
+                *.MISSING)
+                    original=${name%.MISSING}"
+                    rm -f "/usr/local/bin/$original"
+                    ;;
+                *)
+                    cp -a \
+                        "$backup" \
+                        "/usr/local/sbin/$name"
+                    ;;
+            esac
+        done
+    fi
+
+    if
+
+    if [ -d "$ROLLBACK/sudoers" ]; then
+        for backup in "$ROLLBACK/sudoers/"*; do
+            [ -e "$backup" ] || continue
+
+            name="$(basename "$backup")"
+
+            case "$name" in
+                *.MISSING)
+                    original="${name%.MISSING}"
+                    rm -f "/etc/sudoers.d/$original"
+                    ;;
+                *)
+                    cp -a \
+                        "$backup" \
+                        "/etc/sudoers.d/$name"
+                    ;;
+            esac
+        done
+    fi
+
+    systemctl daemon-reload
+    systemctl restart cyberdeck cyberdeck-worker
+
+    echo
+    log "Rollback completed"
+    log "Rollback files: $ROLLBACK"
+
+    exit 1
+}
+
+on_error() {
+    local line="$1"
+    local code="$2"
+
+    echo
+    echo "[FAIL] Deployment error at line $line, exit code $code"
+
+    if [ "$DEPLOY_STARTED" -eq 1 ]; then
+        rollback
+    fi
+
+    exit "$code"
+}
+
+trap 'on_error "$LINENO" "$?"' ERR
+
+
+[ "$(id -u)" -eq 0 ] || die "Run as root"
+
+for cmd in git rsync curl systemctl visudo; do
+    command -v "$cmd" >/dev/null 2>&1 ||
+        die "Missing required command: $cmd"
+done
+
+[ -x "$PYTHON" ] ||
+    die "CyberDeck Python environment missing: $PYTHON"
+
+mkdir -p "$LIVE/backups"
+
+
+log "Updating deployment repository"
+
+if [ ! -d "$SOURCE/.git" ]; then
+    rm -rf "$SOURCE"
+
+    git clone \
+        --branch "$BRANCH" \
+        "$REPO" \
+        "$SOURCE"
+else
+    git -C "$SOURCE" fetch \
+        --prune \
+        origin \
+        "$BRANCH"
+
+    git -C "$SOURCE" checkout "$BRANCH"
+
+    git -C "$SOURCE" reset \
+        --hard \
+        "origin/$BRANCH"
+
+    git -C "$SOURCE" clean -fd
+fi
+
+
+[ -d "$PROJECT/api" ] ||
+    die "CyberDeck api directory missing"
+
+[ -d "$PROJECT/frontend" ] ||
+    die "CyberDeck frontend directory missing"
+
+
+COMMIT="$(
+    git -C "$SOURCE" \
+        rev-parse \
+        --short HEAD
+)"
+
+log "Git commit: $COMMIT"
+
+
+log "Checking repository for obvious secrets"
+
+SECRET_MATCHES="$(
+    grep \
+        -RIlE \
+        'postgresql://[^[:space:]]+:[^[:space:]@]+@|BEGIN (RSA|OPENSSH|EC) PRIVATE KEY' \
+        "$PROJECT" \
+        --exclude-dir=.git \
+        --exclude-dir=node_modules \
+        2>/dev/null || true
+)"
+
+if [ -n "$SECRET_MATCHES" ]; then
+    echo "$SECRET_MATCHES"
+    die "Possible secret detected in repository"
+fi
+
+
+log "Checking Python syntax"
+
+"$PYTHON" - "$PROJECT/api" <<'PY'
+import ast
+import pathlib
+import sys
+
+root = pathlib.Path(sys.argv[1])
+
+files = list(root.rglob("*.py"))
+
+for path in files:
+    source = path.read_text(encoding="utf-8")
+    ast.parse(source, filename=str(path))
+
+print(f"Python syntax OK: {len(files)} files")
+PY
+
+
+log "Checking sudoers files"
+
+if [ -d "$PROJECT/deployment/sudoers" ]; then
+    for file in "$PROJECT/deployment/sudoers/"*; do
+        [ -f "$file" ] || continue
+        visudo -cf "$file" >/dev/null
+    done
+fi
+
+
+log "Running full CyberDeck backup"
+
+/usr/local/sbin/cyberdeck-backup
+
+
+log "Creating deployment rollback snapshot"
+
+mkdir -p \
+    "$ROLLBACK/live" \
+    "$ROLLBACK/systemd" \
+    "$ROLLBACK/bin" \
+    "$ROLLBACK/sudoers"
+
+for dir in api frontend mobile knowledge; do
+    backup_dir \
+        "$LIVE/$dir" \
+        "$ROLLBACK/live/$dir"
+done
+
+for file in README.md .gitignore; do
+    backup_file \
+        "$LIVE/$file" \
+        "$ROLLBACK/live/$file"
+done
+
+
+if [ -d "$PROJECT/deployment/systemd" ]; then
+    for src in "$PROJECT/deployment/systemd/"*; do
+        [ -f "$src" ] || continue
+
+        name="$(basename "$src")"
+
+        backup_file \
+            "/etc/systemd/system/$name" \
+            "$ROLLBACK/systemd/$name"
+    done
+fi
+
+
+if [ -d "$PROJECT/deployment/bin" ]; then
+    for src in "$PROJECT/deployment/bin/"*; do
+        [ -f "$src" ] || continue
+
+        name="$(basename "$src")"
+
+        backup_file \
+            "/usr/local/sbin/$name" \
+            "$ROLLBACK/bin/$name"
+    done
+fi
+
+
+if [ -d "$PROJECT/deployment/sudoers" ]; then
+    for src in "$PROJECT/deployment/sudoers/"*; do
+        [ -f "$src" ] || continue
+
+        name="$(basename "$src")"
+
+        backup_file \
+            "/etc/sudoers.d/$name" \
+            "$ROLLBACK/sudoers/$name"
+    done
+fi
+
+
+DEPLOY_STARTED=1
+
+
+log "Deploying application files"
+
+for dir in api frontend mobile knowledge; do
+
+    if [ -d "$PROJECT/$dir" ]; then
+
+        mkdir -p "$LIVE/$dir"
+
+        rsync \
+            -a \
+            --delete \
+            "$PROJECT/$dir/" \
+            "$LIVE/$dir/"
+    fi
+
+done
+
+
+for file in README.md .gitignore; do
+    if [ -f "$PROJECT/$file" ]; then
+        cp \
+            "$PROJECT/$file" \
+            "$LIVE/$file"
+    fi
+done
+
+
+log "Preserving runtime directories"
+
+mkdir -p \
+    "$LIVE/config" \
+    "$LIVE/files" \
+    "$LIVE/captures" \
+    "$LIVE/reports" \
+    "$LIVE/logs" \
+    "$LIVE/backups"
+
+
+[ -f "$LIVE/config/.env" ] ||
+    die "Production .env disappeared during deployment"
+
+
+log "Setting application ownership"
+
+for dir in api frontend mobile knowledge; do
+    [ -e "$LIVE/$dir" ] &&
+        chown -R cyberdeck:cyberdeck "$LIVE/$dir"
+done
+
+
+log "Installing deployment utilities"
+
+if [ -d "$PROJECT/deployment/bin" ]; then
+    for file in "$PROJECT/deployment/bin/"*; do
+        [ -f "$file" ] || continue
+
+        install \
+            -m 750 \
+            "$file" \
+            "/usr/local/sbin/$(basename "$file")"
+    done
+fi
+
+
+log "Installing sudoers configuration"
+
+if [ -d "$PROJECT/deployment/sudoers" ]; then
+    for file in "$PROJECT/deployment/sudoers/"*; do
+        [ -f "$file" ] || continue
+
+        install \
+            -m 440 \
+            "$file" \
+            "/etc/sudoers.d/$(basename "$file")"
+    done
+fi
+
+
+log "Installing systemd configuration"
+
+if [ -d "$PROJECT/deployment/systemd" ]; then
+    for file in "$PROJECT/deployment/systemd/"*; do
+        [ -f "$file" ] || continue
+
+        install \
+            -m 644 \
+            "$file" \
+            "/etc/systemd/system/$(basename "$file")"
+    done
+fi
+
+
+systemctl daemon-reload
+
+
+log "Restarting CyberDeck"
+
+systemctl restart cyberdeck
+systemctl restart cyberdeck-worker
+
+
+log "Waiting for API"
+
+HEALTH_OK=0
+
+for attempt in $(seq 1 15); do
+
+    HEALTH="$(
+        curl \
+            -fsS \
+            --max-time 3 \
+            http://127.0.0.1:8000/api/health \
+            2>/dev/null || true
+    )"
+
+    if echo "$HEALTH" | grep -q '"online"'; then
+        HEALTH_OK=1
+        break
+    fi
+
+    sleep 1
+done
+
+
+[ "$HEALTH_OK" -eq 1 ] ||
+    die "CyberDeck API failed health check"
+
+
+log "Running post-deployment audit"
+
+AUDIT_REPORT="$ROLLBACK/post-deploy-audit.txt"
+
+/usr/local/sbin/cyberdeck-audit |
+    tee "$AUDIT_REPORT"
+
+
+grep -q '^FAIL: 0$' "$AUDIT_REPORT" ||
+    die "CyberDeck audit reported a failure"
+
+
+trap - ERR
+
+echo
+echo "========================================"
+echo "CYBERDECK DEPLOYMENT COMPLETE"
+echo "========================================"
+echo "Commit:   $COMMIT"
+echo "Rollback: $ROLLBACK"
+echo "API:      ONLINE"
+echo "Audit:    PASS"
+echo
