@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "CyberDeck",
+    "slug": "cyberdeck",
+    "scheme": "cyberdeck",
+    "version": "0.5.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocalNetworkUsageDescription": "CyberDeck connects to your authorized CyberDeck server and lab systems.",
+        "NSAppTransportSecurity": {
+          "NSAllowsLocalNetworking": true
+        }
+      }
+    },
+    "android": {
+      "usesCleartextTraffic": true
+    },
+    "extra": {
+      "apiUrl": "http://192.168.0.124:8000"
+    }
+  }
+}

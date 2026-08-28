@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberDeck Simulator</title>
+<link rel="stylesheet" href="/static/simulator.css">
+</head>
+
+<body>
+<div id="simulator">
+
+    <div class="background-grid"></div>
+    <div class="scanlines"></div>
+
+    <div class="sim-status">
+        SIMULATION ONLY
+    </div>
+
+    <!-- PROGRAM CONSOLE -->
+    <section class="window terminal-window" id="terminalWindow">
+        <div class="titlebar drag-handle">
+            <span>Program Console</span>
+            <div class="window-controls">
+                <button class="minimize">_</button>
+                <button class="maximize">□</button>
+                <button class="close">×</button>
+            </div>
+        </div>
+
+        <div class="terminal-body" id="terminalBody">
+            <div id="terminalOutput"></div>
+            <div class="terminal-line">
+                <span class="prompt">root@cyberdeck:~# </span>
+                <span id="typedCommand"></span><span class="cursor">█</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- NETWORK VISUALIZER -->
+    <section class="window network-window" id="networkWindow">
+        <div class="titlebar drag-handle">
+            <span>Neural Network Tracing</span>
+            <div class="window-controls">
+                <button class="minimize">_</button>
+                <button class="maximize">□</button>
+                <button class="close">×</button>
+            </div>
+        </div>
+
+        <canvas id="networkCanvas"></canvas>
+
+        <div class="network-stats">
+            <span>NODES <b id="nodeCount">00</b></span>
+            <span>LINKS <b id="linkCount">00</b></span>
+            <span>TRACE <b id="traceCount">000</b></span>
+        </div>
+    </section>
+
+    <!-- MATRIX / COMPILER -->
+    <section class="window matrix-window" id="matrixWindow">
+        <div class="titlebar drag-handle">
+            <span id="matrixTitle">Compiling...</span>
+            <div class="window-controls">
+                <button class="minimize">_</button>
+                <button class="maximize">□</button>
+                <button class="close">×</button>
+            </div>
+        </div>
+
+        <canvas id="matrixCanvas"></canvas>
+    </section>
+
+    <!-- EVENT MONITOR -->
+    <section class="window event-window" id="eventWindow">
+        <div class="titlebar drag-handle">
+            <span>Event Monitor</span>
+            <div class="window-controls">
+                <button class="minimize">_</button>
+                <button class="maximize">□</button>
+                <button class="close">×</button>
+            </div>
+        </div>
+
+        <div id="eventLog"></div>
+    </section>
+
+    <!-- SCENARIO MENU -->
+    <div id="scenarioMenu" class="scenario-menu hidden">
+
+        <div class="scenario-header">
+            CYBERDECK SIMULATIONS
+            <button id="closeScenario">×</button>
+        </div>
+
+        <button data-scenario="network">
+            <b>Network Intrusion</b>
+            <span>Recon → enumeration → access simulation</span>
+        </button>
+
+        <button data-scenario="soc">
+            <b>SOC Investigation</b>
+            <span>Detection → triage → containment</span>
+        </button>
+
+        <button data-scenario="malware">
+            <b>Malware Analysis</b>
+            <span>Static → behavioral → IOC analysis</span>
+        </button>
+
+        <button data-scenario="web">
+            <b>Web Assessment</b>
+            <span>Discovery → analysis → validation</span>
+        </button>
+
+        <button data-scenario="linux">
+            <b>Linux Operations</b>
+            <span>Bash → services → logs → processes</span>
+        </button>
+
+        <button data-scenario="python">
+            <b>Python Cyber Lab</b>
+            <span>Automated analysis simulation</span>
+        </button>
+
+    </div>
+
+    <!-- TASKBAR -->
+    <footer id="taskbar">
+
+        <button id="startButton">
+            ☰ Start
+        </button>
+
+        <button id="consoleButton">
+            >_ Program Console
+        </button>
+
+        <button id="networkButton">
+            ◇ Network
+        </button>
+
+        <button id="matrixButton">
+            ▦ Compiler
+        </button>
+
+        <div class="taskbar-spacer"></div>
+
+        <span id="scenarioName">
+            NETWORK INTRUSION
+        </span>
+
+        <span id="clock"></span>
+    </footer>
+
+</div>
+
+<script src="/static/simulator.js"></script>
+</body>
+</html>
+EOF
+
+
+cat > /opt/cyberdeck/frontend/static/simulator.css <<'EOF'
+:root {
+    --green: #00ff66;
+    --green2: #00dd55;
+    --dark-green: #003d20;
+    --black: #020604;
+    --panel: rgba(2, 12, 7, 0.94);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    color: var(--green);
+    font-family:
+        "SFMono-Regular",
+        Menlo,
+        Monaco,
+        Consolas,
+        "Liberation Mono",
+        monospace;
+}
+
+body {
+    user-select: none;
+}
+
+#simulator {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    min-height: 600px;
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(0, 120, 50, .18),
+            transparent 45%
+        ),
+        linear-gradient(
+            135deg,
+            #00170c,
+            #000 70%
+        );
+}
+
+.background-grid {
+    position: absolute;
+    inset: 0;
+
+    opacity: .22;
+
+    background-image:
+        linear-gradient(
+            rgba(0,255,100,.08) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(0,255,100,.08) 1px,
+            transparent 1px
+        );
+
+    background-size: 42px 42px;
+}
+
+.scanlines {
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    z-index: 999;
+
+    opacity: .13;
+
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 3px,
+            rgba(0,0,0,.65) 4px
+        );
+}
+
+.sim-status {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+
+    color: #00ff66;
+    border: 1px solid #00ff66;
+
+    padding: 5px 10px;
+
+    font-size: 11px;
+    letter-spacing: 2px;
+
+    background: rgba(0,0,0,.75);
+
+    z-index: 80;
+}
+
+.watermark {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: 360px;
+    height: 360px;
+
+    border-radius: 50%;
+
+    border: 5px solid rgba(0,255,100,.15);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow:
+        0 0 80px rgba(0,255,100,.1),
+        inset 0 0 80px rgba(0,255,100,.08);
+}
+
+.watermark:before,
+.watermark:after {
+    content: "";
+
+    position: absolute;
+
+    border-radius: 50%;
+    border: 1px solid rgba(0,255,100,.14);
+}
+
+.watermark:before {
+    inset: 18px;
+}
+
+.watermark:after {
+    inset: 43px;
+}
+
+.watermark-inner {
+    text-align: center;
+    opacity: .22;
+}
+
+.watermark-title {
+    font-size: 34px;
+    letter-spacing: 8px;
+}
+
+.watermark-icon {
+    font-size: 110px;
+    line-height: 120px;
+}
+
+.watermark-subtitle {
+    font-size: 14px;
+    letter-spacing: 4px;
+}
+
+.window {
+    position: absolute;
+
+    border: 2px solid var(--green);
+
+    background: var(--panel);
+
+    box-shadow:
+        0 0 12px rgba(0,255,100,.16);
+
+    overflow: hidden;
+
+    z-index: 10;
+}
+
+.titlebar {
+    height: 34px;
+
+    background: var(--green);
+
+    color: #001708;
+
+    display: flex;
+    align-items: center;
+
+    padding-left: 12px;
+
+    font-size: 14px;
+
+    cursor: move;
+}
+
+.window-controls {
+    margin-left: auto;
+
+    display: flex;
+
+    height: 100%;
+}
+
+.window-controls button {
+    border: 0;
+    background: transparent;
+    color: #001708;
+
+    width: 36px;
+
+    cursor: pointer;
+
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.window-controls button:hover {
+    background: rgba(0,0,0,.2);
+}
+
+.terminal-window {
+    left: 5%;
+    top: 8%;
+
+    width: 37%;
+    height: 39%;
+}
+
+.terminal-body {
+    height: calc(100% - 34px);
+
+    padding: 12px;
+
+    overflow: hidden;
+
+    white-space: pre-wrap;
+
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.prompt {
+    color: #00ff66;
+}
+
+.cursor {
+    display: inline-block;
+
+    animation: blink .65s steps(1) infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+.network-window {
+    right: 5%;
+    top: 8%;
+
+    width: 38%;
+    height: 38%;
+}
+
+#networkCanvas {
+    width: 100%;
+    height: calc(100% - 34px);
+
+    display: block;
+}
+
+.network-stats {
+    position: absolute;
+
+    bottom: 7px;
+    left: 10px;
+
+    display: flex;
+    gap: 18px;
+
+    font-size: 10px;
+
+    background: rgba(0,0,0,.65);
+
+    padding: 4px 7px;
+}
+
+.matrix-window {
+    left: 4%;
+    bottom: 10%;
+
+    width: 38%;
+    height: 35%;
+}
+
+#matrixCanvas {
+    display: block;
+
+    width: 100%;
+    height: calc(100% - 34px);
+}
+
+.event-window {
+    right: 5%;
+    bottom: 10%;
+
+    width: 38%;
+    height: 34%;
+}
+
+#eventLog {
+    padding: 11px;
+
+    overflow: hidden;
+
+    height: calc(100% - 34px);
+
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.log-time {
+    color: #008a40;
+}
+
+.log-good {
+    color: #00ff66;
+}
+
+.log-info {
+    color: #00b84f;
+}
+
+.log-alert {
+    color: #7cffaa;
+}
+
+.scenario-menu {
+    position: absolute;
+
+    left: 14px;
+    bottom: 54px;
+
+    width: 420px;
+
+    background: rgba(0,15,7,.98);
+
+    border: 2px solid var(--green);
+
+    z-index: 500;
+
+    box-shadow: 0 0 30px rgba(0,255,100,.25);
+}
+
+.scenario-menu.hidden {
+    display: none;
+}
+
+.scenario-header {
+    background: var(--green);
+    color: black;
+
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+
+    padding-left: 12px;
+
+    font-weight: bold;
+}
+
+.scenario-header button {
+    margin-left: auto;
+
+    width: 40px;
+    height: 38px;
+
+    border: 0;
+    background: transparent;
+
+    cursor: pointer;
+
+    font-size: 20px;
+}
+
+.scenario-menu > button {
+    display: block;
+
+    width: 100%;
+
+    text-align: left;
+
+    padding: 13px 15px;
+
+    color: var(--green);
+
+    background: #010805;
+
+    border: 0;
+    border-bottom: 1px solid #084823;
+
+    cursor: pointer;
+
+    font-family: monospace;
+}
+
+.scenario-menu > button:hover {
+    background: #00381b;
+}
+
+.scenario-menu b,
+.scenario-menu span {
+    display: block;
+}
+
+.scenario-menu span {
+    opacity: .6;
+
+    margin-top: 4px;
+
+    font-size: 11px;
+}
+
+#taskbar {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    height: 45px;
+
+    background: var(--green);
+
+    color: #001608;
+
+    z-index: 400;
+
+    display: flex;
+    align-items: center;
+
+    padding: 4px 10px;
+
+    gap: 7px;
+}
+
+#taskbar button {
+    height: 34px;
+
+    border: 1px solid #003f1d;
+
+    background: #002d16;
+
+    color: #00ff66;
+
+    padding: 0 12px;
+
+    font-family: monospace;
+
+    cursor: pointer;
+}
+
+#taskbar button:hover {
+    background: #004723;
+}
+
+.taskbar-spacer {
+    flex: 1;
+}
+
+#scenarioName {
+    font-size: 11px;
+
+    padding-right: 16px;
+}
+
+#clock {
+    min-width: 76px;
+
+    font-size: 12px;
+
+    text-align: right;
+}
+
+.minimized {
+    display: none;
+}
+
+.maximized {
+    left: 1% !important;
+    top: 1% !important;
+
+    width: 98% !important;
+    height: calc(99% - 50px) !important;
+
+    z-index: 300 !important;
+}
+
+@media (max-width: 900px) {
+
+    .terminal-window,
+    .network-window,
+    .matrix-window,
+    .event-window {
+        width: 44%;
+    }
+
+    .terminal-window {
+        left: 3%;
+    }
+
+    .network-window {
+        right: 3%;
+    }
+
+    .matrix-window {
+        left: 3%;
+    }
+
+    .event-window {
+        right: 3%;
+    }
+}
+EOF
+
+
+cat > /opt/cyberdeck/frontend/static/simulator.js <<'EOF'
+(() => {
+
+"use strict";
+
+/*
+ * CYBERDECK SIMULATOR
+ *
+ * Everything in this file is visual simulation only.
+ * No shell commands are executed.
+ * No request is sent to /api/terminal/run.
+ */
+
+const terminalOutput = document.getElementById("terminalOutput");
+const typedCommand = document.getElementById("typedCommand");
+
+const eventLog = document.getElementById("eventLog");
+
+const scenarioName = document.getElementById("scenarioName");
+
+const scenarios = {
+
+network: {
+    name: "NETWORK INTRUSION",
+    steps: [
+        {
+            type: "bash",
+            command: "nmap -sV -O 198.51.100.24",
+            output: [
+                "Starting Nmap simulation...",
+                "Host 198.51.100.24 appears online",
+                "",
+                "PORT     STATE   SERVICE",
+                "22/tcp   open    ssh",
+                "80/tcp   open    http",
+                "443/tcp  open    https",
+                "",
+                "[+] Service enumeration complete"
+            ]
+        },
+        {
+            type: "bash",
+            command: "deck-enum --target 198.51.100.24 --services",
+            output: [
+                "[*] Enumerating exposed services",
+                "[+] SSH banner collected",
+                "[+] HTTP service fingerprinted",
+                "[+] TLS metadata discovered",
+                "[*] Correlating simulated findings..."
+            ]
+        },
+        {
+            type: "python",
+            command: "python3 analyze_target.py --target 198.51.100.24",
+            output: [
+                "[PYTHON] loading simulated target profile",
+                "[PYTHON] parsing service metadata",
+                "[PYTHON] evaluating exposure graph",
+                "[+] candidate attack path identified"
+            ]
+        },
+        {
+            type: "bash",
+            command: "deck-access --target 198.51.100.24 --simulate",
+            output: [
+                "[*] Initiating simulated access sequence",
+                "[*] Negotiating session...",
+                "[+] SIMULATED SESSION ESTABLISHED",
+                "",
+                "operator@sim-target:~$"
+            ]
+        }
+    ]
+},
+
+soc: {
+    name: "SOC INVESTIGATION",
+    steps: [
+        {
+            command: "soc-query --alert 49218 --timeline",
+            output: [
+                "[*] Retrieving event timeline",
+                "[+] 38 events correlated",
+                "[!] suspicious authentication pattern detected"
+            ]
+        },
+        {
+            command: "hunt --host WS-042 --process-tree",
+            output: [
+                "[*] Reconstructing process tree",
+                "[+] parent-child relationships mapped",
+                "[!] anomalous child process identified"
+            ]
+        },
+        {
+            command: "contain --host WS-042 --simulate",
+            output: [
+                "[*] Isolation request generated",
+                "[+] host logically contained",
+                "[+] investigation package created"
+            ]
+        }
+    ]
+},
+
+malware: {
+    name: "MALWARE ANALYSIS",
+    steps: [
+        {
+            command: "sample-info suspicious.bin",
+            output: [
+                "SHA256  4f96...SIMULATED",
+                "TYPE    PE32 executable",
+                "SIZE    284 KB",
+                "[*] static analysis initialized"
+            ]
+        },
+        {
+            command: "sandbox-run suspicious.bin --simulate",
+            output: [
+                "[*] launching isolated simulation",
+                "[+] filesystem events observed",
+                "[+] registry events observed",
+                "[+] network indicators generated"
+            ]
+        },
+        {
+            command: "ioc-export suspicious.bin",
+            output: [
+                "[+] simulated indicators extracted",
+                "[+] IOC package prepared",
+                "[+] analysis complete"
+            ]
+        }
+    ]
+},
+
+web: {
+    name: "WEB ASSESSMENT",
+    steps: [
+        {
+            command: "webscan https://simulated.target --profile full",
+            output: [
+                "[*] crawling simulated application",
+                "[+] 14 routes discovered",
+                "[+] 6 parameters identified",
+                "[*] beginning assessment"
+            ]
+        },
+        {
+            command: "http-analyze --target simulated.target",
+            output: [
+                "[+] headers collected",
+                "[+] framework fingerprint generated",
+                "[+] session behavior mapped"
+            ]
+        },
+        {
+            command: "deck-report --target simulated.target",
+            output: [
+                "[+] findings correlated",
+                "[+] severity model calculated",
+                "[+] assessment report generated"
+            ]
+        }
+    ]
+},
+
+linux: {
+    name: "LINUX OPERATIONS",
+    steps: [
+        {
+            command: "systemctl --type=service --state=running",
+            output: [
+                "ssh.service",
+                "postgresql.service",
+                "cyberdeck.service",
+                "networking.service",
+                "",
+                "4 services listed."
+            ]
+        },
+        {
+            command: "journalctl -n 12 --no-pager",
+            output: [
+                "systemd: Started CyberDeck service",
+                "kernel: network interface initialized",
+                "cyberdeck: simulator module ready"
+            ]
+        },
+        {
+            command: "ps aux --sort=-%cpu | head",
+            output: [
+                "root      cyberdeck-api",
+                "postgres  postgres",
+                "root      simulator-worker",
+                "root      systemd"
+            ]
+        }
+    ]
+},
+
+python: {
+    name: "PYTHON CYBER LAB",
+    steps: [
+        {
+            command: "python3 telemetry.py",
+            output: [
+                "importing telemetry engine...",
+                "loading simulated packets...",
+                "normalizing events...",
+                "building network graph..."
+            ]
+        },
+        {
+            command: "python3 detect.py --dataset simulation.json",
+            output: [
+                "model initialized",
+                "events analyzed: 8192",
+                "anomalies detected: 7",
+                "confidence: 97.4%"
+            ]
+        },
+        {
+            command: "python3 report.py",
+            output: [
+                "building incident summary...",
+                "mapping observations...",
+                "report complete."
+            ]
+        }
+    ]
+}
+
+};
+
+let currentScenario = scenarios.network;
+let currentStep = 0;
+let typedIndex = 0;
+let waitingForEnter = false;
+let outputAnimating = false;
+
+function setScenario(key) {
+
+    if (!scenarios[key]) return;
+
+    currentScenario = scenarios[key];
+
+    currentStep = 0;
+    typedIndex = 0;
+    waitingForEnter = false;
+    outputAnimating = false;
+
+    terminalOutput.textContent = "";
+
+    typedCommand.textContent = "";
+
+    scenarioName.textContent = currentScenario.name;
+
+    addEvent(
+        "INFO",
+        "scenario loaded: " + currentScenario.name
+    );
+
+    document
+        .getElementById("scenarioMenu")
+        .classList.add("hidden");
+}
+
+function currentCommand() {
+
+    if (currentStep >= currentScenario.steps.length) {
+        return "";
+    }
+
+    return currentScenario.steps[currentStep].command;
+}
+
+document.addEventListener("keydown", event => {
+
+    const target = event.target;
+
+    if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT"
+    ) {
+        return;
+    }
+
+    if (event.key === "Escape") {
+
+        document
+            .getElementById("scenarioMenu")
+            .classList.toggle("hidden");
+
+        return;
+    }
+
+    if (outputAnimating) {
+        return;
+    }
+
+    if (currentStep >= currentScenario.steps.length) {
+
+        if (event.key.toLowerCase() === "r") {
+            setScenario(
+                Object.keys(scenarios).find(
+                    key => scenarios[key] === currentScenario
+                ) || "network"
+            );
+        }
+
+        return;
+    }
+
+    if (waitingForEnter) {
+
+        if (event.key === "Enter") {
+
+            event.preventDefault();
+
+            playOutput();
+        }
+
+        return;
+    }
+
+    if (
+        event.ctrlKey ||
+        event.metaKey ||
+        event.altKey
+    ) {
+        return;
+    }
+
+    if (event.key.length !== 1) {
+        return;
+    }
+
+    event.preventDefault();
+
+    const command = currentCommand();
+
+    const characters =
+        Math.floor(Math.random() * 5) + 2;
+
+    typedIndex = Math.min(
+        command.length,
+        typedIndex + characters
+    );
+
+    typedCommand.textContent =
+        command.slice(0, typedIndex);
+
+    if (typedIndex >= command.length) {
+
+        waitingForEnter = true;
+
+        addEvent(
+            "READY",
+            "command buffer complete"
+        );
+    }
+});
+
+async function playOutput() {
+
+    outputAnimating = true;
+
+    waitingForEnter = false;
+
+    const step =
+        currentScenario.steps[currentStep];
+
+    terminalOutput.textContent +=
+        "root@cyberdeck:~# " +
+        step.command +
+        "\n";
+
+    typedCommand.textContent = "";
+
+    await sleep(150);
+
+    for (const line of step.output) {
+
+        await typeOutputLine(line);
+
+        terminalOutput.textContent += "\n";
+
+        scrollTerminal();
+
+        if (line.includes("[+]")) {
+            addEvent("OK", stripMarkup(line));
+        }
+
+        if (line.includes("[!]")) {
+            addEvent("ALERT", stripMarkup(line));
+        }
+    }
+
+    terminalOutput.textContent += "\n";
+
+    currentStep++;
+    typedIndex = 0;
+
+    if (currentStep >= currentScenario.steps.length) {
+
+        terminalOutput.textContent +=
+            "[ SIMULATION COMPLETE ]\n" +
+            "Press R to restart scenario.\n\n";
+
+        addEvent(
+            "DONE",
+            currentScenario.name + " completed"
+        );
+    }
+
+    outputAnimating = false;
+}
+
+async function typeOutputLine(line) {
+
+    for (const char of line) {
+
+        terminalOutput.textContent += char;
+
+        scrollTerminal();
+
+        await sleep(
+            Math.floor(Math.random() * 16) + 4
+        );
+    }
+
+    await sleep(
+        Math.floor(Math.random() * 140) + 70
+    );
+}
+
+function scrollTerminal() {
+
+    const body =
+        document.getElementById("terminalBody");
+
+    body.scrollTop =
+        body.scrollHeight;
+}
+
+function stripMarkup(line) {
+
+    return line
+        .replace("[+]", "")
+        .replace("[!]", "")
+        .replace("[*]", "")
+        .trim();
+}
+
+function sleep(ms) {
+
+    return new Promise(resolve =>
+        setTimeout(resolve, ms)
+    );
+}
+
+/* ==========================
+   EVENT MONITOR
+   ========================== */
+
+const simulatedEvents = [
+    "packet stream synchronized",
+    "telemetry buffer updated",
+    "node heartbeat received",
+    "routing table analyzed",
+    "service metadata indexed",
+    "trace vector recalculated",
+    "sensor channel active",
+    "event correlation running",
+    "session metadata received",
+    "analysis engine heartbeat"
+];
+
+function addEvent(type, message) {
+
+    const time =
+        new Date().toLocaleTimeString(
+            [],
+            {
+                hour12: false
+            }
+        );
+
+    const line =
+        document.createElement("div");
+
+    let cls = "log-info";
+
+    if (type === "OK") cls = "log-good";
+    if (type === "ALERT") cls = "log-alert";
+
+    line.innerHTML =
+        `<span class="log-time">${time}</span> ` +
+        `<span class="${cls}">[${type}]</span> ` +
+        escapeHtml(message);
+
+    eventLog.appendChild(line);
+
+    while (
+        eventLog.children.length > 18
+    ) {
+        eventLog.removeChild(
+            eventLog.firstChild
+        );
+    }
+
+    eventLog.scrollTop =
+        eventLog.scrollHeight;
+}
+
+function escapeHtml(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+}
+
+setInterval(() => {
+
+    const event =
+        simulatedEvents[
+            Math.floor(
+                Math.random() *
+                simulatedEvents.length
+            )
+        ];
+
+    addEvent("INFO", event);
+
+}, 2300);
+
+
+/* ==========================
+   NETWORK VISUALIZER
+   ========================== */
+
+const networkCanvas =
+    document.getElementById("networkCanvas");
+
+const nctx =
+    networkCanvas.getContext("2d");
+
+let nodes = [];
+let traceCounter = 0;
+
+function resizeNetwork() {
+
+    const rect =
+        networkCanvas.getBoundingClientRect();
+
+    const ratio =
+        window.devicePixelRatio || 1;
+
+    networkCanvas.width =
+        rect.width * ratio;
+
+    networkCanvas.height =
+        rect.height * ratio;
+
+    nctx.setTransform(
+        ratio,
+        0,
+        0,
+        ratio,
+        0,
+        0
+    );
+
+    buildNodes(rect.width, rect.height);
+}
+
+function buildNodes(width, height) {
+
+    nodes = [];
+
+    const count =
+        Math.max(
+            18,
+            Math.floor(width / 18)
+        );
+
+    for (
+        let i = 0;
+        i < count;
+        i++
+    ) {
+
+        nodes.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx:
+                (Math.random() - .5) *
+                .45,
+            vy:
+                (Math.random() - .5) *
+                .45,
+            radius:
+                Math.random() * 2 + 1
+        });
+    }
+
+    document.getElementById(
+        "nodeCount"
+    ).textContent =
+        String(nodes.length)
+            .padStart(2, "0");
+}
+
+function animateNetwork() {
+
+    const rect =
+        networkCanvas.getBoundingClientRect();
+
+    const width = rect.width;
+    const height = rect.height;
+
+    nctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    let links = 0;
+
+    for (
+        let i = 0;
+        i < nodes.length;
+        i++
+    ) {
+
+        const a = nodes[i];
+
+        a.x += a.vx;
+        a.y += a.vy;
+
+        if (
+            a.x <= 0 ||
+            a.x >= width
+        ) {
+            a.vx *= -1;
+        }
+
+        if (
+            a.y <= 0 ||
+            a.y >= height
+        ) {
+            a.vy *= -1;
+        }
+
+        for (
+            let j = i + 1;
+            j < nodes.length;
+            j++
+        ) {
+
+            const b = nodes[j];
+
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+
+            const dist =
+                Math.sqrt(
+                    dx * dx +
+                    dy * dy
+                );
+
+            if (dist < 95) {
+
+                links++;
+
+                const alpha =
+                    1 - dist / 95;
+
+                nctx.beginPath();
+
+                nctx.moveTo(
+                    a.x,
+                    a.y
+                );
+
+                nctx.lineTo(
+                    b.x,
+                    b.y
+                );
+
+                nctx.strokeStyle =
+                    `rgba(0,255,100,${alpha * .5})`;
+
+                nctx.lineWidth = 1;
+
+                nctx.stroke();
+            }
+        }
+    }
+
+    for (const node of nodes) {
+
+        nctx.beginPath();
+
+        nctx.arc(
+            node.x,
+            node.y,
+            node.radius,
+            0,
+            Math.PI * 2
+        );
+
+        nctx.fillStyle = "#00ff66";
+
+        nctx.fill();
+    }
+
+    document.getElementById(
+        "linkCount"
+    ).textContent =
+        String(links)
+            .padStart(2, "0");
+
+    traceCounter +=
+        Math.floor(
+            Math.random() * 3
+        );
+
+    document.getElementById(
+        "traceCount"
+    ).textContent =
+        String(traceCounter % 1000)
+            .padStart(3, "0");
+
+    requestAnimationFrame(
+        animateNetwork
+    );
+}
+
+
+/* ==========================
+   MATRIX / COMPILER
+   ========================== */
+
+const matrixCanvas =
+    document.getElementById("matrixCanvas");
+
+const mctx =
+    matrixCanvas.getContext("2d");
+
+let drops = [];
+
+const characters =
+    "01ABCDEF{}[]<>/\\$#@%&*" +
+    "アイウエオカキクケコ" +
+    "λπΣΩЖЙД";
+
+function resizeMatrix() {
+
+    const rect =
+        matrixCanvas.getBoundingClientRect();
+
+    const ratio =
+        window.devicePixelRatio || 1;
+
+    matrixCanvas.width =
+        rect.width * ratio;
+
+    matrixCanvas.height =
+        rect.height * ratio;
+
+    mctx.setTransform(
+        ratio,
+        0,
+        0,
+        ratio,
+        0,
+        0
+    );
+
+    const columns =
+        Math.floor(
+            rect.width / 15
+        );
+
+    drops =
+        new Array(columns)
+            .fill(1)
+            .map(
+                () =>
+                    Math.random() *
+                    -20
+            );
+}
+
+function drawMatrix() {
+
+    const rect =
+        matrixCanvas.getBoundingClientRect();
+
+    mctx.fillStyle =
+        "rgba(0,8,4,.14)";
+
+    mctx.fillRect(
+        0,
+        0,
+        rect.width,
+        rect.height
+    );
+
+    mctx.font =
+        "14px monospace";
+
+    for (
+        let i = 0;
+        i < drops.length;
+        i++
+    ) {
+
+        const char =
+            characters[
+                Math.floor(
+                    Math.random() *
+                    characters.length
+                )
+            ];
+
+        mctx.fillStyle =
+            Math.random() > .93
+                ? "#d8ffe8"
+                : "#00ff66";
+
+        mctx.fillText(
+            char,
+            i * 15,
+            drops[i] * 15
+        );
+
+        if (
+            drops[i] * 15 >
+                rect.height &&
+            Math.random() > .975
+        ) {
+            drops[i] = 0;
+        }
+
+        drops[i]++;
+    }
+}
+
+setInterval(
+    drawMatrix,
+    48
+);
+
+
+/* ==========================
+   WINDOW CONTROLS
+   ========================== */
+
+document.querySelectorAll(
+    ".window"
+).forEach(makeWindowInteractive);
+
+function makeWindowInteractive(win) {
+
+    const handle =
+        win.querySelector(
+            ".drag-handle"
+        );
+
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    handle.addEventListener(
+        "mousedown",
+        event => {
+
+            if (
+                event.target.tagName ===
+                "BUTTON"
+            ) {
+                return;
+            }
+
+            if (
+                win.classList.contains(
+                    "maximized"
+                )
+            ) {
+                return;
+            }
+
+            dragging = true;
+
+            const rect =
+                win.getBoundingClientRect();
+
+            offsetX =
+                event.clientX -
+                rect.left;
+
+            offsetY =
+                event.clientY -
+                rect.top;
+
+            bringToFront(win);
+        }
+    );
+
+    document.addEventListener(
+        "mousemove",
+        event => {
+
+            if (!dragging) return;
+
+            const maxX =
+                window.innerWidth -
+                win.offsetWidth;
+
+            const maxY =
+                window.innerHeight -
+                win.offsetHeight -
+                45;
+
+            win.style.left =
+                Math.max(
+                    0,
+                    Math.min(
+                        maxX,
+                        event.clientX -
+                            offsetX
+                    )
+                ) + "px";
+
+            win.style.top =
+                Math.max(
+                    0,
+                    Math.min(
+                        maxY,
+                        event.clientY -
+                            offsetY
+                    )
+                ) + "px";
+
+            win.style.right =
+                "auto";
+
+            win.style.bottom =
+                "auto";
+        }
+    );
+
+    document.addEventListener(
+        "mouseup",
+        () => {
+            dragging = false;
+        }
+    );
+
+    win.addEventListener(
+        "mousedown",
+        () => bringToFront(win)
+    );
+
+    const minimize =
+        win.querySelector(
+            ".minimize"
+        );
+
+    const maximize =
+        win.querySelector(
+            ".maximize"
+        );
+
+    const close =
+        win.querySelector(
+            ".close"
+        );
+
+    minimize.addEventListener(
+        "click",
+        () => {
+            win.classList.add(
+                "minimized"
+            );
+        }
+    );
+
+    close.addEventListener(
+        "click",
+        () => {
+            win.classList.add(
+                "minimized"
+            );
+        }
+    );
+
+    maximize.addEventListener(
+        "click",
+        () => {
+
+            win.classList.toggle(
+                "maximized"
+            );
+
+            setTimeout(() => {
+
+                resizeNetwork();
+                resizeMatrix();
+
+            }, 40);
+        }
+    );
+}
+
+let zIndex = 20;
+
+function bringToFront(win) {
+
+    zIndex++;
+
+    win.style.zIndex =
+        String(zIndex);
+}
+
+function showWindow(id) {
+
+    const win =
+        document.getElementById(id);
+
+    win.classList.remove(
+        "minimized"
+    );
+
+    bringToFront(win);
+
+    setTimeout(() => {
+
+        resizeNetwork();
+        resizeMatrix();
+
+    }, 30);
+}
+
+
+/* ==========================
+   TASKBAR
+   ========================== */
+
+document
+    .getElementById("startButton")
+    .addEventListener(
+        "click",
+        () => {
+
+            document
+                .getElementById(
+                    "scenarioMenu"
+                )
+                .classList.toggle(
+                    "hidden"
+                );
+        }
+    );
+
+document
+    .getElementById(
+        "closeScenario"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            document
+                .getElementById(
+                    "scenarioMenu"
+                )
+                .classList.add(
+                    "hidden"
+                );
+        }
+    );
+
+document
+    .querySelectorAll(
+        "[data-scenario]"
+    )
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                setScenario(
+                    button.dataset.scenario
+                );
+            }
+        );
+    });
+
+document
+    .getElementById(
+        "consoleButton"
+    )
+    .addEventListener(
+        "click",
+        () =>
+            showWindow(
+                "terminalWindow"
+            )
+    );
+
+document
+    .getElementById(
+        "networkButton"
+    )
+    .addEventListener(
+        "click",
+        () =>
+            showWindow(
+                "networkWindow"
+            )
+    );
+
+document
+    .getElementById(
+        "matrixButton"
+    )
+    .addEventListener(
+        "click",
+        () =>
+            showWindow(
+                "matrixWindow"
+            )
+    );
+
+
+/* ==========================
+   CLOCK
+   ========================== */
+
+function updateClock() {
+
+    document.getElementById(
+        "clock"
+    ).textContent =
+        new Date()
+            .toLocaleTimeString(
+                [],
+                {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+                }
+            );
+}
+
+setInterval(
+    updateClock,
+    1000
+);
+
+updateClock();
+
+
+/* ==========================
+   INITIALIZATION
+   ========================== */
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        resizeNetwork();
+        resizeMatrix();
+    }
+);
+
+resizeNetwork();
+resizeMatrix();
+
+requestAnimationFrame(
+    animateNetwork
+);
+
+setScenario("network");
+
+addEvent(
+    "OK",
+    "CyberDeck simulator initialized"
+);
+
+addEvent(
+    "INFO",
+    "keyboard simulation engine online"
+);
+
+})();
+EOF
+
+echo
+echo "CyberDeck simulator files installed:"
+echo "  /opt/cyberdeck/frontend/simulator.html"
+echo "  /opt/cyberdeck/frontend/static/simulator.css"
+echo "  /opt/cyberdeck/frontend/static/simulator.js"

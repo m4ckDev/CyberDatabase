@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<link rel="stylesheet" href="/static/cyberdeck.css">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<a href="/dashboard">back</a>
+</header>
+
+<main>
+
+<h1>logs</h1>
+<div id="logs"></div>
+
+</main>
+
+<script src="/static/common.js"></script>
+
+<script>
+async function load(){
+
+const r=
+await CD.api("/api/logs");
+
+const rows=
+await r.json();
+
+const box=
+document.getElementById(
+"logs"
+);
+
+box.innerHTML="";
+
+rows.forEach(log=>{
+
+const row=
+document.createElement(
+"div"
+);
+
+row.className="row";
+
+row.innerHTML=
+`<div>
+${log.method}
+&nbsp;
+${log.path}
+</div>
+<div class="small">
+${log.username||"-"}
+&nbsp;
+${log.ip||"-"}
+&nbsp;
+${log.status}
+&nbsp;
+${new Date(log.created_at).toLocaleString()}
+</div>`;
+
+box.appendChild(row);
+
+});
+
+}
+
+load();
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

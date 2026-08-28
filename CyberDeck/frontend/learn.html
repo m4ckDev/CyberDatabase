@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<link rel="stylesheet" href="/static/cyberdeck.css">
+</head>
+
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<a href="/dashboard">back</a>
+</header>
+
+<main>
+
+<h1>learn</h1>
+
+<div class="form-grid">
+
+<input id="search" placeholder="search">
+
+<select id="category">
+<option value="">all</option>
+</select>
+
+</div>
+
+<div id="entries"></div>
+
+</main>
+
+<script src="/static/common.js"></script>
+
+<script>
+async function loadCategories(){
+
+const r=await CD.api("/api/learn/categories");
+const data=await r.json();
+
+const select=document.getElementById("category");
+
+data.forEach(c=>{
+const option=document.createElement("option");
+option.value=c.name;
+option.textContent=c.name;
+select.appendChild(option);
+});
+
+}
+
+async function load(){
+
+const q=document.getElementById("search").value.trim();
+const category=document.getElementById("category").value;
+
+const params=new URLSearchParams();
+
+if(q) params.set("q",q);
+if(category) params.set("category",category);
+
+const r=await CD.api("/api/learn?"+params.toString());
+const rows=await r.json();
+
+const box=document.getElementById("entries");
+box.innerHTML="";
+
+rows.forEach(e=>{
+
+const row=document.createElement("div");
+row.className="row";
+
+const title=document.createElement("div");
+title.className="value";
+title.textContent=e.title;
+
+const cat=document.createElement("div");
+cat.className="small";
+cat.textContent=e.category;
+
+row.append(title,cat);
+
+if(e.command){
+
+const command=document.createElement("pre");
+command.textContent=e.command;
+row.appendChild(command);
+
+const copy=document.createElement("button");
+copy.textContent="copy";
+copy.onclick=()=>navigator.clipboard.writeText(e.command);
+
+row.appendChild(copy);
+}
+
+const description=document.createElement("div");
+description.textContent=e.description || "";
+row.appendChild(description);
+
+if(e.example){
+
+const example=document.createElement("div");
+example.className="small";
+example.textContent="example: "+e.example;
+row.appendChild(example);
+
+}
+
+box.appendChild(row);
+
+});
+
+}
+
+document.getElementById("search").addEventListener("input",load);
+document.getElementById("category").addEventListener("change",load);
+
+loadCategories().then(load);
+</script>
+
+</body>
+</html>

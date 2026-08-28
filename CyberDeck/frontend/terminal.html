@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:#000;
+color:#aaa;
+font:13px monospace;
+}
+
+header{
+padding:25px 30px;
+border-bottom:1px solid #181818;
+display:flex;
+justify-content:space-between;
+}
+
+.logo{
+color:#ddd;
+letter-spacing:3px;
+}
+
+a{
+color:#666;
+text-decoration:none;
+margin-left:20px;
+}
+
+main{
+max-width:1100px;
+margin:auto;
+padding:30px;
+}
+
+#screen{
+min-height:65vh;
+white-space:pre-wrap;
+word-break:break-word;
+line-height:1.5;
+}
+
+.prompt{
+display:flex;
+border-top:1px solid #181818;
+padding-top:15px;
+}
+
+.label{
+color:#666;
+white-space:nowrap;
+padding:10px 8px 10px 0;
+}
+
+input{
+flex:1;
+background:#000;
+border:0;
+outline:none;
+color:#ddd;
+font:13px monospace;
+padding:10px 0;
+}
+</style>
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">CYBERDECK</div>
+
+<div>
+<a href="/tools">tools</a>
+<a href="/dashboard">back</a>
+</div>
+
+</header>
+
+<main>
+
+<div id="screen">CyberDeck command console
+admin session / non-root shell
+
+</div>
+
+<div class="prompt">
+
+<div class="label">
+cyberdeck@terminal:~$
+</div>
+
+<input id="command"
+autocomplete="off"
+autocapitalize="off"
+spellcheck="false"
+autofocus>
+
+</div>
+
+</main>
+
+<script>
+const token=sessionStorage.getItem("cyberdeck_token");
+
+if(!token){
+location="/";
+}
+
+const input=document.getElementById("command");
+const screen=document.getElementById("screen");
+
+const history=[];
+let historyIndex=0;
+
+
+async function run(){
+
+const command=input.value.trim();
+
+if(!command){
+return;
+}
+
+input.value="";
+
+if(command==="clear"){
+screen.textContent="";
+return;
+}
+
+history.push(command);
+historyIndex=history.length;
+
+screen.textContent+=
+"cyberdeck@terminal:~$ "+
+command+"\n";
+
+const response=await fetch("/api/terminal/run",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+token
+},
+
+body:JSON.stringify({
+command
+})
+
+});
+
+const data=await response.json();
+
+if(!response.ok){
+screen.textContent+=
+(data.detail || "failed")+
+"\n\n";
+}else{
+screen.textContent+=
+(data.output || "")+
+"\n\n";
+}
+
+window.scrollTo(0,document.body.scrollHeight);
+}
+
+
+input.addEventListener("keydown",event=>{
+
+if(event.key==="Enter"){
+event.preventDefault();
+run();
+}
+
+if(event.key==="ArrowUp"){
+
+event.preventDefault();
+
+if(historyIndex>0){
+historyIndex--;
+input.value=history[historyIndex];
+}
+
+}
+
+if(event.key==="ArrowDown"){
+
+event.preventDefault();
+
+if(historyIndex<history.length-1){
+historyIndex++;
+input.value=history[historyIndex];
+}else{
+historyIndex=history.length;
+input.value="";
+}
+
+}
+
+});
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

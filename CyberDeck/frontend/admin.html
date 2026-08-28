@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<style>
+body{margin:0;background:#000;color:#888;font:13px monospace}
+header{padding:25px 30px;border-bottom:1px solid #181818;display:flex;justify-content:space-between}
+a,button{background:#000;color:#777;border:1px solid #222;padding:9px 12px;font:12px monospace;text-decoration:none}
+main{max-width:800px;margin:auto;padding:45px 30px}
+h2{font-size:13px;color:#bbb;font-weight:normal;letter-spacing:2px}
+.row{padding:14px 0;border-bottom:1px solid #181818;display:flex;justify-content:space-between}
+#invite{margin:25px 0;color:#bbb;word-break:break-all}
+</style>
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+<body>
+
+<header>
+<div>CYBERDECK</div>
+<a href="/dashboard">back</a>
+</header>
+
+<main>
+
+<h2>ACCESS</h2>
+
+<button onclick="createInvite()">create invite</button>
+
+<div id="invite"></div>
+
+<h2>USERS</h2>
+
+<div id="users"></div>
+
+</main>
+
+<script>
+const token=sessionStorage.getItem("cyberdeck_token");
+if(!token) location="/";
+
+async function loadUsers(){
+const r=await fetch("/api/admin/users",{
+headers:{"Authorization":"Bearer "+token}
+});
+
+if(!r.ok){
+location="/dashboard";
+return;
+}
+
+const users=await r.json();
+const box=document.getElementById("users");
+box.innerHTML="";
+
+users.forEach(u=>{
+const row=document.createElement("div");
+row.className="row";
+
+const left=document.createElement("span");
+left.textContent=u.username;
+
+const right=document.createElement("span");
+right.textContent=u.is_admin ? "admin" : "user";
+
+row.append(left,right);
+box.appendChild(row);
+});
+}
+
+async function createInvite(){
+
+const r=await fetch("/api/admin/invites",{
+method:"POST",
+headers:{"Authorization":"Bearer "+token}
+});
+
+const data=await r.json();
+
+if(!r.ok){
+document.getElementById("invite").textContent=data.detail || "failed";
+return;
+}
+
+const url=
+location.origin+
+"/invite?token="+
+encodeURIComponent(data.token);
+
+document.getElementById("invite").textContent=url;
+}
+
+loadUsers();
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

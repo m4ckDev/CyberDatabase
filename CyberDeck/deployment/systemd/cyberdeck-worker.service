@@ -1,0 +1,16 @@
+[Unit]
+Description=CyberDeck Background Worker
+After=network.target postgresql.service cyberdeck.service
+Requires=postgresql.service
+
+[Service]
+User=cyberdeck
+Group=cyberdeck
+WorkingDirectory=/opt/cyberdeck/api
+EnvironmentFile=/opt/cyberdeck/config/.env
+ExecStart=/opt/cyberdeck/venv/bin/python /opt/cyberdeck/api/worker.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

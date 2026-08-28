@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<style>
+body{margin:0;background:#000;color:#888;font:13px monospace;height:100vh;display:flex;align-items:center;justify-content:center}
+main{width:300px}
+h1{font-size:15px;font-weight:normal;color:#bbb;letter-spacing:3px;margin-bottom:30px}
+input{width:100%;box-sizing:border-box;background:#000;border:0;border-bottom:1px solid #333;color:#bbb;font:13px monospace;padding:12px 2px;margin:10px 0;outline:none}
+button{margin-top:20px;background:#000;border:1px solid #333;color:#888;font:12px monospace;padding:10px 14px}
+#status{margin-top:20px;color:#777}
+</style>
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+<body>
+
+<main>
+
+<h1>CYBERDECK</h1>
+
+<input id="username" placeholder="username">
+<input id="password" type="password" placeholder="password">
+<input id="confirm" type="password" placeholder="confirm password">
+
+<button onclick="register()">create account</button>
+
+<div id="status"></div>
+
+</main>
+
+<script>
+const params=new URLSearchParams(location.search);
+const token=params.get("token");
+
+async function register(){
+
+const username=document.getElementById("username").value.trim();
+const password=document.getElementById("password").value;
+const confirm=document.getElementById("confirm").value;
+const status=document.getElementById("status");
+
+if(password!==confirm){
+status.textContent="passwords do not match";
+return;
+}
+
+const r=await fetch("/api/register",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({token,username,password})
+});
+
+const data=await r.json();
+
+if(!r.ok){
+status.textContent=data.detail || "registration failed";
+return;
+}
+
+status.textContent="account created";
+
+setTimeout(()=>{
+location="/";
+},1200);
+}
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

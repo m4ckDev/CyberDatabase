@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<style>
+body{margin:0;background:#000;color:#888;font:13px monospace}
+header{padding:25px 30px;border-bottom:1px solid #181818;display:flex;justify-content:space-between}
+a,button{background:#000;color:#777;border:1px solid #222;padding:9px 12px;font:12px monospace;text-decoration:none}
+main{max-width:800px;margin:auto;padding:45px 30px}
+h2{font-size:13px;color:#bbb;font-weight:normal;letter-spacing:2px}
+.lab{padding:18px 0;border-bottom:1px solid #181818}
+.name{color:#bbb;margin-bottom:6px}
+.desc{color:#666}
+</style>
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+<body>
+
+<header>
+<div>CYBERDECK</div>
+<a href="/dashboard">back</a>
+</header>
+
+<main>
+<h2>LABS</h2>
+
+<button onclick="createLab()">+ lab</button>
+
+<div id="labs" style="margin-top:25px"></div>
+</main>
+
+<script>
+const token=sessionStorage.getItem("cyberdeck_token");
+if(!token) location="/";
+
+async function loadLabs(){
+const r=await fetch("/api/labs",{
+headers:{"Authorization":"Bearer "+token}
+});
+
+const labs=await r.json();
+const box=document.getElementById("labs");
+box.innerHTML="";
+
+labs.forEach(lab=>{
+const item=document.createElement("div");
+item.className="lab";
+item.style.cursor="pointer";
+item.onclick=()=>location="/lab?id="+lab.id;
+
+const name=document.createElement("div");
+name.className="name";
+name.textContent=lab.name;
+
+const desc=document.createElement("div");
+desc.className="desc";
+desc.textContent=lab.description || "no description";
+
+item.append(name,desc);
+box.appendChild(item);
+});
+}
+
+async function createLab(){
+const name=prompt("lab name");
+if(!name) return;
+
+const description=prompt("description","") || "";
+
+await fetch("/api/labs",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+token
+},
+body:JSON.stringify({name,description})
+});
+
+loadLabs();
+}
+
+loadLabs();
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

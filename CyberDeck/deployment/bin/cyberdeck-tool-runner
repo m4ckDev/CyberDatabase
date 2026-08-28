@@ -1,0 +1,394 @@
+#!/usr/bin/python3
+
+import re
+import shutil
+import subprocess
+import sys
+
+
+ACTION = sys.argv[1] if len(sys.argv) > 1 else ""
+TARGET = sys.argv[2].strip() if len(sys.argv) > 2 else ""
+
+TARGET_ACTIONS = {
+    "ping",
+    "dns",
+    "reverse",
+    "trace",
+    "whois",
+    "host_discovery",
+    "nmap_quick",
+    "nmap_full",
+    "nmap_service",
+    "nmap_os",
+    "nmap_udp",
+    "nmap_safe",
+    "nmap_vuln",
+    "http_headers",
+    "https_headers",
+    "tls",
+    "nikto_http",
+    "nikto_https",
+    "gobuster_http",
+    "gobuster_https",
+    "ssh_check",
+    "ssh_fingerprint",
+    "ftp_check",
+    "dns_check",
+    "kerberos_check",
+    "http_check",
+    "https_check",
+    "smb_check",
+    "smb_info",
+    "mysql_check",
+    "postgres_check",
+    "mssql_check",
+    "ldap_check",
+    "ldaps_check",
+    "rdp_check",
+    "winrm_check",
+    "winrms_check",
+    "vnc_check",
+    "snmp_check",
+    "capture50",
+}
+
+TARGETLESS = {
+    "interfaces",
+    "routes",
+    "neighbors",
+}
+
+if ACTION not in TARGET_ACTIONS | TARGETLESS:
+    print("unknown action")
+    sys.exit(2)
+
+
+def valid_target(value):
+    if not value:
+        return False
+
+    if len(value) > 255:
+        return False
+
+    if value.startswith("-"):
+        return False
+
+    return bool(
+        re.fullmatch(
+            r"[A-Za-z0-9._:\-/]+",
+            value
+        )
+    )
+
+
+if ACTION in TARGET_ACTIONS and not valid_target(TARGET):
+    print("invalid target")
+    sys.exit(2)
+
+
+def require(binary):
+    path = shutil.which(binary)
+
+    if not path:
+        print(f"{binary}: not installed")
+        sys.exit(127)
+
+    return path
+
+
+def execute(command, timeout=240):
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=timeout
+        )
+    except subprocess.TimeoutExpired:
+        print("command timed out")
+        sys.exit(124)
+
+    if result.stdout:
+        print(result.stdout.rstrip())
+
+    if result.stderr:
+        print(result.stderr.rstrip())
+
+    sys.exit(result.returncode)
+
+
+if ACTION == "interfaces":
+    execute(["ip", "-br", "addr"])
+
+if ACTION == "routes":
+    execute(["ip", "route"])
+
+if ACTION == "neighbors":
+    execute(["ip", "neigh"])
+
+if ACTION == "ping":
+    execute(["ping", "-c", "4", "-W", "2", TARGET])
+
+if ACTION == "dns":
+    execute(["dig", TARGET])
+
+if ACTION == "reverse":
+    execute(["dig", "-x", TARGET, "+short"])
+
+if ACTION == "trace":
+    execute(["traceroute", "-m", "20", TARGET])
+
+if ACTION == "whois":
+    execute(["whois", TARGET])
+
+if ACTION == "host_discovery":
+    execute(["nmap", "-sn", TARGET])
+
+if ACTION == "nmap_quick":
+    execute([
+        "nmap",
+        "-T4",
+        "--top-ports",
+        "1000",
+        "--reason",
+        TARGET
+    ])
+
+if ACTION == "nmap_full":
+    execute([
+        "nmap",
+        "-T4",
+        "-p-",
+        "--min-rate",
+        "1000",
+        "--reason",
+        TARGET
+    ])
+
+if ACTION == "nmap_service":
+    execute([
+        "nmap",
+        "-sV",
+        "-sC",
+        "--reason",
+        TARGET
+    ])
+
+if ACTION == "nmap_os":
+    execute([
+        "nmap",
+        "-O",
+        "--osscan-guess",
+        TARGET
+    ])
+
+if ACTION == "nmap_udp":
+    execute([
+        "nmap",
+        "-sU",
+        "--top-ports",
+        "50",
+        "--reason",
+        TARGET
+    ])
+
+if ACTION == "nmap_safe":
+    execute([
+        "nmap",
+        "--script",
+        "default,safe",
+        TARGET
+    ])
+
+if ACTION == "nmap_vuln":
+    execute([
+        "nmap",
+        "--script",
+        "vuln",
+        TARGET
+    ])
+
+if ACTION == "http_headers":
+    execute([
+        "curl",
+        "-sS",
+        "-I",
+        "--max-time",
+        "12",
+        "http://" + TARGET
+    ])
+
+if ACTION == "https_headers":
+    execute([
+        "curl",
+        "-k",
+        "-sS",
+        "-I",
+        "--max-time",
+        "12",
+        "https://" + TARGET
+    ])
+
+if ACTION == "tls":
+    host = TARGET
+
+    if ":" not in TARGET:
+        connection = TARGET + ":443"
+    else:
+        connection = TARGET
+
+    first = subprocess.run(
+        [
+            "openssl",
+            "s_client",
+            "-connect",
+            connection,
+            "-servername",
+            host.split(":")[0],
+            "-showcerts"
+        ],
+        input="",
+        capture_output=True,
+        text=True,
+        timeout=15
+    )
+
+    second = subprocess.run(
+        [
+            "openssl",
+            "x509",
+            "-noout",
+            "-subject",
+            "-issuer",
+            "-dates",
+            "-serial",
+            "-fingerprint",
+            "-sha256"
+        ],
+        input=first.stdout,
+        capture_output=True,
+        text=True,
+        timeout=10
+    )
+
+    print(second.stdout or second.stderr)
+    sys.exit(second.returncode)
+
+if ACTION == "nikto_http":
+    require("nikto")
+    execute([
+        "nikto",
+        "-host",
+        "http://" + TARGET
+    ])
+
+if ACTION == "nikto_https":
+    require("nikto")
+    execute([
+        "nikto",
+        "-host",
+        "https://" + TARGET
+    ])
+
+if ACTION == "gobuster_http":
+    require("gobuster")
+    execute([
+        "gobuster",
+        "dir",
+        "-q",
+        "-u",
+        "http://" + TARGET,
+        "-w",
+        "/opt/cyberdeck/knowledge/common-web-paths.txt",
+        "-t",
+        "20"
+    ])
+
+if ACTION == "gobuster_https":
+    require("gobuster")
+    execute([
+        "gobuster",
+        "dir",
+        "-q",
+        "-k",
+        "-u",
+        "https://" + TARGET,
+        "-w",
+        "/opt/cyberdeck/knowledge/common-web-paths.txt",
+        "-t",
+        "20"
+    ])
+
+PORTS = {
+    "ftp_check": "21",
+    "ssh_check": "22",
+    "dns_check": "53",
+    "kerberos_check": "88",
+    "http_check": "80",
+    "https_check": "443",
+    "smb_check": "445",
+    "mssql_check": "1433",
+    "mysql_check": "3306",
+    "rdp_check": "3389",
+    "postgres_check": "5432",
+    "winrm_check": "5985",
+    "winrms_check": "5986",
+    "vnc_check": "5900",
+    "ldap_check": "389",
+    "ldaps_check": "636",
+}
+
+if ACTION in PORTS:
+    execute([
+        "nc",
+        "-vz",
+        "-w",
+        "4",
+        TARGET,
+        PORTS[ACTION]
+    ])
+
+if ACTION == "ssh_fingerprint":
+    execute([
+        "nmap",
+        "-p",
+        "22",
+        "--script",
+        "ssh-hostkey,ssh2-enum-algos",
+        TARGET
+    ])
+
+if ACTION == "smb_info":
+    execute([
+        "nmap",
+        "-p",
+        "445",
+        "--script",
+        "smb-protocols,smb2-security-mode,smb2-time",
+        TARGET
+    ])
+
+if ACTION == "snmp_check":
+    execute([
+        "nmap",
+        "-sU",
+        "-p",
+        "161",
+        "--reason",
+        TARGET
+    ])
+
+if ACTION == "capture50":
+    execute([
+        "tcpdump",
+        "-i",
+        "any",
+        "-nn",
+        "-c",
+        "50",
+        "host",
+        TARGET
+    ], timeout=60)
+
+print("action not implemented")
+sys.exit(2)

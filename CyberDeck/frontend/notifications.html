@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<link rel="stylesheet" href="/static/cyberdeck.css">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<a href="/dashboard">back</a>
+</header>
+
+<main>
+
+<h1>notifications</h1>
+
+<div id="notifications"></div>
+
+</main>
+
+<script src="/static/common.js"></script>
+
+<script>
+async function load(){
+
+const r=
+await CD.api(
+"/api/notifications"
+);
+
+const rows=
+await r.json();
+
+notifications.innerHTML="";
+
+rows.forEach(n=>{
+
+const row=
+document.createElement(
+"div"
+);
+
+row.className="row";
+
+row.innerHTML=
+`<div class="value">
+${n.title}
+</div>
+<div>${n.body}</div>
+<div class="small">
+${new Date(
+n.created_at
+).toLocaleString()}
+</div>`;
+
+if(!n.read){
+
+const button=
+document.createElement(
+"button"
+);
+
+button.textContent=
+"mark read";
+
+button.onclick=
+async()=>{
+
+await CD.api(
+`/api/notifications/${n.id}/read`,
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify({
+read:true
+})
+}
+);
+
+load();
+};
+
+row.appendChild(button);
+}
+
+notifications.appendChild(
+row
+);
+
+});
+
+}
+
+load();
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

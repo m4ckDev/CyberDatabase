@@ -1,0 +1,916 @@
+#!/bin/bash
+
+set -u
+
+BASE="/opt/cyberdeck"
+ENVFILE="$BASE/config/.env"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+REPORT="$BASE/logs/audit-$STAMP.txt"
+
+PASS=0
+WARN=0
+FAIL=0
+
+mkdir -p "$BASE/logs"
+
+exec > >(tee "$REPORT") 2>&1
+
+pass() {
+    echo "[PASS] $*"
+    PASS=$((PASS+1))
+}
+
+warn() {
+    echo "[WARN] $*"
+    WARN=$((WARN+1))
+}
+
+fail() {
+    echo "[FAIL] $*"
+    FAIL=$((FAIL+1))
+}
+
+info() {
+    echo "[INFO] $*"
+}
+
+section() {
+    echo
+    echo "============================================================"
+    echo "$*"
+    echo "============================================================"
+}
+
+echo
+echo "CYBERDECK FULL SYSTEM AUDIT"
+echo "$(date)"
+echo
+
+if [ ! -f "$ENVFILE" ]; then
+    fail "Missing $ENVFILE"
+    exit 1
+fi
+
+set -a
+source "$ENVFILE"
+set +a
+
+if [ -z "${DATABASE_URL:-}" ]; then
+    fail "DATABASE_URL not loaded"
+    exit 1
+fi
+
+
+section "SERVICES"
+
+for svc in cyberdeck cyberdeck-worker postgresql; do
+
+    STATE="$(systemctl is-active "$svc" 2>/dev/null || true)"
+
+    if [ "$STATE" = "active" ]; then
+        pass "$svc active"
+    else
+        fail "$svc = $STATE"
+    fi
+
+done
+
+
+section "API"
+
+HEALTH="$(
+    curl -fsS \
+    --max-time 5 \
+    http://127.0.0.1:8000/api/health \
+    2>/dev/null || true
+)"
+
+if echo "$HEALTH" | grep -q '"online"'; then
+    pass "API health $HEALTH"
+else
+    fail "API health failed"
+fi
+
+
+OPENAPI="$(
+    curl -fsS \
+    --max-time 5 \
+    http://127.0.0.1:8000/openapi.json \
+    2>/dev/null || true
+)"
+
+if [ -n "$OPENAPI" ]; then
+
+    ROUTES="$(
+        echo "$OPENAPI" |
+        jq '.paths | length' \
+        2>/dev/null || echo "unknown"
+    )"
+
+    pass "OpenAPI available"
+    info "registered API paths: $ROUTES"
+
+else
+    warn "OpenAPI unavailable"
+fi
+
+
+section "WEB PAGES"
+
+PAGES=(
+    dashboard
+    network
+    tools
+    terminal
+    chats
+    labs
+    lab
+    learn
+    files
+    notes
+    jobs
+    captures
+    assets
+    logs
+    search
+    system
+    settings
+    install
+    admin
+)
+
+for PAGE in "${PAGES[@]}"; do
+
+    URL="http://127.0.0.1:8000/$PAGE"
+
+    if [ "$PAGE" = "lab" ]; then
+        URL="${URL}?id=1"
+    fi
+
+    CODE="$(
+        curl \
+        -s \
+        -o /dev/null \
+        -w '%{http_code}' \
+        --max-time 5 \
+        "$URL" \
+        2>/dev/null
+    )"
+
+    if [ "$CODE" = "200" ]; then
+        pass "/$PAGE HTTP 200"
+    else
+        fail "/$PAGE HTTP ${CODE:-no-response}"
+    fi
+
+done
+
+
+section "AUTHENTICATION BOUNDARIES"
+
+PROTECTED=(
+    /api/me
+    /api/system/status
+    /api/labs
+    /api/rooms
+    /api/learn/categories
+    /api/files
+    /api/jobs
+    /api/captures
+    /api/assets
+    /api/logs
+    /api/notifications
+)
+
+for PATHNAME in "${PROTECTED[@]}"; do
+
+    CODE="$(
+        curl \
+        -s \
+        -o /dev/null \
+        -w '%{http_code}' \
+        --max-time 5 \
+        "http://127.0.0.1:8000$PATHNAME" \
+        2>/dev/null
+    )"
+
+    case "$CODE" in
+
+        401|403)
+            pass "$PATHNAME protected ($CODE)"
+            ;;
+
+        200)
+            warn "$PATHNAME accessible without login"
+            ;;
+
+        *)
+            warn "$PATHNAME returned HTTP ${CODE:-unknown}"
+            ;;
+
+    esac
+
+done
+
+
+section "PYTHON BACKEND"
+
+MODULES=(
+    main.py
+    toolbox.py
+    platform_ext.py
+    worker.py
+)
+
+for MODULE in "${MODULES[@]}"; do
+
+    FILE="$BASE/api/$MODULE"
+
+    if [ ! -f "$FILE" ]; then
+        fail "$MODULE missing"
+        continue
+    fi
+
+    if runuser -u cyberdeck -- \
+        "$BASE/venv/bin/python" \
+        -m py_compile \
+        "$FILE" \
+        >/dev/null 2>&1
+    then
+        pass "$MODULE syntax"
+    else
+        fail "$MODULE Python syntax"
+    fi
+
+done
+
+
+section "DATABASE"
+
+if psql "$DATABASE_URL" \
+    -Atqc 'SELECT 1' \
+    2>/dev/null |
+    grep -qx 1
+then
+    pass "database connection"
+else
+    fail "database connection"
+fi
+
+
+TABLES=(
+    users
+    chats
+    chat_messages
+    rooms
+    room_members
+    room_messages
+    invites
+    knowledge_categories
+    knowledge_entries
+    labs
+    lab_targets
+    lab_scans
+    lab_findings
+    lab_notes
+    audit_log
+    user_notes
+    user_files
+    assets
+    notifications
+    tool_runs
+    tool_favorites
+    scan_jobs
+    captures
+)
+
+for TABLE in "${TABLES[@]}"; do
+
+    EXISTS="$(
+        psql "$DATABASE_URL" \
+        -Atqc \
+        "SELECT to_regclass('public.$TABLE') IS NOT NULL" \
+        2>/dev/null || true
+    )"
+
+    if [ "$EXISTS" = "t" ]; then
+        pass "table $TABLE"
+    else
+        fail "table $TABLE missing"
+    fi
+
+done
+
+
+DBSIZE="$(
+    psql "$DATABASE_URL" \
+    -Atqc \
+    "SELECT pg_size_pretty(pg_database_size(current_database()))" \
+    2>/dev/null || true
+)"
+
+info "database size: ${DBSIZE:-unknown}"
+
+
+STUCK="$(
+    psql "$DATABASE_URL" \
+    -Atqc \
+    "SELECT COUNT(*) FROM scan_jobs
+     WHERE status='running'
+     AND started_at < NOW() - INTERVAL '30 minutes'" \
+    2>/dev/null || echo 0
+)"
+
+if [ "${STUCK:-0}" -gt 0 ] 2>/dev/null; then
+    warn "$STUCK stuck scan job(s)"
+else
+    pass "no stuck scan jobs"
+fi
+
+
+QUEUED="$(
+    psql "$DATABASE_URL" \
+    -Atqc \
+    "SELECT COUNT(*) FROM scan_jobs WHERE status='queued'" \
+    2>/dev/null || echo 0
+)"
+
+info "queued jobs: ${QUEUED:-0}"
+
+
+FAILED="$(
+    psql "$DATABASE_URL" \
+    -Atqc \
+    "SELECT COUNT(*) FROM scan_jobs
+     WHERE status='failed'
+     AND created_at > NOW() - INTERVAL '7 days'" \
+    2>/dev/null || echo 0
+)"
+
+if [ "${FAILED:-0}" -gt 0 ] 2>/dev/null; then
+    warn "$FAILED failed job(s) during last 7 days"
+else
+    pass "no failed jobs during last 7 days"
+fi
+
+
+section "FRONTEND FILES"
+
+FILES=(
+    dashboard.html
+    network.html
+    tools.html
+    terminal.html
+    chats.html
+    labs.html
+    lab.html
+    learn.html
+    files.html
+    notes.html
+    jobs.html
+    captures.html
+    assets.html
+    logs.html
+    search.html
+    system.html
+    settings.html
+    install.html
+)
+
+for FILE in "${FILES[@]}"; do
+
+    if [ -s "$BASE/frontend/$FILE" ]; then
+        pass "$FILE"
+    else
+        fail "$FILE missing/empty"
+    fi
+
+done
+
+
+STATIC_FILES=(
+    "$BASE/frontend/static/cyberdeck.css"
+    "$BASE/frontend/static/common.js"
+    "$BASE/frontend/manifest.webmanifest"
+    "$BASE/frontend/sw.js"
+)
+
+for FILE in "${STATIC_FILES[@]}"; do
+
+    if [ -s "$FILE" ]; then
+        pass "$FILE"
+    else
+        fail "$FILE missing"
+    fi
+
+done
+
+
+section "SECRETS AND PERMISSIONS"
+
+MODE="$(
+    stat -c '%a' \
+    "$ENVFILE" \
+    2>/dev/null || true
+)"
+
+OWNER="$(
+    stat -c '%U:%G' \
+    "$ENVFILE" \
+    2>/dev/null || true
+)"
+
+if [ "$MODE" = "600" ]; then
+    pass ".env permissions 600"
+else
+    warn ".env permissions $MODE"
+fi
+
+if [ "$OWNER" = "cyberdeck:cyberdeck" ]; then
+    pass ".env owner cyberdeck:cyberdeck"
+else
+    warn ".env owner $OWNER"
+fi
+
+
+if grep -qx 'config/.env' \
+    "$BASE/.gitignore" \
+    2>/dev/null
+then
+    pass ".env excluded from git"
+else
+    fail ".env not excluded by .gitignore"
+fi
+
+
+section "TOOLS"
+
+TOOLS=(
+    nmap
+    tcpdump
+    ping
+    traceroute
+    dig
+    whois
+    curl
+    openssl
+    jq
+    nc
+    smbclient
+    ldapsearch
+    snmpwalk
+    ssh
+)
+
+for TOOL in "${TOOLS[@]}"; do
+
+    if command -v "$TOOL" >/dev/null 2>&1; then
+        pass "$TOOL installed"
+    else
+        fail "$TOOL missing"
+    fi
+
+done
+
+
+OPTIONAL=(
+    nikto
+    gobuster
+)
+
+for TOOL in "${OPTIONAL[@]}"; do
+
+    if command -v "$TOOL" >/dev/null 2>&1; then
+        pass "$TOOL installed"
+    else
+        warn "$TOOL missing"
+    fi
+
+done
+
+
+section "PING"
+
+CAP="$(
+    getcap /usr/bin/ping \
+    2>/dev/null || true
+)"
+
+if echo "$CAP" |
+    grep -q 'cap_net_raw'
+then
+    pass "ping raw socket capability"
+else
+    warn "ping capability not visible"
+fi
+
+
+if runuser -u cyberdeck -- \
+    ping \
+    -c 1 \
+    -W 1 \
+    127.0.0.1 \
+    >/dev/null 2>&1
+then
+    pass "CyberDeck user ping"
+else
+    fail "CyberDeck user cannot ping"
+fi
+
+
+section "TOOL RUNNER"
+
+if [ -x /usr/local/sbin/cyberdeck-tool-runner ]; then
+
+    pass "tool runner exists"
+
+    if runuser -u cyberdeck -- \
+        sudo -n \
+        /usr/local/sbin/cyberdeck-tool-runner \
+        interfaces \
+        >/dev/null 2>&1
+    then
+        pass "tool runner execution"
+    else
+        fail "tool runner execution"
+    fi
+
+else
+    fail "tool runner missing"
+fi
+
+
+section "BROWSER TERMINAL"
+
+if [ -x /usr/local/sbin/cyberdeck-shell-runner ]; then
+
+    pass "shell runner exists"
+
+    SHELLUSER="$(
+        runuser -u cyberdeck -- \
+        sudo -n \
+        /usr/local/sbin/cyberdeck-shell-runner \
+        'whoami' \
+        2>/dev/null |
+        tail -1
+    )"
+
+    if [ "$SHELLUSER" = "cyberdeck-shell" ]; then
+        pass "terminal runs as cyberdeck-shell"
+    else
+        fail "terminal returned ${SHELLUSER:-nothing}"
+    fi
+
+else
+    fail "shell runner missing"
+fi
+
+
+section "SUDOERS"
+
+if [ -f /etc/sudoers.d/cyberdeck-toolbox ]; then
+
+    if visudo \
+        -cf \
+        /etc/sudoers.d/cyberdeck-toolbox \
+        >/dev/null 2>&1
+    then
+        pass "toolbox sudoers"
+    else
+        fail "toolbox sudoers invalid"
+    fi
+
+else
+    fail "toolbox sudoers missing"
+fi
+
+
+if [ -f /etc/sudoers.d/cyberdeck-platform ]; then
+
+    if visudo \
+        -cf \
+        /etc/sudoers.d/cyberdeck-platform \
+        >/dev/null 2>&1
+    then
+        pass "platform sudoers"
+    else
+        fail "platform sudoers invalid"
+    fi
+
+else
+    warn "platform sudoers missing"
+fi
+
+
+section "PACKET CAPTURE"
+
+TMPPCAP="/tmp/cyberdeck-audit-$STAMP.pcap"
+TMPERR="/tmp/cyberdeck-audit-$STAMP.err"
+
+timeout 6 \
+tcpdump \
+-i any \
+-nn \
+-c 1 \
+-w "$TMPPCAP" \
+host 127.0.0.1 \
+>"$TMPERR" 2>&1 &
+
+TCPDUMP_PID=$!
+
+sleep 1
+
+ping \
+-c 1 \
+127.0.0.1 \
+>/dev/null 2>&1 || true
+
+wait "$TCPDUMP_PID" \
+2>/dev/null || true
+
+
+if [ -s "$TMPPCAP" ]; then
+
+    pass "packet capture capability"
+
+else
+
+    ERR="$(
+        tail -1 \
+        "$TMPERR" \
+        2>/dev/null || true
+    )"
+
+    warn "packet capture test failed: ${ERR:-unknown}"
+
+fi
+
+rm -f \
+"$TMPPCAP" \
+"$TMPERR"
+
+
+section "TIMERS"
+
+for TIMER in \
+cyberdeck-backup.timer \
+cyberdeck-maintain.timer
+
+do
+
+    ENABLED="$(
+        systemctl is-enabled \
+        "$TIMER" \
+        2>/dev/null || true
+    )"
+
+    ACTIVE="$(
+        systemctl is-active \
+        "$TIMER" \
+        2>/dev/null || true
+    )"
+
+    if [ "$ENABLED" = "enabled" ] &&
+       [ "$ACTIVE" = "active" ]
+    then
+        pass "$TIMER enabled/active"
+    else
+        warn "$TIMER enabled=$ENABLED active=$ACTIVE"
+    fi
+
+done
+
+
+section "BACKUPS"
+
+AUTO="$BASE/backups/auto"
+
+LATEST="$(
+    find "$AUTO" \
+    -mindepth 1 \
+    -maxdepth 1 \
+    -type d \
+    -printf '%T@ %p\n' \
+    2>/dev/null |
+    sort -nr |
+    head -1 |
+    cut -d' ' -f2-
+)"
+
+if [ -n "$LATEST" ]; then
+
+    pass "backup found $LATEST"
+
+    if [ -f "$LATEST/database.sql.gz" ] &&
+       gzip -t \
+       "$LATEST/database.sql.gz" \
+       2>/dev/null
+    then
+        pass "database backup integrity"
+    else
+        fail "database backup corrupt/missing"
+    fi
+
+
+    if [ -f "$LATEST/platform.tar.gz" ] &&
+       tar -tzf \
+       "$LATEST/platform.tar.gz" \
+       >/dev/null 2>&1
+    then
+        pass "platform backup integrity"
+    else
+        fail "platform backup corrupt/missing"
+    fi
+
+else
+    warn "no automatic backups found"
+fi
+
+
+section "NETWORK LISTENERS"
+
+if ss -lnt |
+    grep -q ':8000'
+then
+    pass "TCP/8000 listening"
+    ss -lnt |
+    grep ':8000'
+else
+    fail "TCP/8000 not listening"
+fi
+
+
+if ss -lnt |
+    grep -Eq \
+    '0\.0\.0\.0:5432|\[::\]:5432'
+then
+    warn "PostgreSQL listening on all interfaces"
+else
+
+    if ss -lnt |
+        grep -q ':5432'
+    then
+        pass "PostgreSQL listener restricted"
+    else
+        warn "PostgreSQL listener not detected"
+    fi
+
+fi
+
+
+section "MOBILE"
+
+MOBILE_FILES=(
+    App.tsx
+    package.json
+    app.json
+    eas.json
+    README.md
+)
+
+for FILE in "${MOBILE_FILES[@]}"; do
+
+    if [ -s "$BASE/mobile/$FILE" ]; then
+        pass "mobile/$FILE"
+    else
+        fail "mobile/$FILE missing"
+    fi
+
+done
+
+
+section "PWA"
+
+if [ -f "$BASE/frontend/manifest.webmanifest" ]; then
+    pass "PWA manifest"
+else
+    fail "PWA manifest missing"
+fi
+
+if [ -f "$BASE/frontend/sw.js" ]; then
+    pass "service worker"
+else
+    fail "service worker missing"
+fi
+
+if [ -f "$BASE/frontend/static/icon-192.png" ]; then
+    pass "192px app icon"
+else
+    warn "192px app icon missing"
+fi
+
+if [ -f "$BASE/frontend/static/icon-512.png" ]; then
+    pass "512px app icon"
+else
+    warn "512px app icon missing"
+fi
+
+
+section "STORAGE"
+
+for DIR in \
+"$BASE/files" \
+"$BASE/captures" \
+"$BASE/logs" \
+"$BASE/knowledge" \
+"$BASE/backups"
+
+do
+
+    if [ -d "$DIR" ]; then
+        pass "$DIR"
+    else
+        fail "$DIR missing"
+    fi
+
+done
+
+
+section "SYSTEM RESOURCES"
+
+DISK="$(
+    df -P / |
+    awk '
+    NR==2 {
+        gsub(/%/,"",$5)
+        print $5
+    }'
+)"
+
+MEM="$(
+    free |
+    awk '
+    /Mem:/ {
+        printf "%.0f",
+        $3/$2*100
+    }'
+)"
+
+LOAD="$(
+    awk \
+    '{print $1,$2,$3}' \
+    /proc/loadavg
+)"
+
+info "disk usage: ${DISK}%"
+info "memory usage: ${MEM}%"
+info "load average: $LOAD"
+
+
+if [ "$DISK" -ge 90 ]; then
+    warn "disk above 90%"
+else
+    pass "disk capacity"
+fi
+
+if [ "$MEM" -ge 90 ]; then
+    warn "memory above 90%"
+else
+    pass "memory capacity"
+fi
+
+
+section "RECENT ERRORS"
+
+echo
+echo "--- cyberdeck service ---"
+
+journalctl \
+-u cyberdeck \
+--since "7 days ago" \
+-p warning \
+--no-pager \
+-n 20 \
+2>/dev/null || true
+
+
+echo
+echo "--- worker service ---"
+
+journalctl \
+-u cyberdeck-worker \
+--since "7 days ago" \
+-p warning \
+--no-pager \
+-n 20 \
+2>/dev/null || true
+
+
+section "SUMMARY"
+
+echo "PASS: $PASS"
+echo "WARN: $WARN"
+echo "FAIL: $FAIL"
+
+echo
+echo "REPORT:"
+echo "$REPORT"
+echo
+
+if [ "$FAIL" -eq 0 ]; then
+    echo "CYBERDECK AUDIT: PASS"
+else
+    echo "CYBERDECK AUDIT: ATTENTION REQUIRED"
+fi
+
+echo

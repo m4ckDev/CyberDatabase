@@ -1,0 +1,2 @@
+cyberdeck ALL=(root) NOPASSWD: /usr/local/sbin/cyberdeck-tool-runner *
+cyberdeck ALL=(root) NOPASSWD: /usr/local/sbin/cyberdeck-shell-runner *

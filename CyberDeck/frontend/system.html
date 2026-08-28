@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<link rel="stylesheet" href="/static/cyberdeck.css">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<a href="/dashboard">back</a>
+</header>
+
+<main>
+
+<h1>system</h1>
+
+<div class="grid">
+
+<div class="card">
+<div class="label">host</div>
+<div id="host" class="value">-</div>
+</div>
+
+<div class="card">
+<div class="label">address</div>
+<div id="ip" class="value">-</div>
+</div>
+
+<div class="card">
+<div class="label">uptime</div>
+<div id="uptime" class="value">-</div>
+</div>
+
+<div class="card">
+<div class="label">cpu</div>
+<div id="cpu" class="value">-</div>
+</div>
+
+<div class="card">
+<div class="label">memory</div>
+<div id="memory" class="value">-</div>
+</div>
+
+<div class="card">
+<div class="label">disk</div>
+<div id="disk" class="value">-</div>
+</div>
+
+<div class="card">
+<div class="label">database</div>
+<div id="database" class="value">-</div>
+</div>
+
+<div class="card">
+<div class="label">version</div>
+<div id="version" class="value">-</div>
+</div>
+
+</div>
+
+<h2>SERVICES</h2>
+<div id="services"></div>
+
+<h2>COUNTS</h2>
+<div id="counts"></div>
+
+<div class="actions">
+<a class="button" href="/admin">admin</a>
+<a class="button" href="/logs">logs</a>
+<a class="button" href="/settings">settings</a>
+</div>
+
+</main>
+
+<script src="/static/common.js"></script>
+
+<script>
+async function load(){
+
+const r=
+await CD.api(
+"/api/system/status"
+);
+
+const s=
+await r.json();
+
+host.textContent=s.hostname;
+ip.textContent=s.ip;
+
+uptime.textContent=
+CD.fmtUptime(s.uptime);
+
+cpu.textContent=
+s.cpu_percent.toFixed(1)+"%";
+
+memory.textContent=
+s.memory_percent.toFixed(1)+"%";
+
+disk.textContent=
+s.disk_percent.toFixed(1)+"%";
+
+database.textContent=
+CD.fmtBytes(
+s.database_bytes
+);
+
+version.textContent=s.version;
+
+const serviceBox=
+document.getElementById(
+"services"
+);
+
+serviceBox.innerHTML="";
+
+Object.entries(
+s.services
+).forEach(([name,state])=>{
+
+const row=
+document.createElement(
+"div"
+);
+
+row.className=
+"row-flex";
+
+row.innerHTML=
+`<span>${name}</span><span>${state}</span>`;
+
+serviceBox.appendChild(row);
+
+});
+
+const countBox=
+document.getElementById(
+"counts"
+);
+
+countBox.innerHTML="";
+
+Object.entries(
+s.counts
+).forEach(([name,value])=>{
+
+const row=
+document.createElement(
+"div"
+);
+
+row.className=
+"row-flex";
+
+row.innerHTML=
+`<span>${name}</span><span>${value}</span>`;
+
+countBox.appendChild(row);
+
+});
+
+}
+
+load();
+
+setInterval(
+load,
+5000
+);
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

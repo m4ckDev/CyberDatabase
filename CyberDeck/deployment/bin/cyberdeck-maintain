@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -euo pipefail
+
+ENVFILE="/opt/cyberdeck/config/.env"
+
+set -a
+source "$ENVFILE"
+set +a
+
+psql "$DATABASE_URL" <<'SQL'
+DELETE FROM audit_log
+WHERE created_at
+< NOW() - INTERVAL '90 days';
+
+DELETE FROM notifications
+WHERE read_at IS NOT NULL
+AND created_at
+< NOW() - INTERVAL '90 days';
+SQL
+
+vacuumdb \
+--dbname="$DATABASE_URL" \
+--analyze
+
+echo "maintenance complete"

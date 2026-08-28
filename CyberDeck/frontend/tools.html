@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:#000;
+color:#888;
+font:13px monospace;
+}
+
+header{
+padding:25px 30px;
+border-bottom:1px solid #181818;
+display:flex;
+justify-content:space-between;
+}
+
+.logo{
+color:#ddd;
+letter-spacing:3px;
+}
+
+nav a{
+color:#666;
+text-decoration:none;
+margin-left:20px;
+}
+
+main{
+max-width:1100px;
+margin:auto;
+padding:40px 30px 80px;
+}
+
+input{
+width:100%;
+background:#000;
+border:0;
+border-bottom:1px solid #333;
+color:#ddd;
+font:14px monospace;
+padding:14px 4px;
+outline:none;
+}
+
+.section{
+margin-top:38px;
+}
+
+.section-title{
+font-size:11px;
+letter-spacing:2px;
+color:#555;
+margin-bottom:12px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+gap:8px;
+}
+
+.tool{
+position:relative;
+border:1px solid #202020;
+min-height:85px;
+padding:18px 14px;
+cursor:pointer;
+}
+
+.tool:hover{
+border-color:#666;
+}
+
+.tool-name{
+color:#bbb;
+margin-bottom:7px;
+}
+
+.tool-desc{
+font-size:11px;
+color:#555;
+}
+
+.star{
+position:absolute;
+right:9px;
+top:7px;
+color:#444;
+font-size:13px;
+}
+
+.star.on{
+color:#aaa;
+}
+
+pre{
+margin-top:35px;
+border-top:1px solid #181818;
+padding:25px 3px;
+color:#aaa;
+white-space:pre-wrap;
+word-break:break-word;
+line-height:1.5;
+min-height:130px;
+}
+
+.utilities{
+margin-top:45px;
+}
+
+.utility-buttons{
+display:flex;
+flex-wrap:wrap;
+gap:7px;
+margin-top:15px;
+}
+
+button{
+background:#000;
+border:1px solid #222;
+color:#777;
+font:12px monospace;
+padding:9px 12px;
+cursor:pointer;
+}
+
+button:hover{
+border-color:#666;
+color:#bbb;
+}
+
+.history{
+margin-top:45px;
+}
+
+.history-row{
+padding:11px 3px;
+border-bottom:1px solid #151515;
+display:grid;
+grid-template-columns:140px 1fr 100px;
+cursor:pointer;
+}
+
+.history-row:hover{
+color:#bbb;
+}
+
+.small{
+color:#444;
+font-size:11px;
+}
+
+#cve-results{
+white-space:pre-wrap;
+margin-top:20px;
+line-height:1.5;
+}
+</style>
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+
+<nav>
+<a href="/terminal">terminal</a>
+<a href="/dashboard">back</a>
+</nav>
+</header>
+
+<main>
+
+<input id="target"
+placeholder="target / hostname / IP / CIDR">
+
+<div id="tool-sections"></div>
+
+<div class="utilities">
+
+<div class="section-title">UTILITIES</div>
+
+<input id="utility"
+placeholder="text / hash / token / CIDR / timestamp">
+
+<div class="utility-buttons">
+
+<button onclick="utility('sha256')">sha256</button>
+<button onclick="utility('sha512')">sha512</button>
+<button onclick="utility('md5')">md5</button>
+
+<button onclick="utility('base64_encode')">base64 +</button>
+<button onclick="utility('base64_decode')">base64 -</button>
+
+<button onclick="utility('url_encode')">url +</button>
+<button onclick="utility('url_decode')">url -</button>
+
+<button onclick="utility('hex_encode')">hex +</button>
+<button onclick="utility('hex_decode')">hex -</button>
+
+<button onclick="utility('jwt')">jwt</button>
+<button onclick="utility('cidr')">cidr</button>
+<button onclick="utility('timestamp')">timestamp</button>
+<button onclick="utility('password')">password</button>
+<button onclick="cveLookup()">cve lookup</button>
+
+</div>
+
+<div id="cve-results"></div>
+
+</div>
+
+<pre id="output">ready</pre>
+
+<div class="history">
+
+<div style="display:flex;justify-content:space-between;align-items:center">
+
+<div class="section-title">RECENT</div>
+
+<button onclick="exportHistory()">export</button>
+
+</div>
+
+<div id="history"></div>
+
+</div>
+
+</main>
+
+<script>
+const token=sessionStorage.getItem("cyberdeck_token");
+
+if(!token){
+location="/";
+}
+
+let favorites=new Set();
+
+const groups={
+
+"network":[
+
+["interfaces","interfaces","local interfaces",false],
+["routes","routes","routing table",false],
+["neighbors","neighbors","ARP / neighbor cache",false],
+
+["ping","ping","reachability",true],
+["dns","dns","DNS records",true],
+["reverse","reverse dns","IP to hostname",true],
+["trace","traceroute","network path",true],
+["whois","whois","registration data",true],
+["host_discovery","host discovery","discover live hosts",true]
+
+],
+
+"scanning":[
+
+["nmap_quick","quick nmap","top 1000 TCP ports",true],
+["nmap_full","full TCP","ports 1-65535",true],
+["nmap_service","services","versions + default scripts",true],
+["nmap_os","OS detect","OS fingerprint",true],
+["nmap_udp","UDP scan","top UDP ports",true],
+["nmap_safe","NSE safe","default + safe scripts",true],
+["nmap_vuln","NSE vuln","vulnerability scripts",true]
+
+],
+
+"web":[
+
+["http_headers","HTTP headers","HTTP response headers",true],
+["https_headers","HTTPS headers","TLS web headers",true],
+["tls","TLS inspect","certificate details",true],
+["nikto_http","Nikto HTTP","web assessment",true],
+["nikto_https","Nikto HTTPS","TLS web assessment",true],
+["gobuster_http","dirs HTTP","directory enumeration",true],
+["gobuster_https","dirs HTTPS","directory enumeration",true]
+
+],
+
+"services":[
+
+["ftp_check","FTP","tcp/21",true],
+["ssh_check","SSH","tcp/22",true],
+["ssh_fingerprint","SSH fingerprint","keys + algorithms",true],
+["dns_check","DNS","tcp/53",true],
+["kerberos_check","Kerberos","tcp/88",true],
+["http_check","HTTP","tcp/80",true],
+["https_check","HTTPS","tcp/443",true],
+["smb_check","SMB","tcp/445",true],
+["smb_info","SMB info","protocol + security mode",true],
+["mssql_check","MSSQL","tcp/1433",true],
+["mysql_check","MySQL","tcp/3306",true],
+["rdp_check","RDP","tcp/3389",true],
+["postgres_check","PostgreSQL","tcp/5432",true],
+["vnc_check","VNC","tcp/5900",true],
+["winrm_check","WinRM","tcp/5985",true],
+["winrms_check","WinRM TLS","tcp/5986",true],
+["ldap_check","LDAP","tcp/389",true],
+["ldaps_check","LDAPS","tcp/636",true],
+["snmp_check","SNMP","udp/161",true]
+
+],
+
+"packet":[
+
+["capture50","packet sample","capture 50 packets",true]
+
+]
+
+};
+
+
+async function api(url,options={}){
+
+options.headers=options.headers || {};
+options.headers["Authorization"]="Bearer "+token;
+
+const response=await fetch(url,options);
+
+if(response.status===401){
+sessionStorage.removeItem("cyberdeck_token");
+location="/";
+throw new Error("unauthorized");
+}
+
+return response;
+}
+
+
+function renderTools(){
+
+const root=document.getElementById("tool-sections");
+root.innerHTML="";
+
+Object.entries(groups).forEach(([section,tools])=>{
+
+const wrapper=document.createElement("div");
+wrapper.className="section";
+
+const title=document.createElement("div");
+title.className="section-title";
+title.textContent=section.toUpperCase();
+
+const grid=document.createElement("div");
+grid.className="grid";
+
+tools.forEach(tool=>{
+
+const [action,name,desc,needsTarget]=tool;
+
+const box=document.createElement("div");
+box.className="tool";
+
+box.onclick=()=>{
+runTool(action,needsTarget);
+};
+
+const star=document.createElement("span");
+star.className="star"+(
+favorites.has(action) ? " on" : ""
+);
+star.textContent=favorites.has(action) ? "★" : "☆";
+
+star.onclick=(event)=>{
+event.stopPropagation();
+toggleFavorite(action);
+};
+
+const n=document.createElement("div");
+n.className="tool-name";
+n.textContent=name;
+
+const d=document.createElement("div");
+d.className="tool-desc";
+d.textContent=desc;
+
+box.append(star,n,d);
+grid.appendChild(box);
+
+});
+
+wrapper.append(title,grid);
+root.appendChild(wrapper);
+
+});
+}
+
+
+async function loadFavorites(){
+
+const response=await api("/api/toolbox/favorites");
+const data=await response.json();
+
+favorites=new Set(data);
+renderTools();
+}
+
+
+async function toggleFavorite(action){
+
+if(favorites.has(action)){
+
+await api(
+"/api/toolbox/favorites/"+action,
+{method:"DELETE"}
+);
+
+favorites.delete(action);
+
+}else{
+
+await api(
+"/api/toolbox/favorites/"+action,
+{method:"POST"}
+);
+
+favorites.add(action);
+
+}
+
+renderTools();
+}
+
+
+async function runTool(action,needsTarget){
+
+const target=document.getElementById("target").value.trim();
+const output=document.getElementById("output");
+
+if(needsTarget && !target){
+output.textContent="enter target";
+return;
+}
+
+output.textContent="running "+action+" ...";
+
+const response=await api("/api/toolbox/run",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+action,
+target
+})
+
+});
+
+const data=await response.json();
+
+if(!response.ok){
+output.textContent=data.detail || "failed";
+return;
+}
+
+output.textContent=data.output || "no output";
+
+loadHistory();
+}
+
+
+async function utility(action){
+
+const text=document.getElementById("utility").value;
+const output=document.getElementById("output");
+
+output.textContent="running...";
+
+const response=await api("/api/toolbox/utility",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+action,
+text
+})
+
+});
+
+const data=await response.json();
+
+output.textContent=response.ok
+? data.output
+: data.detail;
+}
+
+
+async function cveLookup(){
+
+const query=document.getElementById("utility").value.trim();
+const output=document.getElementById("output");
+
+if(!query){
+output.textContent="enter product, version, or CVE";
+return;
+}
+
+output.textContent="searching CVE database...";
+
+const response=await api("/api/toolbox/cve",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+query
+})
+
+});
+
+const data=await response.json();
+
+if(!response.ok){
+output.textContent=data.detail || "lookup failed";
+return;
+}
+
+if(!data.results.length){
+output.textContent="no results";
+return;
+}
+
+let text="";
+
+data.results.forEach(item=>{
+
+text+=item.id+"\n";
+text+=item.description+"\n";
+
+item.references.forEach(ref=>{
+text+="  "+ref+"\n";
+});
+
+text+="\n";
+
+});
+
+output.textContent=text.trim();
+}
+
+
+async function loadHistory(){
+
+const response=await api("/api/toolbox/history");
+const rows=await response.json();
+
+const box=document.getElementById("history");
+box.innerHTML="";
+
+rows.forEach(row=>{
+
+const el=document.createElement("div");
+el.className="history-row";
+
+const action=document.createElement("span");
+action.textContent=row.action;
+
+const target=document.createElement("span");
+target.textContent=row.target || "-";
+
+const code=document.createElement("span");
+code.className="small";
+code.textContent="exit "+row.return_code;
+
+el.append(action,target,code);
+
+el.onclick=async()=>{
+
+const response=await api(
+"/api/toolbox/history/"+row.id
+);
+
+const data=await response.json();
+
+document.getElementById("output").textContent=
+data.output;
+
+window.scrollTo({
+top:document.getElementById("output").offsetTop-100,
+behavior:"smooth"
+});
+
+};
+
+box.appendChild(el);
+
+});
+}
+
+
+async function exportHistory(){
+
+const response=await api("/api/toolbox/export");
+
+const blob=await response.blob();
+
+const url=URL.createObjectURL(blob);
+
+const link=document.createElement("a");
+link.href=url;
+link.download="cyberdeck-tool-history.txt";
+link.click();
+
+URL.revokeObjectURL(url);
+}
+
+
+renderTools();
+loadFavorites();
+loadHistory();
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

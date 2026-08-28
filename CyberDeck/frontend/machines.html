@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>machines</title>
+<link rel="stylesheet" href="/static/cyberdeck.css">
+
+<style>
+body{
+    background:#000;
+    color:#ddd;
+    font-family:monospace;
+    margin:0;
+}
+
+.wrap{
+    max-width:1100px;
+    margin:0 auto;
+    padding:28px 20px;
+}
+
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:28px;
+}
+
+a{
+    color:#aaa;
+    text-decoration:none;
+}
+
+a:hover{
+    color:#fff;
+}
+
+.title{
+    font-size:20px;
+}
+
+.summary{
+    color:#777;
+    margin-bottom:20px;
+}
+
+.machine{
+    border-top:1px solid #222;
+    padding:18px 0;
+    display:grid;
+    grid-template-columns:1.5fr 1.5fr 1.5fr 1fr 2fr;
+    gap:16px;
+    align-items:center;
+}
+
+.machine:last-child{
+    border-bottom:1px solid #222;
+}
+
+.name{
+    color:#fff;
+}
+
+.address{
+    color:#aaa;
+}
+
+.os{
+    color:#777;
+}
+
+.status{
+    text-align:right;
+}
+
+.online{
+    color:#bbb;
+}
+
+.offline{
+    color:#555;
+}
+
+.unknown{
+    color:#777;
+}
+
+.empty{
+    color:#666;
+    padding:30px 0;
+}
+
+.meta{
+    color:#555;
+    font-size:12px;
+    margin-top:5px;
+}
+
+button{
+    background:#000;
+    color:#aaa;
+    border:1px solid #333;
+    font-family:monospace;
+    padding:7px 12px;
+    cursor:pointer;
+}
+
+button:hover{
+    color:#fff;
+    border-color:#666;
+}
+
+@media(max-width:700px){
+    .machine{
+        grid-template-columns:1fr;
+        gap:5px;
+    }
+
+    .status{
+        text-align:left;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<div class="top">
+    <a href="/dashboard">&lt; back</a>
+    <div class="title">machines</div>
+    <button onclick="loadMachines()">refresh</button>
+</div>
+
+<div id="summary" class="summary">
+loading...
+</div>
+
+<div id="machines"></div>
+
+<div id="toolbox" style="
+    display:none;
+    margin-top:24px;
+    border-top:1px solid #222;
+    padding-top:18px;
+">
+    <div id="tooltitle" style="margin-bottom:10px;color:#aaa;"></div>
+    <pre id="tooloutput" style="
+        white-space:pre-wrap;
+        word-break:break-word;
+        color:#bbb;
+        margin:0;
+        padding:14px;
+        border:1px solid #222;
+        background:#000;
+        max-height:400px;
+        overflow:auto;
+    "></pre>
+</div>
+
+</div>
+
+<script>
+
+function getToken(){
+    return sessionStorage.getItem("cyberdeck_token");
+}
+
+function esc(value){
+    return String(value ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;");
+}
+
+async function loadMachines(){
+
+    const area = document.getElementById("machines");
+    const summary = document.getElementById("summary");
+
+    summary.textContent = "checking machines...";
+
+    try{
+
+        const token = getToken();
+
+        const headers = {};
+
+        if(token){
+            headers["Authorization"] = "Bearer " + token;
+        }
+
+        const response = await fetch(
+            "/api/machines",
+            {headers}
+        );
+
+        if(response.status === 401 || response.status === 403){
+            window.location.href = "/";
+            return;
+        }
+
+        if(!response.ok){
+            throw new Error(
+                "HTTP " + response.status
+            );
+        }
+
+        const data = await response.json();
+
+        area.innerHTML = "";
+
+        let online = 0;
+
+        for(const machine of data){
+
+            if(machine.status === "online"){
+                online++;
+            }
+
+            const row = document.createElement("div");
+            row.className = "machine";
+
+            let latency = "";
+
+            if(machine.response_ms !== null){
+                latency =
+                    `<div class="meta">${esc(machine.response_ms)} ms</div>`;
+            }
+
+            row.innerHTML = `
+                <div>
+                    <div class="name">${esc(machine.name)}</div>
+                    <div class="meta">${esc(machine.tags || "")}</div>
+                </div>
+
+                <div class="address">
+                    ${esc(machine.address || "-")}
+                </div>
+
+                <div class="os">
+                    ${esc(machine.operating_system || "-")}
+                </div>
+
+                <div class="status ${esc(machine.status)}">
+                    ${esc(machine.status)}
+                    ${latency}
+                </div>
+
+                <div class="actions">
+                    <button onclick='runTool("ping", ${JSON.stringify(machine.address)})'>ping</button>
+                    <button onclick='runTool("trace", ${JSON.stringify(machine.address)})'>trace</button>
+                    <button onclick='runTool("ssh", ${JSON.stringify(machine.address)})'>ssh</button>
+                    <button onclick='openWeb(${JSON.stringify(machine.address)})'>web</button>
+                    <button onclick='openTerminal(${JSON.stringify(machine.address)})'>terminal</button>
+                </div>
+            `;
+
+            area.appendChild(row);
+        }
+
+        if(data.length === 0){
+            area.innerHTML =
+                '<div class="empty">no machines saved</div>';
+        }
+
+        summary.textContent =
+            `${online} online / ${data.length} total`;
+
+    }catch(error){
+
+        summary.textContent =
+            "unable to load machines";
+
+        area.innerHTML =
+            `<div class="empty">${esc(error.message)}</div>`;
+    }
+}
+
+function hostOf(value){
+    let v = String(value || "").trim();
+
+    try{
+        if(v.includes("://")){
+            return new URL(v).hostname;
+        }
+    }catch(e){}
+
+    v = v.split("/")[0];
+
+    if(v.includes(":") && v.split(":").length === 2){
+        v = v.split(":")[0];
+    }
+
+    return v;
+}
+
+async function runTool(action,address){
+
+    const host = hostOf(address);
+
+    const box = document.getElementById("toolbox");
+    const title = document.getElementById("tooltitle");
+    const output = document.getElementById("tooloutput");
+
+    box.style.display = "block";
+    title.textContent = action + " > " + host;
+    output.textContent = "running...";
+
+    try{
+
+        const token = getToken();
+
+        const response = await fetch(
+            "/api/tools/run",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json",
+                    "Authorization":"Bearer " + token
+                },
+                body:JSON.stringify({
+                    action:action,
+                    target:host
+                })
+            }
+        );
+
+        if(response.status === 401 || response.status === 403){
+            window.location.href = "/";
+            return;
+        }
+
+        const data = await response.json();
+
+        if(!response.ok){
+            output.textContent =
+                data.detail ||
+                JSON.stringify(data,null,2);
+            return;
+        }
+
+        output.textContent =
+            data.output ||
+            data.stdout ||
+            data.result ||
+            JSON.stringify(data,null,2);
+
+    }catch(error){
+        output.textContent = error.message;
+    }
+}
+
+function openWeb(address){
+
+    let value = String(address || "").trim();
+
+    if(!value){
+        return;
+    }
+
+    if(!/^https?:\/\//i.test(value)){
+        value = "http://" + value;
+    }
+
+    window.open(value,"_blank","noopener");
+}
+
+function openTerminal(address){
+
+    const host = hostOf(address);
+
+    sessionStorage.setItem(
+        "cyberdeck_machine_target",
+        host
+    );
+
+    window.location.href = "/terminal";
+}
+
+loadMachines();
+
+setInterval(loadMachines, 30000);
+
+</script>
+
+</body>
+</html>

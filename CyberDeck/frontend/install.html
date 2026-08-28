@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<link rel="stylesheet" href="/static/cyberdeck.css">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<a href="/dashboard">back</a>
+</header>
+
+<main>
+
+<h1>install</h1>
+
+<div class="row">
+<div class="value">iPhone / iPad</div>
+<div class="small">
+Open CyberDeck in Safari, Share, Add to Home Screen.
+</div>
+</div>
+
+<div class="row">
+<div class="value">native iOS source</div>
+<div class="small">
+Expo source scaffold:
+<br>
+/opt/cyberdeck/mobile
+</div>
+</div>
+
+<div class="row">
+<div class="value">server</div>
+<div class="small">
+192.168.0.124:8000
+</div>
+</div>
+
+<div class="row">
+<div class="value">TestFlight</div>
+<div class="small">
+Requires Apple Developer / Expo build credentials before final distribution.
+</div>
+</div>
+
+</main>
+
+<script src="/static/common.js"></script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

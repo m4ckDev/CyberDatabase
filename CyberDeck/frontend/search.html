@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<link rel="stylesheet" href="/static/cyberdeck.css">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<a href="/dashboard">back</a>
+</header>
+
+<main>
+
+<h1>search</h1>
+
+<input id="query"
+placeholder="search CyberDeck">
+
+<div id="results"></div>
+
+</main>
+
+<script src="/static/common.js"></script>
+
+<script>
+let timer=null;
+
+query.addEventListener(
+"input",
+()=>{
+
+clearTimeout(timer);
+
+timer=setTimeout(
+search,
+250
+);
+
+}
+);
+
+async function search(){
+
+const q=query.value.trim();
+
+if(q.length<2){
+
+results.innerHTML="";
+return;
+}
+
+const r=
+await CD.api(
+"/api/search?q="
++encodeURIComponent(q)
+);
+
+const rows=
+await r.json();
+
+results.innerHTML="";
+
+rows.forEach(item=>{
+
+const link=
+document.createElement(
+"a"
+);
+
+link.href=item.url;
+link.className="item";
+
+link.innerHTML=
+`<span>
+${item.type} / ${item.title}
+<br>
+<span class="small">
+${item.detail||""}
+</span>
+</span>
+<span>&gt;</span>`;
+
+results.appendChild(link);
+
+});
+
+}
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

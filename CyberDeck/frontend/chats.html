@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:#000;
+color:#888;
+font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+font-size:13px;
+}
+
+header{
+height:70px;
+padding:0 30px;
+border-bottom:1px solid #181818;
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+
+.logo{
+color:#ddd;
+letter-spacing:3px;
+}
+
+a,button{
+background:none;
+border:0;
+color:#666;
+font:12px monospace;
+text-decoration:none;
+cursor:pointer;
+}
+
+main{
+height:calc(100vh - 70px);
+max-width:1100px;
+margin:auto;
+display:grid;
+grid-template-columns:230px 1fr;
+}
+
+.rooms{
+border-right:1px solid #181818;
+padding:20px 15px;
+overflow:auto;
+}
+
+.new{
+width:100%;
+padding:10px;
+border:1px solid #222;
+margin-bottom:20px;
+}
+
+.room{
+padding:13px 5px;
+border-bottom:1px solid #151515;
+cursor:pointer;
+display:flex;
+justify-content:space-between;
+}
+
+.room:hover,.room.active{
+color:#ddd;
+}
+
+.count{
+color:#444;
+font-size:11px;
+}
+
+.panel{
+display:flex;
+flex-direction:column;
+min-width:0;
+}
+
+.room-title{
+padding:18px 25px;
+border-bottom:1px solid #181818;
+color:#bbb;
+}
+
+.messages{
+flex:1;
+overflow:auto;
+padding:30px;
+}
+
+.message{
+margin-bottom:22px;
+max-width:800px;
+}
+
+.meta{
+font-size:10px;
+color:#444;
+margin-bottom:6px;
+}
+
+.text{
+color:#aaa;
+white-space:pre-wrap;
+line-height:1.5;
+}
+
+.composer{
+border-top:1px solid #181818;
+padding:18px 25px;
+display:flex;
+gap:10px;
+}
+
+textarea{
+flex:1;
+height:55px;
+resize:none;
+background:#000;
+border:1px solid #222;
+color:#bbb;
+font:13px monospace;
+padding:12px;
+outline:none;
+}
+
+.send{
+border:1px solid #222;
+padding:0 18px;
+}
+
+@media(max-width:700px){
+main{
+grid-template-columns:1fr;
+}
+
+.rooms{
+max-height:180px;
+border-right:0;
+border-bottom:1px solid #181818;
+}
+
+.panel{
+height:calc(100vh - 250px);
+}
+}
+</style>
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<a href="/dashboard">back</a>
+</header>
+
+<main>
+
+<div class="rooms">
+<button class="new" onclick="createRoom()">+ room</button>
+<div id="rooms"></div>
+</div>
+
+<div class="panel">
+
+<div class="room-title" id="room-title">select room</div>
+
+<div class="messages" id="messages"></div>
+
+<div class="composer">
+<textarea id="message" placeholder="message"></textarea>
+<button class="send" onclick="sendMessage()">send</button>
+</div>
+
+</div>
+
+</main>
+
+<script>
+const token=sessionStorage.getItem("cyberdeck_token");
+
+let activeRoom=null;
+let activeName=null;
+
+if(!token){
+window.location="/";
+}
+
+async function api(url,options={}){
+options.headers=options.headers || {};
+options.headers["Authorization"]="Bearer "+token;
+
+const r=await fetch(url,options);
+
+if(r.status===401){
+sessionStorage.removeItem("cyberdeck_token");
+window.location="/";
+throw new Error("unauthorized");
+}
+
+return r;
+}
+
+async function loadRooms(){
+
+const r=await api("/api/rooms");
+const rooms=await r.json();
+
+const box=document.getElementById("rooms");
+box.innerHTML="";
+
+rooms.forEach(room=>{
+
+const el=document.createElement("div");
+el.className="room"+(room.id===activeRoom?" active":"");
+
+const name=document.createElement("span");
+name.textContent="# "+room.name;
+
+const count=document.createElement("span");
+count.className="count";
+count.textContent=room.members;
+
+el.appendChild(name);
+el.appendChild(count);
+
+el.onclick=()=>openRoom(room);
+
+box.appendChild(el);
+
+});
+}
+
+async function createRoom(){
+
+const name=prompt("room name");
+
+if(!name) return;
+
+const r=await api("/api/rooms",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({name})
+});
+
+const data=await r.json();
+
+if(!r.ok){
+alert(data.detail || "unable to create room");
+return;
+}
+
+await loadRooms();
+
+openRoom({
+id:data.id,
+name:data.name,
+joined:true
+});
+}
+
+async function openRoom(room){
+
+if(!room.joined){
+
+await api(`/api/rooms/${room.id}/join`,{
+method:"POST"
+});
+
+}
+
+activeRoom=room.id;
+activeName=room.name;
+
+document.getElementById("room-title").textContent="# "+room.name;
+
+await loadRooms();
+await loadMessages();
+}
+
+async function loadMessages(){
+
+if(!activeRoom) return;
+
+const r=await api(`/api/rooms/${activeRoom}/messages`);
+
+if(!r.ok) return;
+
+const messages=await r.json();
+
+const box=document.getElementById("messages");
+
+const nearBottom=
+box.scrollHeight-box.scrollTop-box.clientHeight < 100;
+
+box.innerHTML="";
+
+messages.forEach(msg=>{
+
+const wrapper=document.createElement("div");
+wrapper.className="message";
+
+const meta=document.createElement("div");
+meta.className="meta";
+
+const date=new Date(msg.created_at);
+
+meta.textContent=
+msg.username+"  "+date.toLocaleTimeString([],{
+hour:"2-digit",
+minute:"2-digit"
+});
+
+const text=document.createElement("div");
+text.className="text";
+text.textContent=msg.content;
+
+wrapper.appendChild(meta);
+wrapper.appendChild(text);
+
+box.appendChild(wrapper);
+
+});
+
+if(nearBottom){
+box.scrollTop=box.scrollHeight;
+}
+}
+
+async function sendMessage(){
+
+if(!activeRoom) return;
+
+const input=document.getElementById("message");
+const content=input.value.trim();
+
+if(!content) return;
+
+input.value="";
+
+const r=await api(`/api/rooms/${activeRoom}/messages`,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({content})
+});
+
+if(!r.ok){
+const data=await r.json();
+alert(data.detail || "message failed");
+return;
+}
+
+await loadMessages();
+}
+
+document.getElementById("message").addEventListener("keydown",e=>{
+if(e.key==="Enter" && !e.shiftKey){
+e.preventDefault();
+sendMessage();
+}
+});
+
+loadRooms();
+
+setInterval(()=>{
+loadMessages();
+loadRooms();
+},2000);
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

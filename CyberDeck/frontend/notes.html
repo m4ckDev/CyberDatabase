@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<link rel="stylesheet" href="/static/cyberdeck.css">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<a href="/dashboard">back</a>
+</header>
+
+<main>
+
+<h1>notes</h1>
+
+<input id="title" placeholder="title">
+
+<br><br>
+
+<input id="tags" placeholder="tags">
+
+<br><br>
+
+<textarea id="content" placeholder="note"></textarea>
+
+<div class="actions">
+<button onclick="createNote()">save</button>
+</div>
+
+<h2>NOTES</h2>
+<div id="notes"></div>
+
+</main>
+
+<script src="/static/common.js"></script>
+
+<script>
+async function load(){
+
+const r=
+await CD.api("/api/notes");
+
+const notes=
+await r.json();
+
+const box=
+document.getElementById(
+"notes"
+);
+
+box.innerHTML="";
+
+notes.forEach(note=>{
+
+const row=
+document.createElement(
+"div"
+);
+
+row.className="row";
+
+const title=
+document.createElement(
+"div"
+);
+
+title.className="value";
+title.textContent=note.title;
+
+const tags=
+document.createElement(
+"div"
+);
+
+tags.className="small";
+tags.textContent=note.tags;
+
+const content=
+document.createElement(
+"pre"
+);
+
+content.textContent=
+note.content;
+
+const del=
+document.createElement(
+"button"
+);
+
+del.textContent="delete";
+
+del.onclick=async()=>{
+
+await CD.api(
+`/api/notes/${note.id}`,
+{method:"DELETE"}
+);
+
+load();
+};
+
+row.append(
+title,
+tags,
+content,
+del
+);
+
+box.appendChild(row);
+
+});
+
+}
+
+async function createNote(){
+
+const payload={
+title:
+document.getElementById(
+"title"
+).value,
+tags:
+document.getElementById(
+"tags"
+).value,
+content:
+document.getElementById(
+"content"
+).value
+};
+
+const r=
+await CD.api(
+"/api/notes",
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify(
+payload
+)
+}
+);
+
+if(!r.ok){
+
+const data=
+await r.json();
+
+alert(data.detail);
+
+return;
+}
+
+title.value="";
+tags.value="";
+content.value="";
+
+load();
+}
+
+load();
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

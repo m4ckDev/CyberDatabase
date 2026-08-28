@@ -1,0 +1,43 @@
+#!/bin/bash
+
+set -u
+
+ID="${1:-}"
+TARGET="${2:-}"
+
+if ! [[ "$ID" =~ ^[0-9]+$ ]]; then
+    echo "invalid capture id"
+    exit 2
+fi
+
+if [ -z "$TARGET" ] || [[ "$TARGET" == -* ]]; then
+    echo "invalid target"
+    exit 2
+fi
+
+if ! [[ "$TARGET" =~ ^[A-Za-z0-9._:/-]+$ ]]; then
+    echo "invalid target"
+    exit 2
+fi
+
+OUT="/opt/cyberdeck/captures/capture-${ID}.pcap"
+
+rm -f "$OUT"
+
+timeout 240 \
+    tcpdump \
+    -i any \
+    -nn \
+    -s 0 \
+    -c 500 \
+    -w "$OUT" \
+    host "$TARGET"
+
+RC=$?
+
+if [ -f "$OUT" ]; then
+    chown cyberdeck:cyberdeck "$OUT"
+    chmod 640 "$OUT"
+fi
+
+exit "$RC"

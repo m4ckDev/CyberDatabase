@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<link rel="stylesheet" href="/static/cyberdeck.css">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<a href="/labs">back</a>
+</header>
+
+<main>
+
+<h1 id="lab-name">lab</h1>
+
+<div id="lab-description"
+class="muted"></div>
+
+<div class="actions">
+<button onclick="addTarget()">+ target</button>
+<button onclick="addNote()">+ note</button>
+<button onclick="addFinding()">+ finding</button>
+<button onclick="exportReport()">export report</button>
+</div>
+
+<h2>TARGETS</h2>
+<div id="targets"></div>
+
+<h2>FINDINGS</h2>
+<div id="findings"></div>
+
+<h2>NOTES</h2>
+<div id="notes"></div>
+
+<h2>SCAN HISTORY</h2>
+<div id="scans"></div>
+
+<h2>OUTPUT</h2>
+<pre id="output">select a scan</pre>
+
+</main>
+
+<script src="/static/common.js"></script>
+
+<script>
+const labId=
+new URLSearchParams(
+location.search
+).get("id");
+
+let targetData=[];
+
+if(!labId)
+location="/labs";
+
+
+async function loadLab(){
+
+const r=
+await CD.api(
+`/api/labs/${labId}`
+);
+
+if(!r.ok){
+
+location="/labs";
+return;
+}
+
+const lab=
+await r.json();
+
+document.getElementById(
+"lab-name"
+).textContent=lab.name;
+
+document.getElementById(
+"lab-description"
+).textContent=
+lab.description||"";
+}
+
+
+async function loadTargets(){
+
+const r=
+await CD.api(
+`/api/labs/${labId}/targets`
+);
+
+targetData=
+await r.json();
+
+const box=
+document.getElementById(
+"targets"
+);
+
+box.innerHTML="";
+
+targetData.forEach(target=>{
+
+const row=
+document.createElement(
+"div"
+);
+
+row.className="row";
+
+row.innerHTML=
+`<div class="value">
+${target.name}
+</div>
+<div>${target.address}</div>
+<div class="small">
+${target.notes||""}
+</div>`;
+
+const actions=
+document.createElement(
+"div"
+);
+
+actions.className=
+"actions";
+
+[
+["nmap_quick","quick"],
+["nmap_service","services"],
+["nmap_full","full tcp"],
+["nmap_os","os"]
+].forEach(
+([action,label])=>{
+
+const b=
+document.createElement(
+"button"
+);
+
+b.textContent=label;
+
+b.onclick=
+()=>queueScan(
+target,
+action
+);
+
+actions.appendChild(b);
+
+}
+);
+
+row.appendChild(actions);
+
+box.appendChild(row);
+
+});
+
+}
+
+
+async function queueScan(
+target,
+action
+){
+
+const r=
+await CD.api(
+"/api/jobs",
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify({
+action,
+target:target.address,
+lab_id:Number(labId),
+target_id:target.id
+})
+}
+);
+
+const data=
+await r.json();
+
+if(!r.ok){
+
+alert(data.detail);
+return;
+}
+
+alert(
+"scan queued"
+);
+}
+
+
+async function addTarget(){
+
+const name=
+prompt("target name");
+
+if(!name)
+return;
+
+const address=
+prompt(
+"IP, domain, hostname, or CIDR"
+);
+
+if(!address)
+return;
+
+const notes=
+prompt(
+"notes",
+""
+)||"";
+
+const r=
+await CD.api(
+`/api/labs/${labId}/targets`,
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify({
+name,
+address,
+notes
+})
+}
+);
+
+const data=
+await r.json();
+
+if(!r.ok)
+alert(data.detail);
+
+loadTargets();
+}
+
+
+async function loadNotes(){
+
+const r=
+await CD.api(
+`/api/labs/${labId}/notes`
+);
+
+const rows=
+await r.json();
+
+const box=
+document.getElementById(
+"notes"
+);
+
+box.innerHTML="";
+
+rows.forEach(note=>{
+
+const row=
+document.createElement(
+"div"
+);
+
+row.className="row";
+
+row.innerHTML=
+`<div>${note.content}</div>
+<div class="small">
+${new Date(
+note.created_at
+).toLocaleString()}
+</div>`;
+
+box.appendChild(row);
+
+});
+
+}
+
+
+async function addNote(){
+
+const content=
+prompt("note");
+
+if(!content)
+return;
+
+await CD.api(
+`/api/labs/${labId}/notes`,
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify({
+content
+})
+}
+);
+
+loadNotes();
+}
+
+
+async function loadFindings(){
+
+const r=
+await CD.api(
+`/api/labs/${labId}/findings`
+);
+
+const rows=
+await r.json();
+
+const box=
+document.getElementById(
+"findings"
+);
+
+box.innerHTML="";
+
+rows.forEach(f=>{
+
+const row=
+document.createElement(
+"div"
+);
+
+row.className="row";
+
+row.innerHTML=
+`<div class="value">
+[${f.severity}] ${f.title}
+</div>
+<div>${f.description||""}</div>
+<pre>${f.evidence||""}</pre>
+<div class="small">
+${f.status}
+</div>`;
+
+box.appendChild(row);
+
+});
+
+}
+
+
+async function addFinding(){
+
+const title=
+prompt("finding title");
+
+if(!title)
+return;
+
+const severity=
+prompt(
+"severity: info, low, medium, high, critical",
+"info"
+)||"info";
+
+let targetId=null;
+
+if(targetData.length){
+
+const choices=
+targetData.map(
+t=>`${t.id}: ${t.name}`
+).join("\n");
+
+const selected=
+prompt(
+"target ID or blank\n"
++choices,
+""
+);
+
+if(selected)
+targetId=Number(selected);
+}
+
+const description=
+prompt(
+"description",
+""
+)||"";
+
+const evidence=
+prompt(
+"evidence",
+""
+)||"";
+
+const remediation=
+prompt(
+"remediation",
+""
+)||"";
+
+const r=
+await CD.api(
+`/api/labs/${labId}/findings`,
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify({
+target_id:targetId,
+title,
+severity,
+description,
+evidence,
+remediation
+})
+}
+);
+
+const data=
+await r.json();
+
+if(!r.ok)
+alert(data.detail);
+
+loadFindings();
+}
+
+
+async function loadScans(){
+
+const r=
+await CD.api(
+`/api/labs/${labId}/scans`
+);
+
+const rows=
+await r.json();
+
+const box=
+document.getElementById(
+"scans"
+);
+
+box.innerHTML="";
+
+rows.forEach(scan=>{
+
+const row=
+document.createElement(
+"div"
+);
+
+row.className="row-flex";
+
+const left=
+document.createElement(
+"div"
+);
+
+left.innerHTML=
+`<div>${scan.scan_type}</div>
+<div class="small">
+${scan.target_name||""}
+&nbsp;
+${new Date(
+scan.created_at
+).toLocaleString()}
+</div>`;
+
+left.style.cursor="pointer";
+
+left.onclick=()=>{
+
+document.getElementById(
+"output"
+).textContent=
+scan.output||"";
+};
+
+row.appendChild(left);
+
+box.appendChild(row);
+
+});
+
+}
+
+
+function exportReport(){
+
+CD.download(
+`/api/labs/${labId}/report.txt`,
+`cyberdeck-lab-${labId}.txt`
+);
+}
+
+
+async function refresh(){
+
+await Promise.all([
+loadLab(),
+loadTargets(),
+loadNotes(),
+loadFindings(),
+loadScans()
+]);
+
+}
+
+refresh();
+
+setInterval(
+loadScans,
+4000
+);
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

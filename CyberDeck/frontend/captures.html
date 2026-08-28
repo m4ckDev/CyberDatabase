@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<link rel="stylesheet" href="/static/cyberdeck.css">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<a href="/dashboard">back</a>
+</header>
+
+<main>
+
+<h1>captures</h1>
+
+<input id="target"
+placeholder="host to capture">
+
+<div class="actions">
+<button onclick="capture()">capture 500 packets</button>
+</div>
+
+<div class="small">
+captures use the interfaces visible to the CyberDeck container
+</div>
+
+<h2>PCAP</h2>
+<div id="captures"></div>
+
+</main>
+
+<script src="/static/common.js"></script>
+
+<script>
+async function capture(){
+
+const target=
+document.getElementById(
+"target"
+).value.trim();
+
+if(!target)
+return;
+
+const r=
+await CD.api(
+"/api/captures",
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify({
+target
+})
+}
+);
+
+const data=
+await r.json();
+
+if(!r.ok)
+alert(data.detail);
+
+load();
+}
+
+async function load(){
+
+const r=
+await CD.api(
+"/api/captures"
+);
+
+const rows=
+await r.json();
+
+const box=
+document.getElementById(
+"captures"
+);
+
+box.innerHTML="";
+
+rows.forEach(c=>{
+
+const row=
+document.createElement(
+"div"
+);
+
+row.className=
+"row-flex";
+
+const left=
+document.createElement(
+"div"
+);
+
+left.innerHTML=
+`<div>${c.target}</div>
+<div class="small">
+${c.status}
+&nbsp;
+${CD.fmtBytes(c.size)}
+${c.error
+? "<br>"+c.error
+: ""}
+</div>`;
+
+const actions=
+document.createElement(
+"div"
+);
+
+actions.className=
+"actions";
+
+if(c.status==="completed"){
+
+const download=
+document.createElement(
+"button"
+);
+
+download.textContent=
+"download";
+
+download.onclick=
+()=>CD.download(
+`/api/captures/${c.id}/download`,
+`capture-${c.id}.pcap`
+);
+
+actions.appendChild(
+download
+);
+}
+
+if(
+c.status==="completed"
+|| c.status==="failed"
+){
+
+const del=
+document.createElement(
+"button"
+);
+
+del.textContent=
+"delete";
+
+del.onclick=
+async()=>{
+
+await CD.api(
+`/api/captures/${c.id}`,
+{method:"DELETE"}
+);
+
+load();
+};
+
+actions.appendChild(
+del
+);
+}
+
+row.append(
+left,
+actions
+);
+
+box.appendChild(row);
+
+});
+
+}
+
+load();
+
+setInterval(
+load,
+3000
+);
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<link rel="stylesheet" href="/static/cyberdeck.css">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<div>
+<span id="username" class="small"></span>
+&nbsp;&nbsp;
+<a href="#" onclick="logout()">logout</a>
+</div>
+</header>
+
+<main>
+
+<a class="item" href="/network">
+<span>network</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/machines">
+<span>machines</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/tools">
+<span>tools</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/terminal">
+<span>terminal</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/chats">
+<span>chats</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/labs">
+<span>labs</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/jobs">
+<span>jobs</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/captures">
+<span>captures</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/assets">
+<span>assets</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/learn">
+<span>learn</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/files">
+<span>files</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/notes">
+<span>notes</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/notifications">
+<span>notifications</span>
+<span id="notification-count">&gt;</span>
+</a>
+
+<a class="item" href="/logs">
+<span>logs</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/search">
+<span>search</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/system">
+<span>system</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/settings">
+<span>settings</span><span>&gt;</span>
+</a>
+
+<a class="item" href="/install">
+<span>install</span><span>&gt;</span>
+</a>
+
+</main>
+
+<script src="/static/common.js"></script>
+
+<script>
+async function load(){
+
+const me=
+await CD.api("/api/me");
+
+const user=
+await me.json();
+
+document.getElementById(
+"username"
+).textContent=user.username;
+
+const nr=
+await CD.api(
+"/api/notifications"
+);
+
+const notes=
+await nr.json();
+
+const unread=
+notes.filter(
+n=>!n.read
+).length;
+
+document.getElementById(
+"notification-count"
+).textContent=
+unread
+? unread+" >"
+: ">";
+
+}
+
+function logout(){
+
+sessionStorage.removeItem(
+"cyberdeck_token"
+);
+
+location="/";
+}
+
+load();
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

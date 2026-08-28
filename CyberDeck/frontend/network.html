@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;
+background:#000;
+color:#999;
+font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+font-size:13px;
+}
+header{
+padding:25px 30px;
+border-bottom:1px solid #181818;
+display:flex;
+justify-content:space-between;
+}
+.logo{
+color:#ddd;
+letter-spacing:3px;
+}
+nav a{
+color:#666;
+text-decoration:none;
+margin-left:20px;
+}
+main{
+max-width:800px;
+margin:auto;
+padding:50px 30px;
+}
+.title{
+color:#ddd;
+margin-bottom:35px;
+letter-spacing:2px;
+}
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:1px;
+background:#181818;
+border:1px solid #181818;
+}
+.cell{
+background:#000;
+padding:22px;
+}
+.label{
+color:#555;
+font-size:11px;
+margin-bottom:8px;
+}
+.value{
+color:#ccc;
+font-size:18px;
+}
+.traffic{
+margin-top:40px;
+border-top:1px solid #181818;
+}
+.row{
+padding:16px 4px;
+border-bottom:1px solid #181818;
+display:flex;
+justify-content:space-between;
+}
+.good{color:#888}
+</style>
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<nav>
+<a href="/dashboard">back</a>
+</nav>
+</header>
+
+<main>
+
+<div class="title">network</div>
+
+<div class="grid">
+
+<div class="cell">
+<div class="label">status</div>
+<div class="value good">online</div>
+</div>
+
+<div class="cell">
+<div class="label">host</div>
+<div class="value" id="hostname">-</div>
+</div>
+
+<div class="cell">
+<div class="label">address</div>
+<div class="value" id="ip">-</div>
+</div>
+
+<div class="cell">
+<div class="label">uptime</div>
+<div class="value" id="uptime">-</div>
+</div>
+
+<div class="cell">
+<div class="label">cpu</div>
+<div class="value" id="cpu">-</div>
+</div>
+
+<div class="cell">
+<div class="label">memory</div>
+<div class="value" id="memory">-</div>
+</div>
+
+</div>
+
+<div class="traffic">
+
+<div class="row">
+<span>download</span>
+<span id="download">-</span>
+</div>
+
+<div class="row">
+<span>upload</span>
+<span id="upload">-</span>
+</div>
+
+<div class="row">
+<span>packets received</span>
+<span id="packets-recv">-</span>
+</div>
+
+<div class="row">
+<span>packets sent</span>
+<span id="packets-sent">-</span>
+</div>
+
+</div>
+
+</main>
+
+<script>
+const token=sessionStorage.getItem("cyberdeck_token");
+
+if(!token){
+window.location="/";
+}
+
+let lastRx=null;
+let lastTx=null;
+let lastTime=null;
+
+function formatRate(bytes){
+if(bytes>1024*1024) return (bytes/1024/1024).toFixed(2)+" MB/s";
+if(bytes>1024) return (bytes/1024).toFixed(2)+" KB/s";
+return bytes.toFixed(0)+" B/s";
+}
+
+function formatUptime(seconds){
+const d=Math.floor(seconds/86400);
+const h=Math.floor((seconds%86400)/3600);
+const m=Math.floor((seconds%3600)/60);
+return `${d}d ${h}h ${m}m`;
+}
+
+async function refresh(){
+const r=await fetch("/api/network/status",{
+headers:{"Authorization":"Bearer "+token}
+});
+
+if(!r.ok){
+sessionStorage.removeItem("cyberdeck_token");
+window.location="/";
+return;
+}
+
+const d=await r.json();
+
+document.getElementById("hostname").textContent=d.hostname;
+document.getElementById("ip").textContent=d.ip;
+document.getElementById("cpu").textContent=d.cpu.toFixed(1)+"%";
+document.getElementById("memory").textContent=d.memory.toFixed(1)+"%";
+document.getElementById("uptime").textContent=formatUptime(d.uptime);
+document.getElementById("packets-recv").textContent=d.packets_recv.toLocaleString();
+document.getElementById("packets-sent").textContent=d.packets_sent.toLocaleString();
+
+const now=Date.now();
+
+if(lastTime!==null){
+const seconds=(now-lastTime)/1000;
+document.getElementById("download").textContent=formatRate((d.bytes_recv-lastRx)/seconds);
+document.getElementById("upload").textContent=formatRate((d.bytes_sent-lastTx)/seconds);
+}
+
+lastRx=d.bytes_recv;
+lastTx=d.bytes_sent;
+lastTime=now;
+}
+
+refresh();
+setInterval(refresh,2000);
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+COMMAND="${1:-}"
+
+if [ -z "$COMMAND" ]; then
+    echo "no command"
+    exit 1
+fi
+
+exec /usr/sbin/runuser -u cyberdeck-shell -- \
+    /usr/bin/env -i \
+    HOME=/srv/cyberdeck-shell \
+    USER=cyberdeck-shell \
+    LOGNAME=cyberdeck-shell \
+    TERM=xterm-256color \
+    PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin \
+    /bin/bash --noprofile --norc -c "$COMMAND"

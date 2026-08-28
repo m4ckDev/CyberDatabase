@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<link rel="stylesheet" href="/static/cyberdeck.css">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<a href="/dashboard">back</a>
+</header>
+
+<main>
+
+<h1>settings</h1>
+
+<h2>PASSWORD</h2>
+
+<input id="current"
+type="password"
+placeholder="current password">
+
+<br><br>
+
+<input id="next"
+type="password"
+placeholder="new password">
+
+<br><br>
+
+<input id="confirm"
+type="password"
+placeholder="confirm new password">
+
+<div class="actions">
+<button onclick="changePassword()">change password</button>
+</div>
+
+<div id="status" class="small"></div>
+
+<h2>ACCESS</h2>
+
+<div class="actions">
+<a class="button" href="/admin">admin</a>
+<a class="button" href="/install">install</a>
+</div>
+
+</main>
+
+<script src="/static/common.js"></script>
+
+<script>
+async function changePassword(){
+
+if(next.value!==confirm.value){
+
+status.textContent=
+"passwords do not match";
+
+return;
+}
+
+const r=
+await CD.api(
+"/api/settings/password",
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify({
+current_password:
+current.value,
+new_password:
+next.value
+})
+}
+);
+
+const data=
+await r.json();
+
+status.textContent=
+r.ok
+? "password changed"
+: data.detail;
+
+if(r.ok){
+
+current.value="";
+next.value="";
+confirm.value="";
+}
+
+}
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

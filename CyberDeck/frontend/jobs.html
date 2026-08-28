@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<link rel="stylesheet" href="/static/cyberdeck.css">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<a href="/dashboard">back</a>
+</header>
+
+<main>
+
+<h1>jobs</h1>
+
+<div class="form-grid">
+
+<input id="target"
+placeholder="target / CIDR">
+
+<select id="action">
+<option value="host_discovery">host discovery</option>
+<option value="nmap_quick">quick nmap</option>
+<option value="nmap_full">full tcp</option>
+<option value="nmap_service">service scan</option>
+<option value="nmap_os">os detect</option>
+<option value="nmap_udp">udp scan</option>
+<option value="nmap_safe">nse safe</option>
+<option value="nmap_vuln">nse vuln</option>
+<option value="nikto_http">nikto http</option>
+<option value="nikto_https">nikto https</option>
+<option value="gobuster_http">dirs http</option>
+<option value="gobuster_https">dirs https</option>
+<option value="ssh_fingerprint">ssh fingerprint</option>
+<option value="smb_info">smb info</option>
+<option value="tls">tls inspect</option>
+<option value="trace">traceroute</option>
+<option value="whois">whois</option>
+</select>
+
+</div>
+
+<div class="actions">
+<button onclick="queue()">queue</button>
+</div>
+
+<h2>BACKGROUND JOBS</h2>
+<div id="jobs"></div>
+
+<h2>OUTPUT</h2>
+<pre id="output">select a job</pre>
+
+</main>
+
+<script src="/static/common.js"></script>
+
+<script>
+async function queue(){
+
+const payload={
+action:
+document.getElementById(
+"action"
+).value,
+target:
+document.getElementById(
+"target"
+).value.trim()
+};
+
+const r=
+await CD.api(
+"/api/jobs",
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify(
+payload
+)
+}
+);
+
+const data=
+await r.json();
+
+if(!r.ok)
+alert(data.detail);
+
+load();
+}
+
+async function load(){
+
+const r=
+await CD.api("/api/jobs");
+
+const jobs=
+await r.json();
+
+const box=
+document.getElementById(
+"jobs"
+);
+
+box.innerHTML="";
+
+jobs.forEach(job=>{
+
+const row=
+document.createElement(
+"div"
+);
+
+row.className=
+"row-flex";
+
+const left=
+document.createElement(
+"div"
+);
+
+left.innerHTML=
+`<div>${job.action}</div>
+<div class="small">
+${job.target}
+&nbsp;
+${job.status}
+</div>`;
+
+left.style.cursor=
+"pointer";
+
+left.onclick=()=>{
+
+document.getElementById(
+"output"
+).textContent=
+job.output
+|| job.status;
+
+};
+
+const right=
+document.createElement(
+"div"
+);
+
+if(job.status==="queued"){
+
+const cancel=
+document.createElement(
+"button"
+);
+
+cancel.textContent=
+"cancel";
+
+cancel.onclick=
+async()=>{
+
+await CD.api(
+`/api/jobs/${job.id}/cancel`,
+{method:"POST"}
+);
+
+load();
+};
+
+right.appendChild(
+cancel
+);
+}
+
+row.append(
+left,
+right
+);
+
+box.appendChild(row);
+
+});
+
+}
+
+load();
+
+setInterval(
+load,
+3000
+);
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

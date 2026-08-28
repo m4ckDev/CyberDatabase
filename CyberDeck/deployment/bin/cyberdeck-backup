@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -euo pipefail
+umask 077
+
+BASE="/opt/cyberdeck"
+ENVFILE="$BASE/config/.env"
+ROOT="$BASE/backups/auto"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+DEST="$ROOT/$STAMP"
+
+mkdir -p "$DEST"
+
+set -a
+source "$ENVFILE"
+set +a
+
+pg_dump "$DATABASE_URL" \
+| gzip \
+> "$DEST/database.sql.gz"
+
+tar -czf \
+"$DEST/platform.tar.gz" \
+-C "$BASE" \
+api \
+frontend \
+knowledge \
+files \
+mobile \
+config/.env
+
+find "$ROOT" \
+-mindepth 1 \
+-maxdepth 1 \
+-type d \
+-mtime +14 \
+-exec rm -rf {} +
+
+echo "backup complete: $DEST"

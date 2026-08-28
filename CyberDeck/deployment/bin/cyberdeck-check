@@ -1,0 +1,24 @@
+#!/bin/bash
+
+echo "CyberDeck API:"
+systemctl is-active cyberdeck || true
+
+echo
+echo "Worker:"
+systemctl is-active cyberdeck-worker || true
+
+echo
+echo "PostgreSQL:"
+systemctl is-active postgresql || true
+
+echo
+echo "API:"
+curl -sS \
+http://127.0.0.1:8000/api/health \
+|| true
+
+echo
+echo
+echo "Timers:"
+systemctl is-enabled cyberdeck-backup.timer || true
+systemctl is-enabled cyberdeck-maintain.timer || true

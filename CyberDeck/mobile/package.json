@@ -1,0 +1,22 @@
+{
+  "name": "cyberdeck-mobile",
+  "version": "0.5.0",
+  "private": true,
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "ios": "expo start --ios",
+    "android": "expo start --android"
+  },
+  "dependencies": {
+    "expo": "latest",
+    "expo-secure-store": "latest",
+    "expo-status-bar": "latest",
+    "react": "latest",
+    "react-native": "latest"
+  },
+  "devDependencies": {
+    "@babel/core": "latest",
+    "typescript": "latest"
+  }
+}

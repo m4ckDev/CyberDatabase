@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<link rel="stylesheet" href="/static/cyberdeck.css">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<a href="/dashboard">back</a>
+</header>
+
+<main>
+
+<h1>files</h1>
+
+<input id="upload" type="file">
+
+<div class="actions">
+<button onclick="uploadFile()">upload</button>
+</div>
+
+<div id="status" class="small"></div>
+
+<h2>STORAGE</h2>
+<div id="files"></div>
+
+</main>
+
+<script src="/static/common.js"></script>
+
+<script>
+async function load(){
+
+const r=
+await CD.api("/api/files");
+
+const files=
+await r.json();
+
+const box=
+document.getElementById(
+"files"
+);
+
+box.innerHTML="";
+
+files.forEach(file=>{
+
+const row=
+document.createElement(
+"div"
+);
+
+row.className="row";
+
+row.innerHTML=
+`<div>${file.name}</div>
+<div class="small">
+${CD.fmtBytes(file.size)}
+&nbsp;
+${file.sha256}
+</div>`;
+
+const actions=
+document.createElement(
+"div"
+);
+
+actions.className="actions";
+
+const dl=
+document.createElement(
+"button"
+);
+
+dl.textContent="download";
+
+dl.onclick=()=>CD.download(
+`/api/files/${file.id}/download`,
+file.name
+);
+
+const del=
+document.createElement(
+"button"
+);
+
+del.textContent="delete";
+
+del.onclick=async()=>{
+
+await CD.api(
+`/api/files/${file.id}`,
+{method:"DELETE"}
+);
+
+load();
+};
+
+actions.append(dl,del);
+
+row.appendChild(actions);
+
+box.appendChild(row);
+
+});
+
+}
+
+async function uploadFile(){
+
+const input=
+document.getElementById(
+"upload"
+);
+
+if(!input.files.length)
+return;
+
+const data=
+new FormData();
+
+data.append(
+"upload",
+input.files[0]
+);
+
+status.textContent=
+"uploading...";
+
+const r=
+await CD.api(
+"/api/files",
+{
+method:"POST",
+body:data
+}
+);
+
+const result=
+await r.json();
+
+status.textContent=
+r.ok
+? "uploaded"
+: result.detail;
+
+input.value="";
+
+load();
+}
+
+load();
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>

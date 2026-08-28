@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberDeck</title>
+<link rel="stylesheet" href="/static/cyberdeck.css">
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+
+</head>
+<body>
+
+<header>
+<div class="logo">CYBERDECK</div>
+<a href="/dashboard">back</a>
+</header>
+
+<main>
+
+<h1>assets</h1>
+
+<div class="form-grid">
+
+<input id="name"
+placeholder="asset name">
+
+<input id="address"
+placeholder="IP / hostname">
+
+<input id="os"
+placeholder="operating system">
+
+<input id="tags"
+placeholder="tags">
+
+</div>
+
+<br>
+
+<textarea id="notes"
+placeholder="notes"></textarea>
+
+<div class="actions">
+<button onclick="add()">add asset</button>
+</div>
+
+<h2>INVENTORY</h2>
+<div id="assets"></div>
+
+</main>
+
+<script src="/static/common.js"></script>
+
+<script>
+async function add(){
+
+const payload={
+name:name.value,
+address:address.value,
+operating_system:
+os.value,
+tags:tags.value,
+notes:notes.value
+};
+
+const r=
+await CD.api(
+"/api/assets",
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify(
+payload
+)
+}
+);
+
+const data=
+await r.json();
+
+if(!r.ok){
+
+alert(data.detail);
+return;
+}
+
+name.value="";
+address.value="";
+os.value="";
+tags.value="";
+notes.value="";
+
+load();
+}
+
+async function load(){
+
+const r=
+await CD.api(
+"/api/assets"
+);
+
+const rows=
+await r.json();
+
+const box=
+document.getElementById(
+"assets"
+);
+
+box.innerHTML="";
+
+rows.forEach(a=>{
+
+const row=
+document.createElement(
+"div"
+);
+
+row.className="row";
+
+row.innerHTML=
+`<div class="value">
+${a.name}
+</div>
+<div>${a.address}</div>
+<div class="small">
+${a.operating_system}
+&nbsp;
+${a.tags}
+</div>
+<pre>${a.notes}</pre>`;
+
+const del=
+document.createElement(
+"button"
+);
+
+del.textContent="delete";
+
+del.onclick=
+async()=>{
+
+await CD.api(
+`/api/assets/${a.id}`,
+{method:"DELETE"}
+);
+
+load();
+};
+
+row.appendChild(del);
+
+box.appendChild(row);
+
+});
+
+}
+
+load();
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("/sw.js").catch(()=>{});
+}
+</script>
+
+</body>
+</html>
