@@ -32,7 +32,8 @@ backup_dir() {
         mkdir -p "$backup"
         rsync -a "$target/" "$backup/"
     else
-        mkdir -p "$(dirname "$backup")"        touch "${backup}/.MISSING"
+        mkdir -p "$(dirname "$backup")"
+        touch "${backup}.MISSING"
     fi
 }
 
@@ -74,7 +75,7 @@ restore_file() {
 }
 
 rollback() {
-    trap -ERR
+    trap - ERR
     set +e
 
     echo
@@ -100,7 +101,7 @@ rollback() {
 
             case "$name" in 
                 *.MISSING)
-                    original=${name%.MISSING}"
+                    original="${name%.MISSING}"
                     rm -f "/etc/systemd/system/$original"
                     ;;
                 *)
@@ -116,11 +117,11 @@ rollback() {
         for backup in "$ROLLBACK/bin/"*; do
             [ -e "$backup" ] || continue
 
-            name ="$(basename "$backup")"
+            name="$(basename "$backup")"
 
             case "$name" in
                 *.MISSING)
-                    original=${name%.MISSING}"
+                    original="${name%.MISSING}"
                     rm -f "/usr/local/bin/$original"
                     ;;
                 *)
@@ -131,8 +132,6 @@ rollback() {
             esac
         done
     fi
-
-    if
 
     if [ -d "$ROLLBACK/sudoers" ]; then
         for backup in "$ROLLBACK/sudoers/"*; do
