@@ -243,6 +243,7 @@ SECRET_MATCHES="$(
         "$PROJECT" \
         --exclude-dir=.git \
         --exclude-dir=node_modules \
+        --exclude='cyberdeck-deploy' \
         2>/dev/null || true
 )"
 
