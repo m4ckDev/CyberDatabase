@@ -20,9 +20,14 @@ NS="cdvpn-${UID_VALUE}"
 
 ip netns list |
 grep -q "^${NS}\b" || {
-    echo "VPN namespace is not active" >&2
+    echo "VPN is disconnected" >&2
     exit 3
 }
+
+ip netns exec "$NS"     curl     -fsS     --max-time 6     https://api.ipify.org     >/dev/null 2>&1 || {
+        echo "VPN connection has no Internet access" >&2
+        exit 4
+    }
 
 exec ip netns exec "$NS" \
     /opt/cyberdeck/venv/bin/python \

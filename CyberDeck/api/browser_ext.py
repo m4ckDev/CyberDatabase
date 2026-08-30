@@ -110,13 +110,19 @@ def install_browser(app, current_user):
             or result.stderr.strip()
         )
 
+        if result.returncode in {3, 4}:
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    output
+                    or "VPN connection unavailable"
+                )
+            )
+
         if result.returncode != 0:
             raise HTTPException(
                 status_code=502,
-                detail=(
-                    output[-2000:]
-                    or "Browser render failed"
-                )
+                detail="Browser render failed"
             )
 
         try:
