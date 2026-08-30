@@ -111,6 +111,55 @@ button:hover{
     border-color:#666;
 }
 
+.top-actions{
+    display:flex;
+    gap:8px;
+}
+
+.editor{
+    display:none;
+    border:1px solid #222;
+    padding:18px;
+    margin-bottom:24px;
+}
+
+.editor-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.editor input,
+.editor textarea{
+    width:100%;
+    box-sizing:border-box;
+    background:#000;
+    color:#ddd;
+    border:1px solid #333;
+    font-family:monospace;
+    padding:9px;
+}
+
+.editor textarea{
+    min-height:90px;
+    resize:vertical;
+}
+
+.editor-actions{
+    margin-top:12px;
+    display:flex;
+    gap:8px;
+}
+
+.danger{
+    color:#777;
+}
+
+.danger:hover{
+    color:#fff;
+    border-color:#888;
+}
+
 @media(max-width:700px){
     .machine{
         grid-template-columns:1fr;
@@ -131,11 +180,34 @@ button:hover{
 <div class="top">
     <a href="/dashboard">&lt; back</a>
     <div class="title">machines</div>
-    <button onclick="loadMachines()">refresh</button>
+    <div class="top-actions">
+        <button onclick="showMachineForm()">+ machine</button>
+        <button onclick="loadMachines()">refresh</button>
+    </div>
 </div>
 
 <div id="summary" class="summary">
 loading...
+</div>
+
+<div id="editor" class="editor">
+    <div id="editorTitle" style="margin-bottom:14px;color:#aaa;">
+        add machine
+    </div>
+
+    <div class="editor-grid">
+        <input id="machineName" placeholder="name">
+        <input id="machineAddress" placeholder="ip / hostname">
+        <input id="machineOS" placeholder="operating system">
+        <input id="machineTags" placeholder="tags">
+    </div>
+
+    <textarea id="machineNotes" placeholder="notes" style="margin-top:12px;"></textarea>
+
+    <div class="editor-actions">
+        <button onclick="saveMachine()">save</button>
+        <button onclick="hideMachineForm()">cancel</button>
+    </div>
 </div>
 
 <div id="machines"></div>
@@ -163,6 +235,9 @@ loading...
 </div>
 
 <script>
+
+let machinesById = {};
+let editingId = null;
 
 function getToken(){
     return sessionStorage.getItem("cyberdeck_token");
@@ -211,6 +286,12 @@ async function loadMachines(){
 
         const data = await response.json();
 
+        machinesById = {};
+
+        for(const machine of data){
+            machinesById[machine.id] = machine;
+        }
+
         area.innerHTML = "";
 
         let online = 0;
@@ -256,6 +337,8 @@ async function loadMachines(){
                     <button onclick='runTool("ssh", ${JSON.stringify(machine.address)})'>ssh</button>
                     <button onclick='openWeb(${JSON.stringify(machine.address)})'>web</button>
                     <button onclick='openTerminal(${JSON.stringify(machine.address)})'>terminal</button>
+                    <button onclick='editMachine(${machine.id})'>edit</button>
+                    <button class="danger" onclick='deleteMachine(${machine.id})'>delete</button>
                 </div>
             `;
 
@@ -278,6 +361,133 @@ async function loadMachines(){
         area.innerHTML =
             `<div class="empty">${esc(error.message)}</div>`;
     }
+}
+
+
+function showMachineForm(){
+
+    editingId = null;
+
+    document.getElementById("editorTitle").textContent = "add machine";
+
+    document.getElementById("machineName").value = "";
+    document.getElementById("machineAddress").value = "";
+    document.getElementById("machineOS").value = "";
+    document.getElementById("machineTags").value = "";
+    document.getElementById("machineNotes").value = "";
+
+    document.getElementById("editor").style.display = "block";
+    document.getElementById("machineName").focus();
+}
+
+function hideMachineForm(){
+    editingId = null;
+    document.getElementById("editor").style.display = "none";
+}
+
+function editMachine(id){
+
+    const machine = machinesById[id];
+
+    if(!machine){
+        return;
+    }
+
+    editingId = id;
+
+    document.getElementById("editorTitle").textContent = "edit machine";
+    document.getElementById("machineName").value = machine.name || "";
+    document.getElementById("machineAddress").value = machine.address || "";
+    document.getElementById("machineOS").value = machine.operating_system || "";
+    document.getElementById("machineTags").value = machine.tags || "";
+    document.getElementById("machineNotes").value = machine.notes || "";
+
+    document.getElementById("editor").style.display = "block";
+    document.getElementById("machineName").focus();
+}
+
+async function saveMachine(){
+
+    const name = document.getElementById("machineName").value.trim();
+    const address = document.getElementById("machineAddress").value.trim();
+    const operating_system = document.getElementById("machineOS").value.trim();
+    const tags = document.getElementById("machineTags").value.trim();
+    const notes = document.getElementById("machineNotes").value.trim();
+
+    if(!name || !address){
+        alert("name and address are required");
+        return;
+    }
+
+    const editing = editingId !== null;
+
+    const url = editing
+        ? "/api/assets/" + editingId
+        : "/api/assets";
+
+    const method = editing
+        ? "PUT"
+        : "POST";
+
+    const response = await fetch(
+        url,
+        {
+            method,
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer " + getToken()
+            },
+            body:JSON.stringify({
+                name,
+                address,
+                operating_system,
+                tags,
+                notes
+            })
+        }
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        alert(data.detail || "unable to save machine");
+        return;
+    }
+
+    hideMachineForm();
+    await loadMachines();
+}
+
+async function deleteMachine(id){
+
+    const machine = machinesById[id];
+
+    if(!machine){
+        return;
+    }
+
+    if(!confirm("delete " + machine.name + "?")){
+        return;
+    }
+
+    const response = await fetch(
+        "/api/assets/" + id,
+        {
+            method:"DELETE",
+            headers:{
+                "Authorization":"Bearer " + getToken()
+            }
+        }
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+        alert(data.detail || "unable to delete machine");
+        return;
+    }
+
+    await loadMachines();
 }
 
 function hostOf(value){
