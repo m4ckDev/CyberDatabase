@@ -12,6 +12,31 @@ main{max-width:800px;margin:auto;padding:45px 30px}
 h2{font-size:13px;color:#bbb;font-weight:normal;letter-spacing:2px}
 .row{padding:14px 0;border-bottom:1px solid #181818;display:flex;justify-content:space-between}
 #invite{margin:25px 0;color:#bbb;word-break:break-all}
+.metrics{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:10px;
+margin:15px 0 30px
+}
+.metric{
+border:1px solid #181818;
+padding:14px
+}
+.metric .label{
+color:#555;
+font-size:11px;
+margin-bottom:7px
+}
+.metric .value{
+color:#bbb;
+font-size:17px
+}
+.costs{
+border:1px solid #181818;
+padding:14px;
+margin-bottom:30px;
+line-height:1.8
+}
 </style>
 
 <link rel="manifest" href="/manifest.webmanifest">
@@ -35,6 +60,47 @@ h2{font-size:13px;color:#bbb;font-weight:normal;letter-spacing:2px}
 <button onclick="createInvite()">create invite</button>
 
 <div id="invite"></div>
+
+<h2>RATE LIMIT ENGINE</h2>
+
+<button onclick="loadRateLimits()">refresh metrics</button>
+
+<div class="metrics">
+<div class="metric">
+<div class="label">ACTIVE JOBS</div>
+<div class="value" id="rl-active">-</div>
+</div>
+
+<div class="metric">
+<div class="label">BLOCKED USERS</div>
+<div class="value" id="rl-blocked">-</div>
+</div>
+
+<div class="metric">
+<div class="label">VIOLATION USERS</div>
+<div class="value" id="rl-violations">-</div>
+</div>
+
+<div class="metric">
+<div class="label">MAX CONCURRENT</div>
+<div class="value" id="rl-concurrent">-</div>
+</div>
+
+<div class="metric">
+<div class="label">USER CAPACITY</div>
+<div class="value" id="rl-user-capacity">-</div>
+</div>
+
+<div class="metric">
+<div class="label">TARGET CAPACITY</div>
+<div class="value" id="rl-target-capacity">-</div>
+</div>
+</div>
+
+<div class="costs">
+<div>TOOL WEIGHTS</div>
+<div id="rl-costs">loading...</div>
+</div>
 
 <h2>USERS</h2>
 
@@ -75,6 +141,48 @@ box.appendChild(row);
 });
 }
 
+async function loadRateLimits(){
+
+const r=await fetch("/api/admin/rate-limits",{
+headers:{"Authorization":"Bearer "+token}
+});
+
+if(!r.ok){
+document.getElementById("rl-costs").textContent=
+"metrics unavailable: "+r.status;
+return;
+}
+
+const data=await r.json();
+
+document.getElementById("rl-active").textContent=
+data.state?.active_jobs ?? 0;
+
+document.getElementById("rl-blocked").textContent=
+data.state?.blocked_users ?? 0;
+
+document.getElementById("rl-violations").textContent=
+data.state?.tracked_violation_users ?? 0;
+
+document.getElementById("rl-concurrent").textContent=
+data.limits?.max_concurrent_per_user ?? "-";
+
+document.getElementById("rl-user-capacity").textContent=
+data.limits?.user_capacity ?? "-";
+
+document.getElementById("rl-target-capacity").textContent=
+data.limits?.target_capacity ?? "-";
+
+const costs=data.action_costs || {};
+
+document.getElementById("rl-costs").textContent=
+Object.entries(costs)
+.sort((a,b)=>b[1]-a[1])
+.map(([tool,cost])=>tool+"="+cost)
+.join("  |  ");
+}
+
+
 async function createInvite(){
 
 const r=await fetch("/api/admin/invites",{
@@ -98,6 +206,7 @@ document.getElementById("invite").textContent=url;
 }
 
 loadUsers();
+loadRateLimits();
 </script>
 
 
