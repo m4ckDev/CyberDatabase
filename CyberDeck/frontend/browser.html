@@ -29,10 +29,21 @@ content="#000000"
 
 <style>
 
+.browser-controls{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+margin-top:14px;
+}
+
+.browser-controls button{
+min-width:46px;
+}
+
 .browser-bar{
 display:flex;
 gap:8px;
-margin-top:14px;
+margin-top:10px;
 }
 
 .browser-bar input{
@@ -113,6 +124,36 @@ VPN-routed server-side recon browser.
 <h2>NAVIGATE</h2>
 
 <div class="settings-block">
+
+<div class="browser-controls">
+
+<button
+id="browser-back"
+onclick="goBack()"
+disabled
+title="Back"
+>
+&lt;
+</button>
+
+<button
+id="browser-forward"
+onclick="goForward()"
+disabled
+title="Forward"
+>
+&gt;
+</button>
+
+<button
+id="browser-reload"
+onclick="reloadPage()"
+title="Reload"
+>
+reload
+</button>
+
+</div>
 
 <div class="browser-bar">
 
@@ -293,8 +334,131 @@ document.getElementById(
 "browse-button"
 );
 
+const browserBack =
+document.getElementById(
+"browser-back"
+);
 
-async function browse(){
+const browserForward =
+document.getElementById(
+"browser-forward"
+);
+
+let reconHistory = [];
+let reconHistoryIndex = -1;
+
+
+function updateNavButtons(){
+
+browserBack.disabled =
+reconHistoryIndex <= 0;
+
+browserForward.disabled =
+reconHistoryIndex < 0
+||
+reconHistoryIndex >=
+reconHistory.length - 1;
+
+}
+
+
+function saveHistory(url){
+
+if(
+reconHistory[reconHistoryIndex]
+=== url
+){
+return;
+}
+
+reconHistory =
+reconHistory.slice(
+0,
+reconHistoryIndex + 1
+);
+
+reconHistory.push(url);
+
+reconHistoryIndex =
+reconHistory.length - 1;
+
+updateNavButtons();
+
+}
+
+
+async function goBack(){
+
+if(reconHistoryIndex <= 0){
+return;
+}
+
+reconHistoryIndex--;
+
+browserUrl.value =
+reconHistory[
+reconHistoryIndex
+];
+
+updateNavButtons();
+
+await browse(false);
+
+}
+
+
+async function goForward(){
+
+if(
+reconHistoryIndex >=
+reconHistory.length - 1
+){
+return;
+}
+
+reconHistoryIndex++;
+
+browserUrl.value =
+reconHistory[
+reconHistoryIndex
+];
+
+updateNavButtons();
+
+await browse(false);
+
+}
+
+
+async function reloadPage(){
+
+let url =
+browserFinal.textContent;
+
+if(
+!url
+||
+url === "-"
+||
+url === "..."
+){
+url =
+browserUrl.value.trim();
+}
+
+if(!url){
+return;
+}
+
+browserUrl.value =
+url;
+
+await browse(false);
+
+}
+
+
+async function browse(recordHistory=true){
 
 let url =
 browserUrl.value.trim();
@@ -361,6 +525,17 @@ data.title || "-";
 
 browserFinal.textContent =
 data.final_url || "-";
+
+browserUrl.value =
+data.final_url || url;
+
+if(recordHistory){
+
+saveHistory(
+data.final_url || url
+);
+
+}
 
 browserText.textContent =
 data.body_text
