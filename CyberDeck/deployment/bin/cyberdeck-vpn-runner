@@ -1,0 +1,896 @@
+#!/bin/bash
+
+set -Eeuo pipefail
+umask 077
+
+BASE="/opt/cyberdeck/vpn"
+PROFILE_ROOT="$BASE/profiles"
+STATE_ROOT="/run/cyberdeck-vpn"
+
+mkdir -p "$STATE_ROOT"
+
+
+die(){
+
+    echo "$*" >&2
+    exit 1
+}
+
+
+valid_uid(){
+
+    [[ "$1" =~ ^[0-9]+$ ]]
+}
+
+
+valid_profile(){
+
+    [[ "$1" =~ ^[a-f0-9]{10}$ ]]
+}
+
+
+namespace_vars(){
+
+    local uid="$1"
+
+    slot=$(( uid % 16000 ))
+    third=$(( slot / 64 ))
+    base=$(( (slot % 64) * 4 ))
+
+    host_octet=$(( base + 1 ))
+    ns_octet=$(( base + 2 ))
+
+    ns="cdvpn-${uid}"
+
+    printf -v short "%08x" "$uid"
+
+    hostv="cvh${short}"
+    nsv="cvn${short}"
+
+    cidr="10.240.${third}.${base}/30"
+
+    host_addr="10.240.${third}.${host_octet}/30"
+    ns_addr="10.240.${third}.${ns_octet}/30"
+    gateway="10.240.${third}.${host_octet}"
+
+    state="$STATE_ROOT/${uid}.state"
+    runtime="$STATE_ROOT/${uid}"
+}
+
+
+disconnect_impl(){
+
+    local uid="$1"
+
+    namespace_vars "$uid"
+
+    local saved_state="$state"
+
+    local protocol=""
+    local tunnel=""
+    local uplink=""
+    local saved_cidr=""
+    local saved_hostv=""
+    local saved_ns=""
+    local pidfile=""
+
+    if [[ -f "$saved_state" ]]; then
+
+        # shellcheck disable=SC1090
+        source "$saved_state"
+
+        saved_cidr="${cidr:-}"
+        saved_hostv="${hostv:-}"
+        saved_ns="${ns:-}"
+
+    else
+
+        saved_hostv="$hostv"
+        saved_ns="$ns"
+
+    fi
+
+
+    if [[ -n "${pidfile:-}" && -f "$pidfile" ]]; then
+
+        pid="$(
+            cat "$pidfile" \
+            2>/dev/null \
+            || true
+        )"
+
+        if [[ "$pid" =~ ^[0-9]+$ ]]; then
+            kill "$pid" \
+                >/dev/null 2>&1 \
+                || true
+        fi
+
+    fi
+
+
+    if [[ -n "${saved_cidr:-}" && -n "${uplink:-}" ]]; then
+
+        while iptables -t nat -C POSTROUTING \
+            -s "$saved_cidr" \
+            -o "$uplink" \
+            -j MASQUERADE \
+            >/dev/null 2>&1
+        do
+
+            iptables -t nat -D POSTROUTING \
+                -s "$saved_cidr" \
+                -o "$uplink" \
+                -j MASQUERADE \
+                >/dev/null 2>&1 \
+                || true
+
+        done
+
+    fi
+
+
+    if [[ -n "${saved_hostv:-}" && -n "${uplink:-}" ]]; then
+
+        while iptables -C FORWARD \
+            -i "$saved_hostv" \
+            -o "$uplink" \
+            -j ACCEPT \
+            >/dev/null 2>&1
+        do
+
+            iptables -D FORWARD \
+                -i "$saved_hostv" \
+                -o "$uplink" \
+                -j ACCEPT \
+                >/dev/null 2>&1 \
+                || true
+
+        done
+
+
+        while iptables -C FORWARD \
+            -i "$uplink" \
+            -o "$saved_hostv" \
+            -m conntrack \
+            --ctstate RELATED,ESTABLISHED \
+            -j ACCEPT \
+            >/dev/null 2>&1
+        do
+
+            iptables -D FORWARD \
+                -i "$uplink" \
+                -o "$saved_hostv" \
+                -m conntrack \
+                --ctstate RELATED,ESTABLISHED \
+                -j ACCEPT \
+                >/dev/null 2>&1 \
+                || true
+
+        done
+
+    fi
+
+
+    if [[ -n "${saved_ns:-}" ]]; then
+
+        ip netns del "$saved_ns" \
+            >/dev/null 2>&1 \
+            || true
+
+        rm -rf \
+            "/etc/netns/$saved_ns"
+
+    fi
+
+
+    if [[ -n "${saved_hostv:-}" ]]; then
+
+        ip link del "$saved_hostv" \
+            >/dev/null 2>&1 \
+            || true
+
+    fi
+
+
+    rm -rf "$runtime"
+    rm -f "$saved_state"
+}
+
+
+resolve_endpoint(){
+
+    local protocol="$1"
+    local profile="$2"
+
+    local host=""
+    local port=""
+    local transport="udp"
+
+
+    if [[ "$protocol" == "wireguard" ]]; then
+
+        endpoint="$(
+            grep -i \
+                '^[[:space:]]*Endpoint[[:space:]]*=' \
+                "$profile" \
+            | head -1 \
+            | cut -d= -f2- \
+            | xargs
+        )"
+
+        [[ -n "$endpoint" ]] \
+            || die "WireGuard endpoint missing"
+
+
+        if [[ "$endpoint" == \[* ]]; then
+            die "IPv6 VPN endpoints are not enabled yet"
+        fi
+
+
+        host="${endpoint%:*}"
+        port="${endpoint##*:}"
+        transport="udp"
+
+    else
+
+        read -r host port < <(
+            awk '
+            tolower($1)=="remote" {
+                print $2, $3
+                exit
+            }' \
+            "$profile"
+        )
+
+
+        [[ -n "${host:-}" ]] \
+            || die "OpenVPN remote server missing"
+
+
+        port="${port:-1194}"
+
+        raw_proto="$(
+            awk '
+            tolower($1)=="proto" {
+                print tolower($2)
+                exit
+            }' \
+            "$profile"
+        )"
+
+        if [[ "$raw_proto" == tcp* ]]; then
+            transport="tcp"
+        else
+            transport="udp"
+        fi
+
+    fi
+
+
+    if [[ "$host" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+
+        endpoint_ip="$host"
+
+    else
+
+        endpoint_ip="$(
+            getent ahostsv4 "$host" \
+            | awk '
+                {print $1; exit}
+            '
+        )"
+
+    fi
+
+
+    [[ -n "${endpoint_ip:-}" ]] \
+        || die "Unable to resolve VPN endpoint"
+
+
+    endpoint_port="$port"
+    endpoint_transport="$transport"
+}
+
+
+setup_namespace(){
+
+    local uid="$1"
+    local profile_id="$2"
+    local protocol="$3"
+    local kill_switch="$4"
+
+    disconnect_impl "$uid"
+
+    namespace_vars "$uid"
+
+    uplink="$(
+        ip route show default \
+        | awk '
+            {print $5; exit}
+        '
+    )"
+
+    [[ -n "$uplink" ]] \
+        || die "Default network interface not found"
+
+
+    mkdir -p "$runtime"
+
+
+    ip netns add "$ns"
+
+    ip link add "$hostv" \
+        type veth \
+        peer name "$nsv"
+
+    ip link set "$nsv" \
+        netns "$ns"
+
+    ip addr add "$host_addr" \
+        dev "$hostv"
+
+    ip link set "$hostv" up
+
+
+    ip netns exec "$ns" \
+        ip link set lo up
+
+    ip netns exec "$ns" \
+        ip addr add "$ns_addr" \
+        dev "$nsv"
+
+    ip netns exec "$ns" \
+        ip link set "$nsv" up
+
+    ip netns exec "$ns" \
+        ip route add default \
+        via "$gateway"
+
+
+    mkdir -p \
+        "/etc/netns/$ns"
+
+    cat > \
+        "/etc/netns/$ns/resolv.conf" \
+        <<EOF
+nameserver 1.1.1.1
+nameserver 9.9.9.9
+EOF
+
+
+    sysctl -w \
+        net.ipv4.ip_forward=1 \
+        >/dev/null
+
+
+    iptables -t nat -C POSTROUTING \
+        -s "$cidr" \
+        -o "$uplink" \
+        -j MASQUERADE \
+        >/dev/null 2>&1 \
+    || \
+    iptables -t nat -A POSTROUTING \
+        -s "$cidr" \
+        -o "$uplink" \
+        -j MASQUERADE
+
+
+    iptables -C FORWARD \
+        -i "$hostv" \
+        -o "$uplink" \
+        -j ACCEPT \
+        >/dev/null 2>&1 \
+    || \
+    iptables -A FORWARD \
+        -i "$hostv" \
+        -o "$uplink" \
+        -j ACCEPT
+
+
+    iptables -C FORWARD \
+        -i "$uplink" \
+        -o "$hostv" \
+        -m conntrack \
+        --ctstate RELATED,ESTABLISHED \
+        -j ACCEPT \
+        >/dev/null 2>&1 \
+    || \
+    iptables -A FORWARD \
+        -i "$uplink" \
+        -o "$hostv" \
+        -m conntrack \
+        --ctstate RELATED,ESTABLISHED \
+        -j ACCEPT
+
+
+    {
+        printf 'uid=%q\n' "$uid"
+        printf 'ns=%q\n' "$ns"
+        printf 'hostv=%q\n' "$hostv"
+        printf 'nsv=%q\n' "$nsv"
+        printf 'cidr=%q\n' "$cidr"
+        printf 'uplink=%q\n' "$uplink"
+        printf 'profile_id=%q\n' "$profile_id"
+        printf 'protocol=%q\n' "$protocol"
+        printf 'kill_switch=%q\n' "$kill_switch"
+        printf 'endpoint_ip=%q\n' "$endpoint_ip"
+        printf 'endpoint_port=%q\n' "$endpoint_port"
+        printf 'endpoint_transport=%q\n' "$endpoint_transport"
+        printf 'tunnel=%q\n' ""
+        printf 'pidfile=%q\n' ""
+    } > "$state"
+}
+
+
+apply_killswitch(){
+
+    local ns="$1"
+    local nsv="$2"
+    local tunnel="$3"
+    local endpoint_ip="$4"
+
+    ip netns exec "$ns" \
+        iptables -F OUTPUT
+
+    ip netns exec "$ns" \
+        iptables -A OUTPUT \
+        -o lo \
+        -j ACCEPT
+
+    ip netns exec "$ns" \
+        iptables -A OUTPUT \
+        -m conntrack \
+        --ctstate RELATED,ESTABLISHED \
+        -j ACCEPT
+
+    ip netns exec "$ns" \
+        iptables -A OUTPUT \
+        -o "$tunnel" \
+        -j ACCEPT
+
+    ip netns exec "$ns" \
+        iptables -A OUTPUT \
+        -o "$nsv" \
+        -d "$endpoint_ip" \
+        -j ACCEPT
+
+    ip netns exec "$ns" \
+        iptables -P OUTPUT DROP
+}
+
+
+connect_wireguard(){
+
+    local profile="$1"
+
+    runtime_conf="$runtime/${profile_id}.conf"
+    logfile="$runtime/wireguard.log"
+
+
+    awk \
+        -v ip="$endpoint_ip" \
+        -v port="$endpoint_port" '
+        BEGIN {
+            changed=0
+        }
+
+        tolower($0) ~ /^[[:space:]]*dns[[:space:]]*=/ {
+            next
+        }
+
+        tolower($0) ~ /^[[:space:]]*endpoint[[:space:]]*=/ && !changed {
+            print "Endpoint = " ip ":" port
+            changed=1
+            next
+        }
+
+        {
+            print
+        }
+        ' \
+        "$profile" \
+        > "$runtime_conf"
+
+
+    chmod 600 \
+        "$runtime_conf"
+
+
+    if ! ip netns exec "$ns" \
+        wg-quick up "$runtime_conf" \
+        >"$logfile" 2>&1
+    then
+
+        tail -30 "$logfile" >&2 \
+            || true
+
+        disconnect_impl "$uid"
+
+        die "WireGuard connection failed"
+    fi
+
+
+    tunnel="$profile_id"
+
+
+    if ! ip netns exec "$ns" \
+        ip link show "$tunnel" \
+        >/dev/null 2>&1
+    then
+
+        disconnect_impl "$uid"
+
+        die "WireGuard interface did not start"
+    fi
+}
+
+
+connect_openvpn(){
+
+    local profile="$1"
+
+    runtime_conf="$runtime/${profile_id}.ovpn"
+    logfile="$runtime/openvpn.log"
+    pidfile="$runtime/openvpn.pid"
+
+
+    awk \
+        -v ip="$endpoint_ip" '
+        BEGIN {
+            changed=0
+        }
+
+        tolower($1)=="remote" && !changed {
+            $2=ip
+            changed=1
+        }
+
+        {
+            print
+        }
+        ' \
+        "$profile" \
+        > "$runtime_conf"
+
+
+    chmod 600 \
+        "$runtime_conf"
+
+
+    ip netns exec "$ns" \
+        openvpn \
+        --config "$runtime_conf" \
+        --daemon "cdvpn-${uid}" \
+        --writepid "$pidfile" \
+        --log "$logfile"
+
+
+    tunnel=""
+
+
+    for _ in $(seq 1 25)
+    do
+
+        tunnel="$(
+            ip netns exec "$ns" \
+                ip -o link show \
+            | awk -F': ' '
+                $2 ~ /^(tun|tap)/ {
+                    print $2
+                    exit
+                }
+            '
+        )"
+
+        if [[ -n "$tunnel" ]]; then
+            break
+        fi
+
+        sleep 1
+
+    done
+
+
+    if [[ -z "$tunnel" ]]; then
+
+        tail -40 "$logfile" >&2 \
+            || true
+
+        disconnect_impl "$uid"
+
+        die "OpenVPN tunnel did not start"
+    fi
+}
+
+
+status_action(){
+
+    local uid="$1"
+
+    namespace_vars "$uid"
+
+
+    if [[ ! -f "$state" ]]; then
+
+        printf '%s\n' \
+            '{"connected":false,"profile_id":null,"protocol":null,"namespace":null,"tunnel":null,"kill_switch":false,"egress_ip":null}'
+
+        return
+    fi
+
+
+    # shellcheck disable=SC1090
+    source "$state"
+
+
+    connected=false
+
+
+    if ip netns list \
+        | awk '{print $1}' \
+        | grep -Fxq "$ns"
+    then
+
+        if [[ -n "${tunnel:-}" ]] \
+            && ip netns exec "$ns" \
+                ip link show "$tunnel" \
+                >/dev/null 2>&1
+        then
+
+            connected=true
+
+        fi
+
+    fi
+
+
+    egress_ip=""
+
+    if [[ "$connected" == true ]]; then
+
+        egress_ip="$(
+            ip netns exec "$ns" \
+                curl \
+                -fsS \
+                --max-time 6 \
+                https://api.ipify.org \
+                2>/dev/null \
+            || true
+        )"
+
+        if [[ ! "$egress_ip" =~ ^[0-9A-Fa-f:.]+$ ]]; then
+            egress_ip=""
+        fi
+
+    fi
+
+
+    if [[ "$kill_switch" == "1" ]]; then
+        ks=true
+    else
+        ks=false
+    fi
+
+
+    if [[ -n "$egress_ip" ]]; then
+
+        ip_json="\"$egress_ip\""
+
+    else
+
+        ip_json="null"
+
+    fi
+
+
+    printf \
+        '{"connected":%s,"profile_id":"%s","protocol":"%s","namespace":"%s","tunnel":"%s","kill_switch":%s,"egress_ip":%s}\n' \
+        "$connected" \
+        "$profile_id" \
+        "$protocol" \
+        "$ns" \
+        "${tunnel:-}" \
+        "$ks" \
+        "$ip_json"
+}
+
+
+preflight_action(){
+
+    tun=false
+    wg=false
+    openvpn=false
+    netns=false
+    iptables_ok=false
+
+
+    [[ -c /dev/net/tun ]] \
+        && tun=true
+
+    command -v wg \
+        >/dev/null 2>&1 \
+        && wg=true
+
+    command -v openvpn \
+        >/dev/null 2>&1 \
+        && openvpn=true
+
+    iptables -L \
+        >/dev/null 2>&1 \
+        && iptables_ok=true
+
+
+    probe="cdvpn-preflight-$$"
+
+    if ip netns add "$probe" \
+        >/dev/null 2>&1
+    then
+
+        ip netns del "$probe" \
+            >/dev/null 2>&1 \
+            || true
+
+        netns=true
+    fi
+
+
+    printf \
+        '{"tun":%s,"wireguard":%s,"openvpn":%s,"netns":%s,"iptables":%s}\n' \
+        "$tun" \
+        "$wg" \
+        "$openvpn" \
+        "$netns" \
+        "$iptables_ok"
+}
+
+
+ACTION="${1:-}"
+
+
+case "$ACTION" in
+
+    preflight)
+
+        preflight_action
+        ;;
+
+
+    status)
+
+        uid="${2:-}"
+
+        valid_uid "$uid" \
+            || die "Invalid user id"
+
+        status_action "$uid"
+        ;;
+
+
+    disconnect)
+
+        uid="${2:-}"
+
+        valid_uid "$uid" \
+            || die "Invalid user id"
+
+        disconnect_impl "$uid"
+
+        printf '%s\n' \
+            '{"connected":false,"profile_id":null,"protocol":null,"namespace":null,"tunnel":null,"kill_switch":false,"egress_ip":null}'
+        ;;
+
+
+    connect)
+
+        uid="${2:-}"
+        profile_id="${3:-}"
+        protocol="${4:-}"
+        kill_switch="${5:-1}"
+
+        valid_uid "$uid" \
+            || die "Invalid user id"
+
+        valid_profile "$profile_id" \
+            || die "Invalid profile id"
+
+        [[ "$protocol" == "wireguard" || "$protocol" == "openvpn" ]] \
+            || die "Invalid protocol"
+
+        [[ "$kill_switch" == "0" || "$kill_switch" == "1" ]] \
+            || die "Invalid kill switch value"
+
+
+        profile="$PROFILE_ROOT/$uid/${profile_id}.conf"
+
+        [[ -f "$profile" ]] \
+            || die "VPN profile not found"
+
+
+        if [[ "$protocol" == "wireguard" ]]; then
+
+            if grep -Eiq \
+                '^[[:space:]]*(PreUp|PostUp|PreDown|PostDown|SaveConfig)[[:space:]]*=' \
+                "$profile"
+            then
+
+                die "Unsafe WireGuard directive detected"
+            fi
+
+        else
+
+            if grep -Eiq \
+                '^[[:space:]]*(script-security|up|down|route-up|route-pre-down|ipchange|learn-address|client-connect|client-disconnect|plugin|management|auth-user-pass|auth-user-pass-verify|askpass)([[:space:]]|$)' \
+                "$profile"
+            then
+
+                die "Unsafe OpenVPN directive detected"
+            fi
+
+        fi
+
+
+        resolve_endpoint \
+            "$protocol" \
+            "$profile"
+
+
+        trap '
+            rc=$?
+            disconnect_impl "'"$uid"'" >/dev/null 2>&1 || true
+            exit $rc
+        ' ERR
+
+
+        setup_namespace \
+            "$uid" \
+            "$profile_id" \
+            "$protocol" \
+            "$kill_switch"
+
+
+        if [[ "$protocol" == "wireguard" ]]; then
+
+            connect_wireguard \
+                "$profile"
+
+        else
+
+            connect_openvpn \
+                "$profile"
+
+        fi
+
+
+        {
+            printf 'tunnel=%q\n' "$tunnel"
+
+            if [[ "$protocol" == "openvpn" ]]; then
+                printf 'pidfile=%q\n' "$pidfile"
+            fi
+
+        } >> "$state"
+
+
+        if [[ "$kill_switch" == "1" ]]; then
+
+            apply_killswitch \
+                "$ns" \
+                "$nsv" \
+                "$tunnel" \
+                "$endpoint_ip"
+
+        fi
+
+
+        trap - ERR
+
+        status_action "$uid"
+        ;;
+
+
+    *)
+
+        die "Usage: cyberdeck-vpn-runner {preflight|status|connect|disconnect}"
+        ;;
+
+esac

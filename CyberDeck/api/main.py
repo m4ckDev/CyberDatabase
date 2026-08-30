@@ -1023,3 +1023,12 @@ install_platform(
     DATABASE_URL,
     ph
 )
+
+
+# CYBERDECK_VPN_V1
+from vpn_ext import install_vpn
+
+install_vpn(
+    app,
+    current_user
+)

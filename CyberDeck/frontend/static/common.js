@@ -8,6 +8,7 @@ modules: [
 ["machines","/machines"],
 ["tools","/tools"],
 ["terminal","/terminal"],
+["vpn","/vpn"],
 ["chats","/chats"],
 ["labs","/labs"],
 ["jobs","/jobs"],

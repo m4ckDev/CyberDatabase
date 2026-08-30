@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1"
+>
+
+<title>CyberDeck VPN</title>
+
+<link
+rel="stylesheet"
+href="/static/cyberdeck.css"
+>
+
+<link
+rel="manifest"
+href="/manifest.webmanifest"
+>
+
+<meta
+name="theme-color"
+content="#000000"
+>
+
+</head>
+
+
+<body>
+
+<header>
+
+<div class="logo">
+CYBERDECK
+</div>
+
+<a href="/dashboard">
+back
+</a>
+
+</header>
+
+
+<main>
+
+<h1>vpn</h1>
+
+<div class="dashboard-sub">
+isolated VPN sessions for CyberDeck traffic.
+</div>
+
+
+<h2>STATUS</h2>
+
+<div class="grid">
+
+<div class="card">
+<div class="label">STATE</div>
+<div id="vpn-state" class="value">
+checking...
+</div>
+</div>
+
+<div class="card">
+<div class="label">PROVIDER</div>
+<div id="vpn-provider" class="value">
+-
+</div>
+</div>
+
+<div class="card">
+<div class="label">LOCATION</div>
+<div id="vpn-location" class="value">
+-
+</div>
+</div>
+
+<div class="card">
+<div class="label">PROTOCOL</div>
+<div id="vpn-protocol" class="value">
+-
+</div>
+</div>
+
+<div class="card">
+<div class="label">EXIT IP</div>
+<div id="vpn-ip" class="value">
+-
+</div>
+</div>
+
+<div class="card">
+<div class="label">KILL SWITCH</div>
+<div id="vpn-kill" class="value">
+-
+</div>
+</div>
+
+</div>
+
+
+<div class="actions">
+
+<button onclick="disconnectVpn()">
+disconnect
+</button>
+
+<button onclick="loadStatus()">
+refresh
+</button>
+
+</div>
+
+
+<h2>ENGINE</h2>
+
+<div id="preflight" class="status-strip">
+checking VPN engine...
+</div>
+
+
+<h2>ADD PROFILE</h2>
+
+<div class="settings-block">
+
+<div class="form-grid">
+
+<div>
+
+<div class="label">
+PROVIDER
+</div>
+
+<input
+id="provider"
+placeholder="Proton VPN, Mullvad, custom..."
+>
+
+</div>
+
+
+<div>
+
+<div class="label">
+PROTOCOL
+</div>
+
+<select id="protocol">
+
+<option value="wireguard">
+WireGuard
+</option>
+
+<option value="openvpn">
+OpenVPN
+</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<div class="label">
+COUNTRY
+</div>
+
+<input
+id="country"
+placeholder="Japan"
+>
+
+</div>
+
+
+<div>
+
+<div class="label">
+CITY / REGION
+</div>
+
+<input
+id="city"
+placeholder="Tokyo"
+>
+
+</div>
+
+
+<div>
+
+<div class="label">
+LABEL
+</div>
+
+<input
+id="label"
+placeholder="Tokyo 01"
+>
+
+</div>
+
+
+<div>
+
+<div class="label">
+CONFIG FILE
+</div>
+
+<input
+id="profile-file"
+type="file"
+accept=".conf,.wg,.ovpn,text/plain"
+>
+
+</div>
+
+</div>
+
+
+<div class="actions">
+
+<button onclick="uploadProfile()">
+add profile
+</button>
+
+</div>
+
+<div
+id="upload-status"
+class="small"
+></div>
+
+</div>
+
+
+<h2>PROFILES</h2>
+
+<div class="toggle-row">
+
+<div class="toggle-copy">
+
+<div class="toggle-title">
+kill switch
+</div>
+
+<div class="toggle-description">
+when enabled, namespace traffic may only leave through the VPN tunnel or reach the VPN endpoint.
+</div>
+
+</div>
+
+<input
+id="kill-switch"
+type="checkbox"
+checked
+>
+
+</div>
+
+
+<div id="profiles">
+loading...
+</div>
+
+
+<div class="footer-line">
+
+<span>
+VPN profiles are stored outside the Git repository.
+</span>
+
+<span>
+browser routing hooks ready
+</span>
+
+</div>
+
+</main>
+
+
+<script src="/static/common.js"></script>
+
+<script>
+
+let profileData=[];
+
+
+function locationText(profile){
+
+const parts=[
+profile.country,
+profile.city
+].filter(Boolean);
+
+return parts.join(", ") || "-";
+}
+
+
+async function loadPreflight(){
+
+try{
+
+const data=
+await CD.json(
+"/api/vpn/preflight"
+);
+
+const checks=[
+["tun",data.tun],
+["namespace",data.netns],
+["wireguard",data.wireguard],
+["openvpn",data.openvpn],
+["iptables",data.iptables]
+];
+
+preflight.innerHTML="";
+
+checks.forEach(item=>{
+
+const block=
+document.createElement("div");
+
+block.className="service";
+
+const dot=
+document.createElement("span");
+
+dot.className="dot";
+
+dot.dataset.state=
+item[1]
+? "active"
+: "offline";
+
+const text=
+document.createElement("span");
+
+text.textContent=
+item[0]+": "+
+(item[1] ? "ready" : "missing");
+
+block.appendChild(dot);
+block.appendChild(text);
+
+preflight.appendChild(block);
+
+});
+
+}catch(error){
+
+preflight.textContent=
+error.message;
+}
+}
+
+
+async function loadProfiles(){
+
+try{
+
+profileData=
+await CD.json(
+"/api/vpn/profiles"
+);
+
+renderProfiles();
+
+}catch(error){
+
+profiles.textContent=
+error.message;
+}
+}
+
+
+function renderProfiles(){
+
+profiles.innerHTML="";
+
+if(!profileData.length){
+
+profiles.textContent=
+"no VPN profiles configured";
+
+return;
+}
+
+
+profileData.forEach(profile=>{
+
+const row=
+document.createElement("div");
+
+row.className=
+"row-flex";
+
+
+const info=
+document.createElement("div");
+
+
+const title=
+document.createElement("div");
+
+title.className=
+"value";
+
+title.textContent=
+profile.label;
+
+
+const meta=
+document.createElement("div");
+
+meta.className=
+"small";
+
+meta.textContent=[
+profile.provider,
+locationText(profile),
+profile.protocol
+].filter(Boolean).join(" / ");
+
+
+info.appendChild(title);
+info.appendChild(meta);
+
+
+const actions=
+document.createElement("div");
+
+actions.className=
+"actions";
+
+
+const connect=
+document.createElement("button");
+
+connect.textContent=
+"connect";
+
+connect.onclick=()=>(
+connectVpn(
+profile.id
+)
+);
+
+
+const remove=
+document.createElement("button");
+
+remove.textContent=
+"delete";
+
+remove.onclick=()=>(
+deleteProfile(
+profile.id
+)
+);
+
+
+actions.appendChild(
+connect
+);
+
+actions.appendChild(
+remove
+);
+
+row.appendChild(
+info
+);
+
+row.appendChild(
+actions
+);
+
+profiles.appendChild(
+row
+);
+
+});
+}
+
+
+async function uploadProfile(){
+
+const file=
+document.getElementById(
+"profile-file"
+).files[0];
+
+if(!file){
+
+upload_status.textContent=
+"select a VPN configuration file";
+
+return;
+}
+
+
+const form=
+new FormData();
+
+form.append(
+"provider",
+provider.value.trim()
+|| "custom"
+);
+
+form.append(
+"country",
+country.value.trim()
+);
+
+form.append(
+"city",
+city.value.trim()
+);
+
+form.append(
+"label",
+label.value.trim()
+);
+
+form.append(
+"protocol",
+protocol.value
+);
+
+form.append(
+"upload",
+file
+);
+
+
+upload_status.textContent=
+"uploading...";
+
+
+try{
+
+const response=
+await CD.api(
+"/api/vpn/profiles",
+{
+method:"POST",
+body:form
+}
+);
+
+
+const data=
+await response.json();
+
+
+if(!response.ok){
+
+throw new Error(
+data.detail
+|| "profile upload failed"
+);
+
+}
+
+
+upload_status.textContent=
+"profile added";
+
+
+document.getElementById(
+"profile-file"
+).value="";
+
+label.value="";
+country.value="";
+city.value="";
+
+await loadProfiles();
+
+
+}catch(error){
+
+upload_status.textContent=
+error.message;
+}
+}
+
+
+async function connectVpn(
+profileId
+){
+
+vpn_state.textContent=
+"connecting...";
+
+
+try{
+
+await CD.json(
+"/api/vpn/connect",
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify({
+profile_id:profileId,
+kill_switch:
+kill_switch.checked
+})
+}
+);
+
+await loadStatus();
+
+
+}catch(error){
+
+vpn_state.textContent=
+"failed";
+
+CD.toast(
+error.message
+);
+}
+}
+
+
+async function disconnectVpn(){
+
+vpn_state.textContent=
+"disconnecting...";
+
+
+try{
+
+await CD.json(
+"/api/vpn/disconnect",
+{
+method:"POST"
+}
+);
+
+await loadStatus();
+
+
+}catch(error){
+
+CD.toast(
+error.message
+);
+}
+}
+
+
+async function deleteProfile(
+profileId
+){
+
+try{
+
+await CD.json(
+"/api/vpn/profiles/"
++ profileId,
+{
+method:"DELETE"
+}
+);
+
+await loadProfiles();
+await loadStatus();
+
+
+}catch(error){
+
+CD.toast(
+error.message
+);
+}
+}
+
+
+async function loadStatus(){
+
+try{
+
+const data=
+await CD.json(
+"/api/vpn/status"
+);
+
+vpn_state.textContent=
+data.connected
+? "connected"
+: "disconnected";
+
+vpn_protocol.textContent=
+data.protocol || "-";
+
+vpn_ip.textContent=
+data.egress_ip || "-";
+
+vpn_kill.textContent=
+data.kill_switch
+? "enabled"
+: "disabled";
+
+
+const profile=
+data.profile || null;
+
+
+vpn_provider.textContent=
+profile
+? profile.provider
+: "-";
+
+
+vpn_location.textContent=
+profile
+? locationText(profile)
+: "-";
+
+
+}catch(error){
+
+vpn_state.textContent=
+"unavailable";
+}
+}
+
+
+loadPreflight();
+loadProfiles();
+loadStatus();
+
+setInterval(
+loadStatus,
+10000
+);
+
+</script>
+
+</body>
+
+</html>
