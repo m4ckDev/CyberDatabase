@@ -284,6 +284,55 @@ and comparison against the active VPN exit location.
 
 <script>
 
+const deviceName =
+document.getElementById("device-name");
+
+const deviceCpu =
+document.getElementById("device-cpu");
+
+const deviceMemory =
+document.getElementById("device-memory");
+
+const deviceStorage =
+document.getElementById("device-storage");
+
+const deviceScreen =
+document.getElementById("device-screen");
+
+const hostValue =
+document.getElementById("host");
+
+const cpuValue =
+document.getElementById("cpu");
+
+const memoryValue =
+document.getElementById("memory");
+
+const diskValue =
+document.getElementById("disk");
+
+const uptimeValue =
+document.getElementById("uptime");
+
+const nodeIp =
+document.getElementById("node-ip");
+
+const usernameValue =
+document.getElementById("username");
+
+const notificationCount =
+document.getElementById("notification-count");
+
+const notificationArrow =
+document.getElementById("notification-arrow");
+
+const versionValue =
+document.getElementById("version");
+
+const clockValue =
+document.getElementById("clock");
+
+
 function setService(id,state,label){
 
 const text=document.getElementById(id);
@@ -319,13 +368,13 @@ else if(/Linux/i.test(ua)){
 name = "Linux";
 }
 
-device_name.textContent =
+deviceName.textContent =
 name;
 
 const cores =
 navigator.hardwareConcurrency;
 
-device_cpu.textContent =
+deviceCpu.textContent =
 cores
 ? cores + " threads"
 : "unavailable";
@@ -333,12 +382,12 @@ cores
 const ram =
 navigator.deviceMemory;
 
-device_memory.textContent =
+deviceMemory.textContent =
 ram
 ? ram + " GB"
 : "restricted";
 
-device_screen.textContent =
+deviceScreen.textContent =
 screen.width
 + "x"
 + screen.height;
@@ -362,13 +411,13 @@ Number(info.quota || 0);
 
 if(!quota){
 
-device_storage.textContent =
+deviceStorage.textContent =
 "restricted";
 
 return;
 }
 
-device_storage.textContent =
+deviceStorage.textContent =
 CD.fmtBytes(used)
 + " / "
 + CD.fmtBytes(quota);
@@ -376,14 +425,14 @@ CD.fmtBytes(used)
 })
 .catch(()=>{
 
-device_storage.textContent =
+deviceStorage.textContent =
 "restricted";
 
 });
 
 }else{
 
-device_storage.textContent =
+deviceStorage.textContent =
 "restricted";
 
 }
@@ -397,19 +446,19 @@ try{
 
 const system=await CD.json("/api/system/status");
 
-host.textContent=system.hostname || "unknown";
-node_ip.textContent=system.ip || "unknown";
+hostValue.textContent=system.hostname || "unknown";
+nodeIp.textContent=system.ip || "unknown";
 
-cpu.textContent=
+cpuValue.textContent=
 Math.round(Number(system.cpu_percent || 0))+"%";
 
-memory.textContent=
+memoryValue.textContent=
 Math.round(Number(system.memory_percent || 0))+"%";
 
-disk.textContent=
+diskValue.textContent=
 Math.round(Number(system.disk_percent || 0))+"%";
 
-uptime.textContent=
+uptimeValue.textContent=
 CD.fmtUptime(system.uptime);
 
 const services=system.services || {};
@@ -445,7 +494,7 @@ try{
 
 const user=await CD.json("/api/me");
 
-username.textContent=user.username;
+usernameValue.textContent=user.username;
 
 }catch(error){}
 }
@@ -459,9 +508,9 @@ const notes=await CD.json("/api/notifications");
 
 const unread=notes.filter(item=>!item.read).length;
 
-notification_count.textContent=unread;
+notificationCount.textContent=unread;
 
-notification_arrow.textContent=
+notificationArrow.textContent=
 unread ? unread+" >" : ">";
 
 }catch(error){}
@@ -473,7 +522,7 @@ async function loadVersion(){
 try{
 
 const data=await CD.json("/api/version");
-version.textContent="version "+data.version;
+versionValue.textContent="version "+data.version;
 
 }catch(error){}
 }
@@ -481,7 +530,7 @@ version.textContent="version "+data.version;
 
 function updateClock(){
 
-clock.textContent=
+clockValue.textContent=
 new Date().toLocaleString();
 }
 
