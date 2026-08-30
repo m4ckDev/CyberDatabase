@@ -546,6 +546,14 @@ def require_admin(user):
         raise HTTPException(status_code=403, detail="Admin required")
 
 
+@app.get("/api/admin/rate-limits")
+def admin_rate_limits(
+    user=Depends(current_user)
+):
+    require_admin(user)
+    return advanced_tool_limiter.snapshot()
+
+
 @app.get("/api/admin/users")
 def admin_users(user=Depends(current_user)):
     require_admin(user)

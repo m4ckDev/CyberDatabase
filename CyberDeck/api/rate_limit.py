@@ -440,6 +440,54 @@ class AdvancedToolRateLimiter:
             user_id
         )
 
+    def snapshot(self):
+
+        now = time.monotonic()
+
+        with self.lock:
+
+            self._cleanup(now)
+
+            blocked = {
+                user: max(
+                    0,
+                    math.ceil(until - now)
+                )
+                for user, until
+                in self.blocked_until.items()
+                if until > now
+            }
+
+            return {
+                "limits": {
+                    "user_capacity": self.user_capacity,
+                    "user_refill_per_second": self.user_refill,
+                    "ip_capacity": self.ip_capacity,
+                    "ip_refill_per_second": self.ip_refill,
+                    "target_capacity": self.target_capacity,
+                    "target_refill_per_second": self.target_refill,
+                    "max_concurrent_per_user": self.max_concurrent,
+                },
+                "state": {
+                    "user_buckets": len(self.user_buckets),
+                    "ip_buckets": len(self.ip_buckets),
+                    "target_buckets": len(self.target_buckets),
+                    "active_users": len(self.active),
+                    "active_jobs": sum(self.active.values()),
+                    "blocked_users": len(blocked),
+                    "tracked_violation_users": len(self.violations),
+                },
+                "active_jobs_by_user": dict(self.active),
+                "blocked_seconds_by_user": blocked,
+                "violations_last_minute": {
+                    user: len(stamps)
+                    for user, stamps
+                    in self.violations.items()
+                },
+                "action_costs": dict(self.ACTION_COSTS),
+            }
+
+
     def release(
         self,
         user_id
