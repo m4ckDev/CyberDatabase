@@ -1032,3 +1032,12 @@ install_vpn(
     app,
     current_user
 )
+
+
+# CYBERDECK_BROWSER_V1
+from browser_ext import install_browser
+
+install_browser(
+    app,
+    current_user
+)
