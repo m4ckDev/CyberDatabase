@@ -84,6 +84,14 @@ max-height:300px;
 overflow:auto;
 }
 
+.browser-data{
+white-space:pre-wrap;
+word-break:break-word;
+max-height:280px;
+overflow:auto;
+font-size:12px;
+}
+
 @media(max-width:700px){
 
 .browser-bar{
@@ -258,6 +266,65 @@ alt="Rendered browser page"
 </div>
 
 
+<h2>RECON DATA</h2>
+
+<div class="grid">
+
+<div class="card">
+
+<div class="label">
+VPN EXIT IP
+</div>
+
+<div
+id="browser-exit-ip"
+class="value"
+>
+-
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="label">
+REDIRECTS
+</div>
+
+<pre
+id="browser-redirects"
+class="browser-data"
+>none</pre>
+
+</div>
+
+</div>
+
+
+<h2>RESPONSE HEADERS</h2>
+
+<div class="settings-block">
+
+<pre
+id="browser-headers"
+class="browser-data"
+>no headers loaded</pre>
+
+</div>
+
+
+<h2>COOKIE METADATA</h2>
+
+<div class="settings-block">
+
+<pre
+id="browser-cookies"
+class="browser-data"
+>no cookies loaded</pre>
+
+</div>
+
+
 <h2>PAGE TEXT</h2>
 
 <div class="settings-block">
@@ -327,6 +394,26 @@ document.getElementById(
 const browserText =
 document.getElementById(
 "browser-text"
+);
+
+const browserExitIp =
+document.getElementById(
+"browser-exit-ip"
+);
+
+const browserHeaders =
+document.getElementById(
+"browser-headers"
+);
+
+const browserRedirects =
+document.getElementById(
+"browser-redirects"
+);
+
+const browserCookies =
+document.getElementById(
+"browser-cookies"
 );
 
 const browseButton =
@@ -540,6 +627,38 @@ data.final_url || url
 browserText.textContent =
 data.body_text
 || "no readable page text";
+
+browserExitIp.textContent =
+data.exit_ip || "-";
+
+browserHeaders.textContent =
+JSON.stringify(
+data.headers || {},
+null,
+2
+);
+
+browserRedirects.textContent =
+(data.redirects || []).length
+?
+JSON.stringify(
+data.redirects,
+null,
+2
+)
+:
+"none";
+
+browserCookies.textContent =
+(data.cookies || []).length
+?
+JSON.stringify(
+data.cookies,
+null,
+2
+)
+:
+"none";
 
 
 if(data.screenshot){
