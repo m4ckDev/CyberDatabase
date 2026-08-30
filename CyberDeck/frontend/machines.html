@@ -347,7 +347,7 @@ async function loadMachines(){
 
         if(data.length === 0){
             area.innerHTML =
-                '<div class="empty">no machines saved</div>';
+                '<div class="empty">no machines yet — click + machine to add one</div>';
         }
 
         summary.textContent =
@@ -406,6 +406,28 @@ function editMachine(id){
     document.getElementById("machineName").focus();
 }
 
+function validMachineAddress(value){
+    const v = String(value || "").trim();
+
+    if(!v || v.length > 255 || /\s/.test(v)){
+        return false;
+    }
+
+    if(v.includes("://")){
+        try{
+            const u = new URL(v);
+            return (
+                (u.protocol === "http:" || u.protocol === "https:") &&
+                !!u.hostname
+            );
+        }catch(e){
+            return false;
+        }
+    }
+
+    return /^[A-Za-z0-9._:-]+$/.test(v);
+}
+
 async function saveMachine(){
 
     const name = document.getElementById("machineName").value.trim();
@@ -416,6 +438,11 @@ async function saveMachine(){
 
     if(!name || !address){
         alert("name and address are required");
+        return;
+    }
+
+    if(!validMachineAddress(address)){
+        alert("enter a valid IP address or hostname");
         return;
     }
 
