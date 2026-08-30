@@ -9,6 +9,7 @@ modules: [
 ["tools","/tools"],
 ["terminal","/terminal"],
 ["vpn","/vpn"],
+["browser","/browser"],
 ["chats","/chats"],
 ["labs","/labs"],
 ["jobs","/jobs"],

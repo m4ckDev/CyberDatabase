@@ -3,6 +3,7 @@ import subprocess
 from urllib.parse import urlparse
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 
@@ -126,6 +127,18 @@ def install_browser(app, current_user):
                 status_code=502,
                 detail="Invalid browser response"
             )
+
+
+
+    @router.get(
+        "/browser",
+        include_in_schema=False
+    )
+    def browser_page():
+
+        return FileResponse(
+            "/opt/cyberdeck/frontend/browser.html"
+        )
 
 
     app.include_router(router)

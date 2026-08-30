@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1"
+>
+
+<title>CyberDeck Browser</title>
+
+<link
+rel="stylesheet"
+href="/static/cyberdeck.css"
+>
+
+<link
+rel="manifest"
+href="/manifest.webmanifest"
+>
+
+<meta
+name="theme-color"
+content="#000000"
+>
+
+<style>
+
+.browser-bar{
+display:flex;
+gap:8px;
+margin-top:14px;
+}
+
+.browser-bar input{
+flex:1;
+}
+
+.browser-frame{
+margin-top:16px;
+border:1px solid #333;
+background:#080808;
+min-height:300px;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:auto;
+}
+
+.browser-frame img{
+display:none;
+width:100%;
+height:auto;
+}
+
+.browser-empty{
+padding:50px 20px;
+text-align:center;
+opacity:.55;
+}
+
+.browser-url{
+word-break:break-all;
+}
+
+.browser-text{
+white-space:pre-wrap;
+word-break:break-word;
+max-height:300px;
+overflow:auto;
+}
+
+@media(max-width:700px){
+
+.browser-bar{
+flex-direction:column;
+}
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<header>
+
+<div class="logo">
+CYBERDECK
+</div>
+
+<a href="/dashboard">
+back
+</a>
+
+</header>
+
+
+<main>
+
+<h1>browser</h1>
+
+<div class="dashboard-sub">
+VPN-routed server-side recon browser.
+</div>
+
+
+<h2>NAVIGATE</h2>
+
+<div class="settings-block">
+
+<div class="browser-bar">
+
+<input
+id="browser-url"
+placeholder="https://example.com"
+autocomplete="off"
+>
+
+<button
+id="browse-button"
+onclick="browse()"
+>
+browse
+</button>
+
+</div>
+
+<div
+id="browser-message"
+class="small"
+>
+requires an active CyberDeck VPN connection
+</div>
+
+</div>
+
+
+<h2>SESSION</h2>
+
+<div class="grid">
+
+<div class="card">
+
+<div class="label">
+HTTP STATUS
+</div>
+
+<div
+id="browser-status"
+class="value"
+>
+-
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="label">
+TITLE
+</div>
+
+<div
+id="browser-title"
+class="value"
+>
+-
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="label">
+FINAL URL
+</div>
+
+<div
+id="browser-final"
+class="value browser-url"
+>
+-
+</div>
+
+</div>
+
+</div>
+
+
+<h2>VIEWPORT</h2>
+
+<div
+id="browser-frame"
+class="browser-frame"
+>
+
+<div
+id="browser-empty"
+class="browser-empty"
+>
+enter a URL to begin
+</div>
+
+<img
+id="browser-shot"
+alt="Rendered browser page"
+>
+
+</div>
+
+
+<h2>PAGE TEXT</h2>
+
+<div class="settings-block">
+
+<pre
+id="browser-text"
+class="browser-text"
+>no page loaded</pre>
+
+</div>
+
+
+<div class="footer-line">
+
+<span>
+traffic routed through active VPN namespace
+</span>
+
+<span>
+Playwright / Chromium
+</span>
+
+</div>
+
+</main>
+
+
+<script src="/static/common.js"></script>
+
+<script>
+
+const browserUrl =
+document.getElementById(
+"browser-url"
+);
+
+const browserStatus =
+document.getElementById(
+"browser-status"
+);
+
+const browserTitle =
+document.getElementById(
+"browser-title"
+);
+
+const browserFinal =
+document.getElementById(
+"browser-final"
+);
+
+const browserMessage =
+document.getElementById(
+"browser-message"
+);
+
+const browserShot =
+document.getElementById(
+"browser-shot"
+);
+
+const browserEmpty =
+document.getElementById(
+"browser-empty"
+);
+
+const browserText =
+document.getElementById(
+"browser-text"
+);
+
+const browseButton =
+document.getElementById(
+"browse-button"
+);
+
+
+async function browse(){
+
+let url =
+browserUrl.value.trim();
+
+if(!url){
+return;
+}
+
+if(
+!url.startsWith("http://")
+&&
+!url.startsWith("https://")
+){
+url =
+"https://" + url;
+
+browserUrl.value =
+url;
+}
+
+
+browserMessage.textContent =
+"loading through VPN...";
+
+browserStatus.textContent =
+"...";
+
+browserTitle.textContent =
+"...";
+
+browserFinal.textContent =
+"...";
+
+browserText.textContent =
+"loading...";
+
+browseButton.disabled =
+true;
+
+
+try{
+
+const data =
+await CD.json(
+"/api/browser/render",
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify({
+url:url
+})
+}
+);
+
+
+browserStatus.textContent =
+data.status ?? "-";
+
+browserTitle.textContent =
+data.title || "-";
+
+browserFinal.textContent =
+data.final_url || "-";
+
+browserText.textContent =
+data.body_text
+|| "no readable page text";
+
+
+if(data.screenshot){
+
+browserShot.src =
+"data:image/jpeg;base64,"
++ data.screenshot;
+
+browserShot.style.display =
+"block";
+
+browserEmpty.style.display =
+"none";
+
+}
+
+
+browserMessage.textContent =
+"render complete";
+
+
+}catch(error){
+
+browserMessage.textContent =
+error.message;
+
+browserStatus.textContent =
+"failed";
+
+browserText.textContent =
+error.message;
+
+}
+
+
+browseButton.disabled =
+false;
+
+}
+
+
+browserUrl.addEventListener(
+"keydown",
+event=>{
+
+if(event.key==="Enter"){
+browse();
+}
+
+}
+);
+
+</script>
+
+</body>
+
+</html>
