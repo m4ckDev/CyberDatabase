@@ -4,10 +4,11 @@ from datetime import datetime, timedelta, timezone
 import psycopg2
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import jwt, JWTError
 from pydantic import BaseModel
+from rate_limit import advanced_tool_limiter
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 SECRET_KEY = os.environ["SECRET_KEY"]
@@ -921,7 +922,11 @@ class QuickToolRequest(BaseModel):
 
 
 @app.post("/api/tools/run")
-def quick_tool(data: QuickToolRequest, user=Depends(current_user)):
+def quick_tool(
+    data: QuickToolRequest,
+    request: Request,
+    user=Depends(current_user)
+):
     target = clean_target(data.target)
 
     commands = {
@@ -979,7 +984,23 @@ def quick_tool(data: QuickToolRequest, user=Depends(current_user)):
     if not command:
         raise HTTPException(status_code=400, detail="Unknown tool")
 
-    return run_tool(command)
+    client_ip = (
+        request.client.host
+        if request.client
+        else "unknown"
+    )
+
+    guard = advanced_tool_limiter.acquire(
+        user_id=user["sub"],
+        client_ip=client_ip,
+        action=data.action,
+        target=target
+    )
+
+    try:
+        return run_tool(command)
+    finally:
+        guard.release()
 
 # CYBERDECK_TOOLBOX_V2
 from toolbox import install_toolbox
