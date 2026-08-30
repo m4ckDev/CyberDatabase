@@ -122,7 +122,7 @@ rollback() {
             case "$name" in
                 *.MISSING)
                     original="${name%.MISSING}"
-                    rm -f "/usr/local/bin/$original"
+                    rm -f "/usr/local/sbin/$original"
                     ;;
                 *)
                     cp -a \
@@ -182,7 +182,7 @@ trap 'on_error "$LINENO" "$?"' ERR
 
 [ "$(id -u)" -eq 0 ] || die "Run as root"
 
-for cmd in git rsync curl systemctl visudo; do
+for cmd in git rsync curl systemctl visudo systemd-analyze; do
     command -v "$cmd" >/dev/null 2>&1 ||
         die "Missing required command: $cmd"
 done
@@ -406,10 +406,18 @@ if [ -d "$PROJECT/deployment/bin" ]; then
     for file in "$PROJECT/deployment/bin/"*; do
         [ -f "$file" ] || continue
 
-        install \
-            -m 750 \
-            "$file" \
-            "/usr/local/sbin/$(basename "$file")"
+        [ -s "$file" ] ||
+            die "Deployment utility empty: $file"
+
+        dest="/usr/local/sbin/$(basename "$file")"
+        tmp="${dest}.new.$$"
+
+        install -m 750 "$file" "$tmp"
+
+        [ -s "$tmp" ] ||
+            die "Installed deployment utility empty: $tmp"
+
+        mv -f "$tmp" "$dest"
     done
 fi
 
@@ -434,13 +442,28 @@ if [ -d "$PROJECT/deployment/systemd" ]; then
     for file in "$PROJECT/deployment/systemd/"*; do
         [ -f "$file" ] || continue
 
-        install \
-            -m 644 \
-            "$file" \
-            "/etc/systemd/system/$(basename "$file")"
+        [ -s "$file" ] ||
+            die "systemd unit empty: $file"
+
+        systemd-analyze verify "$file" >/dev/null
+
+        dest="/etc/systemd/system/$(basename "$file")"
+        tmp="${dest}.new.$$"
+
+        install -m 644 "$file" "$tmp"
+
+        [ -s "$tmp" ] ||
+            die "Installed systemd unit empty: $tmp"
+
+        mv -f "$tmp" "$dest"
     done
 fi
 
+
+[ -s /etc/systemd/system/cyberdeck.service ] ||
+    die "cyberdeck.service missing or empty"
+
+systemd-analyze verify     /etc/systemd/system/cyberdeck.service     >/dev/null
 
 systemctl daemon-reload
 

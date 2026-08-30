@@ -5,157 +5,368 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CyberDeck</title>
 <link rel="stylesheet" href="/static/cyberdeck.css">
-
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <link rel="apple-touch-icon" href="/static/icon-192.png">
-
 </head>
 
 <body>
 
 <header>
 <div class="logo">CYBERDECK</div>
+
 <div>
 <span id="username" class="small"></span>
 &nbsp;&nbsp;
-<a href="#" onclick="logout()">logout</a>
+<a href="#" onclick="CD.logout();return false;">logout</a>
 </div>
 </header>
 
 <main>
 
-<a class="item" href="/network">
-<span>network</span><span>&gt;</span>
+<div class="dashboard-head">
+<div>
+<h1>control center</h1>
+<div class="dashboard-sub">
+system status, operations, workspaces and platform controls.
+press ctrl+k to jump anywhere.
+</div>
+</div>
+
+<div class="small" id="clock"></div>
+</div>
+
+<div class="stats">
+
+<div class="stat">
+<div class="stat-name">HOST</div>
+<div class="stat-value" id="host">...</div>
+</div>
+
+<div class="stat">
+<div class="stat-name">CPU</div>
+<div class="stat-value" id="cpu">...</div>
+</div>
+
+<div class="stat">
+<div class="stat-name">MEMORY</div>
+<div class="stat-value" id="memory">...</div>
+</div>
+
+<div class="stat">
+<div class="stat-name">DISK</div>
+<div class="stat-value" id="disk">...</div>
+</div>
+
+<div class="stat">
+<div class="stat-name">UPTIME</div>
+<div class="stat-value" id="uptime">...</div>
+</div>
+
+</div>
+
+<div class="status-strip">
+
+<div class="service">
+<span class="dot" id="svc-api-dot"></span>
+<span id="svc-api">api</span>
+</div>
+
+<div class="service">
+<span class="dot" id="svc-worker-dot"></span>
+<span id="svc-worker">worker</span>
+</div>
+
+<div class="service">
+<span class="dot" id="svc-db-dot"></span>
+<span id="svc-db">database</span>
+</div>
+
+<div class="service">
+<span>notifications:</span>
+<span id="notification-count">0</span>
+</div>
+
+<div class="service">
+<span>node:</span>
+<span id="node-ip">...</span>
+</div>
+
+</div>
+
+<div class="module-section">
+
+<h2>OPERATIONS</h2>
+
+<div class="module-grid">
+
+<a class="module-card" href="/network">
+<div class="module-title"><span>network</span><span>&gt;</span></div>
+<div class="module-desc">interfaces, routes, neighbors and network state</div>
 </a>
 
-<a class="item" href="/machines">
-<span>machines</span><span>&gt;</span>
+<a class="module-card" href="/machines">
+<div class="module-title"><span>machines</span><span>&gt;</span></div>
+<div class="module-desc">saved systems, availability and quick actions</div>
 </a>
 
-<a class="item" href="/tools">
-<span>tools</span><span>&gt;</span>
+<a class="module-card" href="/tools">
+<div class="module-title"><span>tools</span><span>&gt;</span></div>
+<div class="module-desc">network and security tool runner</div>
 </a>
 
-<a class="item" href="/terminal">
-<span>terminal</span><span>&gt;</span>
+<a class="module-card" href="/terminal">
+<div class="module-title"><span>terminal</span><span>&gt;</span></div>
+<div class="module-desc">isolated browser command environment</div>
 </a>
 
-<a class="item" href="/chats">
-<span>chats</span><span>&gt;</span>
+<a class="module-card" href="/jobs">
+<div class="module-title"><span>jobs</span><span>&gt;</span></div>
+<div class="module-desc">queued and historical tool executions</div>
 </a>
 
-<a class="item" href="/labs">
-<span>labs</span><span>&gt;</span>
+<a class="module-card" href="/captures">
+<div class="module-title"><span>captures</span><span>&gt;</span></div>
+<div class="module-desc">packet capture jobs and artifacts</div>
 </a>
 
-<a class="item" href="/jobs">
-<span>jobs</span><span>&gt;</span>
+</div>
+</div>
+
+
+<div class="module-section">
+
+<h2>WORKSPACE</h2>
+
+<div class="module-grid">
+
+<a class="module-card" href="/chats">
+<div class="module-title"><span>chats</span><span>&gt;</span></div>
+<div class="module-desc">personal sessions and shared rooms</div>
 </a>
 
-<a class="item" href="/captures">
-<span>captures</span><span>&gt;</span>
+<a class="module-card" href="/labs">
+<div class="module-title"><span>labs</span><span>&gt;</span></div>
+<div class="module-desc">targets, findings, scans and lab notes</div>
 </a>
 
-<a class="item" href="/assets">
-<span>assets</span><span>&gt;</span>
+<a class="module-card" href="/assets">
+<div class="module-title"><span>assets</span><span>&gt;</span></div>
+<div class="module-desc">tracked infrastructure and system inventory</div>
 </a>
 
-<a class="item" href="/learn">
-<span>learn</span><span>&gt;</span>
+<a class="module-card" href="/learn">
+<div class="module-title"><span>learn</span><span>&gt;</span></div>
+<div class="module-desc">commands, references and knowledge base</div>
 </a>
 
-<a class="item" href="/files">
-<span>files</span><span>&gt;</span>
+<a class="module-card" href="/files">
+<div class="module-title"><span>files</span><span>&gt;</span></div>
+<div class="module-desc">private uploads, hashes and downloads</div>
 </a>
 
-<a class="item" href="/notes">
-<span>notes</span><span>&gt;</span>
+<a class="module-card" href="/notes">
+<div class="module-title"><span>notes</span><span>&gt;</span></div>
+<div class="module-desc">persistent operator notes and references</div>
 </a>
 
-<a class="item" href="/notifications">
+</div>
+</div>
+
+
+<div class="module-section">
+
+<h2>PLATFORM</h2>
+
+<div class="module-grid">
+
+<a class="module-card" href="/notifications">
+<div class="module-title">
 <span>notifications</span>
-<span id="notification-count">&gt;</span>
+<span id="notification-arrow">&gt;</span>
+</div>
+<div class="module-desc">system and account events requiring attention</div>
 </a>
 
-<a class="item" href="/logs">
-<span>logs</span><span>&gt;</span>
+<a class="module-card" href="/logs">
+<div class="module-title"><span>logs</span><span>&gt;</span></div>
+<div class="module-desc">audit history and platform activity</div>
 </a>
 
-<a class="item" href="/search">
-<span>search</span><span>&gt;</span>
+<a class="module-card" href="/search">
+<div class="module-title"><span>search</span><span>&gt;</span></div>
+<div class="module-desc">search across CyberDeck workspace data</div>
 </a>
 
-<a class="item" href="/system">
-<span>system</span><span>&gt;</span>
+<a class="module-card" href="/system">
+<div class="module-title"><span>system</span><span>&gt;</span></div>
+<div class="module-desc">node resources, services and database state</div>
 </a>
 
-<a class="item" href="/settings">
-<span>settings</span><span>&gt;</span>
+<a class="module-card" href="/settings">
+<div class="module-title"><span>settings</span><span>&gt;</span></div>
+<div class="module-desc">account, interface and session preferences</div>
 </a>
 
-<a class="item" href="/install">
-<span>install</span><span>&gt;</span>
+<a class="module-card" href="/install">
+<div class="module-title"><span>install</span><span>&gt;</span></div>
+<div class="module-desc">PWA installation and device access</div>
 </a>
+
+</div>
+</div>
+
+
+<div class="next-phase">
+
+<div>
+<strong>location + vpn</strong>
+<div class="small">
+next phase: permission-based geolocation, live location state,
+vpn provider/exit selection and native-agent integration.
+</div>
+</div>
+
+<span class="badge">NEXT</span>
+
+</div>
+
+
+<div class="footer-line">
+<span>CYBERDECK</span>
+<span id="version">version ...</span>
+</div>
 
 </main>
 
 <script src="/static/common.js"></script>
 
 <script>
-async function load(){
 
-const me=
-await CD.api("/api/me");
+function setService(id,state,label){
 
-const user=
-await me.json();
+const text=document.getElementById(id);
+const dot=document.getElementById(id+"-dot");
 
-document.getElementById(
-"username"
-).textContent=user.username;
+text.textContent=label+" "+state;
+dot.dataset.state=state;
+}
 
-const nr=
-await CD.api(
-"/api/notifications"
+async function loadSystem(){
+
+try{
+
+const system=await CD.json("/api/system/status");
+
+host.textContent=system.hostname || "unknown";
+node_ip.textContent=system.ip || "unknown";
+
+cpu.textContent=
+Math.round(Number(system.cpu_percent || 0))+"%";
+
+memory.textContent=
+Math.round(Number(system.memory_percent || 0))+"%";
+
+disk.textContent=
+Math.round(Number(system.disk_percent || 0))+"%";
+
+uptime.textContent=
+CD.fmtUptime(system.uptime);
+
+const services=system.services || {};
+
+setService(
+"svc-api",
+services.cyberdeck || "unknown",
+"api"
 );
 
-const notes=
-await nr.json();
-
-const unread=
-notes.filter(
-n=>!n.read
-).length;
-
-document.getElementById(
-"notification-count"
-).textContent=
-unread
-? unread+" >"
-: ">";
-
-}
-
-function logout(){
-
-sessionStorage.removeItem(
-"cyberdeck_token"
+setService(
+"svc-worker",
+services["cyberdeck-worker"] || "unknown",
+"worker"
 );
 
-location="/";
+setService(
+"svc-db",
+services.postgresql || "unknown",
+"database"
+);
+
+}catch(error){
+
+CD.toast("system status unavailable");
+}
 }
 
-load();
-</script>
 
+async function loadAccount(){
 
-<script>
-if("serviceWorker" in navigator){
-navigator.serviceWorker.register("/sw.js").catch(()=>{});
+try{
+
+const user=await CD.json("/api/me");
+
+username.textContent=user.username;
+
+}catch(error){}
 }
+
+
+async function loadNotifications(){
+
+try{
+
+const notes=await CD.json("/api/notifications");
+
+const unread=notes.filter(item=>!item.read).length;
+
+notification_count.textContent=unread;
+
+notification_arrow.textContent=
+unread ? unread+" >" : ">";
+
+}catch(error){}
+}
+
+
+async function loadVersion(){
+
+try{
+
+const data=await CD.json("/api/version");
+version.textContent="version "+data.version;
+
+}catch(error){}
+}
+
+
+function updateClock(){
+
+clock.textContent=
+new Date().toLocaleString();
+}
+
+
+loadAccount();
+loadSystem();
+loadNotifications();
+loadVersion();
+
+updateClock();
+
+setInterval(updateClock,1000);
+
+if(
+CD.pref("auto_refresh","1")==="1"
+){
+setInterval(()=>{
+loadSystem();
+loadNotifications();
+},30000);
+}
+
 </script>
 
 </body>

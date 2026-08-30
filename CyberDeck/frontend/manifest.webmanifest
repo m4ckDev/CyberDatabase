@@ -1,12 +1,39 @@
 {
+  "id": "/",
   "name": "CyberDeck",
   "short_name": "CyberDeck",
-  "start_url": "/",
+  "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
-  "description": "CyberDeck",
+  "description": "CyberDeck cybersecurity command center",
+  "categories": [
+    "utilities",
+    "productivity"
+  ],
+  "shortcuts": [
+    {
+      "name": "Machines",
+      "short_name": "Machines",
+      "url": "/machines"
+    },
+    {
+      "name": "Tools",
+      "short_name": "Tools",
+      "url": "/tools"
+    },
+    {
+      "name": "Labs",
+      "short_name": "Labs",
+      "url": "/labs"
+    },
+    {
+      "name": "Terminal",
+      "short_name": "Terminal",
+      "url": "/terminal"
+    }
+  ],
   "icons": [
     {
       "src": "/static/icon-192.png",

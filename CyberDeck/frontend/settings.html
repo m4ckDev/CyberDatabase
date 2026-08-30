@@ -3,16 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CyberDeck</title>
+<title>CyberDeck Settings</title>
 <link rel="stylesheet" href="/static/cyberdeck.css">
-
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#000000">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<link rel="apple-touch-icon" href="/static/icon-192.png">
-
 </head>
+
 <body>
 
 <header>
@@ -24,23 +20,80 @@
 
 <h1>settings</h1>
 
+<div class="settings-block">
+
+<div class="label">ACCOUNT</div>
+
+<div class="row-flex">
+<div>
+<div class="value" id="account-name">...</div>
+<div class="small" id="account-role">...</div>
+</div>
+
+<button onclick="CD.logout()">logout</button>
+</div>
+
+</div>
+
+
+<h2>INTERFACE</h2>
+
+<div class="toggle-row">
+
+<div class="toggle-copy">
+<div class="toggle-title">compact mode</div>
+<div class="toggle-description">
+reduce spacing across CyberDeck
+</div>
+</div>
+
+<input id="compact-mode" type="checkbox">
+
+</div>
+
+
+<div class="toggle-row">
+
+<div class="toggle-copy">
+<div class="toggle-title">dashboard auto refresh</div>
+<div class="toggle-description">
+refresh node status and notifications every 30 seconds
+</div>
+</div>
+
+<input id="auto-refresh" type="checkbox">
+
+</div>
+
+
 <h2>PASSWORD</h2>
 
-<input id="current"
+<div class="settings-block">
+
+<input
+id="current"
 type="password"
-placeholder="current password">
+autocomplete="current-password"
+placeholder="current password"
+>
 
 <br><br>
 
-<input id="next"
+<input
+id="next"
 type="password"
-placeholder="new password">
+autocomplete="new-password"
+placeholder="new password"
+>
 
 <br><br>
 
-<input id="confirm"
+<input
+id="confirm"
 type="password"
-placeholder="confirm new password">
+autocomplete="new-password"
+placeholder="confirm new password"
+>
 
 <div class="actions">
 <button onclick="changePassword()">change password</button>
@@ -48,11 +101,44 @@ placeholder="confirm new password">
 
 <div id="status" class="small"></div>
 
-<h2>ACCESS</h2>
+</div>
+
+
+<h2>PLATFORM</h2>
+
+<div class="settings-block">
+
+<div class="row-flex">
+
+<div>
+<div class="value">CyberDeck</div>
+<div id="version" class="small">version ...</div>
+</div>
 
 <div class="actions">
-<a class="button" href="/admin">admin</a>
+<a id="admin-link" class="button" href="/admin" hidden>admin</a>
 <a class="button" href="/install">install</a>
+<a class="button" href="/system">system</a>
+</div>
+
+</div>
+
+</div>
+
+
+<h2>LOCAL DATA</h2>
+
+<div class="settings-block">
+
+<div class="small">
+clears interface preferences stored in this browser.
+your CyberDeck account data is not deleted.
+</div>
+
+<div class="actions">
+<button onclick="clearPreferences()">clear local preferences</button>
+</div>
+
 </div>
 
 </main>
@@ -60,57 +146,124 @@ placeholder="confirm new password">
 <script src="/static/common.js"></script>
 
 <script>
+
+async function load(){
+
+compact_mode.checked=
+CD.pref("compact","0")==="1";
+
+auto_refresh.checked=
+CD.pref("auto_refresh","1")==="1";
+
+compact_mode.addEventListener("change",()=>{
+
+CD.setPref(
+"compact",
+compact_mode.checked ? "1" : "0"
+);
+
+CD.applyPreferences();
+});
+
+
+auto_refresh.addEventListener("change",()=>{
+
+CD.setPref(
+"auto_refresh",
+auto_refresh.checked ? "1" : "0"
+);
+
+CD.toast("preference saved");
+});
+
+
+try{
+
+const me=await CD.json("/api/me");
+
+account_name.textContent=me.username;
+
+account_role.textContent=
+me.is_admin ? "administrator" : "user";
+
+admin_link.hidden=!me.is_admin;
+
+}catch(error){}
+
+
+try{
+
+const data=await CD.json("/api/version");
+
+version.textContent="version "+data.version;
+
+}catch(error){}
+
+}
+
+
 async function changePassword(){
+
+status.textContent="";
 
 if(next.value!==confirm.value){
 
+status.textContent="passwords do not match";
+return;
+}
+
+if(next.value.length<12){
+
 status.textContent=
-"passwords do not match";
+"new password must be at least 12 characters";
 
 return;
 }
 
-const r=
-await CD.api(
+try{
+
+await CD.json(
 "/api/settings/password",
 {
 method:"POST",
 headers:{
-"Content-Type":
-"application/json"
+"Content-Type":"application/json"
 },
 body:JSON.stringify({
-current_password:
-current.value,
-new_password:
-next.value
+current_password:current.value,
+new_password:next.value
 })
 }
 );
 
-const data=
-await r.json();
-
-status.textContent=
-r.ok
-? "password changed"
-: data.detail;
-
-if(r.ok){
+status.textContent="password changed";
 
 current.value="";
 next.value="";
 confirm.value="";
+
+}catch(error){
+
+status.textContent=error.message;
+}
 }
 
+
+function clearPreferences(){
+
+localStorage.removeItem("cd_compact");
+localStorage.removeItem("cd_auto_refresh");
+
+compact_mode.checked=false;
+auto_refresh.checked=true;
+
+CD.applyPreferences();
+CD.toast("local preferences cleared");
 }
-</script>
 
 
-<script>
-if("serviceWorker" in navigator){
-navigator.serviceWorker.register("/sw.js").catch(()=>{});
-}
+load();
+
 </script>
 
 </body>

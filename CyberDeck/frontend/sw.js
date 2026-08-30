@@ -1,48 +1,87 @@
-const CACHE="cyberdeck-static-v1";
+const CACHE="cyberdeck-static-v2";
 
-self.addEventListener(
-"install",
-event=>{
-self.skipWaiting();
-}
-);
+const STATIC=[
+"/",
+"/static/cyberdeck.css",
+"/static/common.js",
+"/manifest.webmanifest"
+];
 
-self.addEventListener(
-"activate",
-event=>{
+self.addEventListener("install",event=>{
+
 event.waitUntil(
-self.clients.claim()
+caches.open(CACHE)
+.then(cache=>cache.addAll(STATIC))
+.then(()=>self.skipWaiting())
 );
+
+});
+
+
+self.addEventListener("activate",event=>{
+
+event.waitUntil(
+caches.keys()
+.then(keys=>Promise.all(
+keys
+.filter(key=>key!==CACHE)
+.map(key=>caches.delete(key))
+))
+.then(()=>self.clients.claim())
+);
+
+});
+
+
+self.addEventListener("fetch",event=>{
+
+const request=event.request;
+
+if(request.method!=="GET"){
+return;
 }
-);
 
-self.addEventListener(
-"fetch",
-event=>{
+const url=new URL(request.url);
 
-const url=
-new URL(
-event.request.url
-);
+if(url.origin!==location.origin){
+return;
+}
+
+if(url.pathname.startsWith("/api/")){
+return;
+}
 
 if(
-event.request.method!=="GET"
-|| url.pathname.startsWith(
-"/api/"
-)
+url.pathname.startsWith("/static/")
+|| url.pathname==="/manifest.webmanifest"
 ){
+
+event.respondWith(
+caches.match(request)
+.then(cached=>{
+return cached || fetch(request).then(response=>{
+
+const copy=response.clone();
+
+caches.open(CACHE)
+.then(cache=>cache.put(request,copy));
+
+return response;
+});
+})
+);
 
 return;
 }
 
+
+if(request.mode==="navigate"){
+
 event.respondWith(
-fetch(event.request)
-.catch(
-()=>caches.match(
-event.request
-)
-)
+fetch(request)
+.catch(()=>caches.match("/"))
 );
 
 }
-);
+
+});
