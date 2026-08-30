@@ -92,6 +92,22 @@ overflow:auto;
 font-size:12px;
 }
 
+.finding-form input,
+.finding-form select,
+.finding-form textarea{
+width:100%;
+box-sizing:border-box;
+}
+
+.finding-form textarea{
+min-height:90px;
+resize:vertical;
+}
+
+.finding-field{
+margin-top:12px;
+}
+
 @media(max-width:700px){
 
 .browser-bar{
@@ -325,6 +341,91 @@ class="browser-data"
 </div>
 
 
+<h2>SAVE FINDING</h2>
+
+<div class="settings-block finding-form">
+
+<div class="form-grid">
+
+<div>
+
+<div class="label">
+LAB
+</div>
+
+<select id="finding-lab">
+<option value="">
+loading labs...
+</option>
+</select>
+
+</div>
+
+<div>
+
+<div class="label">
+SEVERITY
+</div>
+
+<select id="finding-severity">
+<option value="info">info</option>
+<option value="low">low</option>
+<option value="medium">medium</option>
+<option value="high">high</option>
+<option value="critical">critical</option>
+</select>
+
+</div>
+
+</div>
+
+<div class="finding-field">
+
+<div class="label">
+TITLE
+</div>
+
+<input
+id="finding-title"
+placeholder="Recon Browser finding"
+>
+
+</div>
+
+<div class="finding-field">
+
+<div class="label">
+REMEDIATION
+</div>
+
+<textarea
+id="finding-remediation"
+placeholder="optional remediation notes"
+></textarea>
+
+</div>
+
+<div class="actions">
+
+<button
+id="finding-save"
+onclick="saveFinding()"
+>
+save finding
+</button>
+
+</div>
+
+<div
+id="finding-message"
+class="small"
+>
+load a page before saving evidence
+</div>
+
+</div>
+
+
 <h2>PAGE TEXT</h2>
 
 <div class="settings-block">
@@ -421,6 +522,36 @@ document.getElementById(
 "browse-button"
 );
 
+const findingLab =
+document.getElementById(
+"finding-lab"
+);
+
+const findingSeverity =
+document.getElementById(
+"finding-severity"
+);
+
+const findingTitle =
+document.getElementById(
+"finding-title"
+);
+
+const findingRemediation =
+document.getElementById(
+"finding-remediation"
+);
+
+const findingMessage =
+document.getElementById(
+"finding-message"
+);
+
+const findingSave =
+document.getElementById(
+"finding-save"
+);
+
 const browserBack =
 document.getElementById(
 "browser-back"
@@ -433,6 +564,7 @@ document.getElementById(
 
 let reconHistory = [];
 let reconHistoryIndex = -1;
+let lastRender = null;
 
 
 function updateNavButtons(){
@@ -567,6 +699,8 @@ url;
 }
 
 
+lastRender = null;
+
 browserMessage.textContent =
 "loading through VPN...";
 
@@ -603,6 +737,8 @@ url:url
 }
 );
 
+
+lastRender = data;
 
 browserStatus.textContent =
 data.status ?? "-";
@@ -698,6 +834,212 @@ browseButton.disabled =
 false;
 
 }
+
+
+
+async function loadFindingLabs(){
+
+try{
+
+const labs =
+await CD.json(
+"/api/labs"
+);
+
+findingLab.innerHTML =
+"";
+
+if(!labs.length){
+
+const option =
+document.createElement(
+"option"
+);
+
+option.value = "";
+option.textContent =
+"no labs available";
+
+findingLab.appendChild(
+option
+);
+
+findingMessage.textContent =
+"create a lab before saving findings";
+
+return;
+}
+
+labs.forEach(lab=>{
+
+const option =
+document.createElement(
+"option"
+);
+
+option.value =
+String(lab.id);
+
+option.textContent =
+lab.name;
+
+findingLab.appendChild(
+option
+);
+
+});
+
+}catch(error){
+
+findingLab.innerHTML =
+"<option value=''>failed to load labs</option>";
+
+findingMessage.textContent =
+error.message;
+
+}
+
+}
+
+
+async function saveFinding(){
+
+if(!lastRender){
+
+findingMessage.textContent =
+"load a page before saving evidence";
+
+return;
+}
+
+const labId =
+findingLab.value;
+
+if(!labId){
+
+findingMessage.textContent =
+"select a lab";
+
+return;
+}
+
+const title =
+findingTitle.value.trim()
+||
+(
+"Recon: "
++
+(
+lastRender.title
+||
+lastRender.final_url
+||
+"web finding"
+)
+);
+
+const evidence = [
+"RECON BROWSER EVIDENCE",
+"",
+"URL: "
++ (
+lastRender.final_url
+|| ""
+),
+"HTTP Status: "
++ (
+lastRender.status
+?? ""
+),
+"VPN Exit IP: "
++ (
+lastRender.exit_ip
+|| ""
+),
+"",
+"RESPONSE HEADERS",
+JSON.stringify(
+lastRender.headers
+|| {},
+null,
+2
+),
+"",
+"REDIRECTS",
+JSON.stringify(
+lastRender.redirects
+|| [],
+null,
+2
+),
+"",
+"COOKIE METADATA",
+JSON.stringify(
+lastRender.cookies
+|| [],
+null,
+2
+)
+].join("\n");
+
+findingSave.disabled =
+true;
+
+findingMessage.textContent =
+"saving finding...";
+
+try{
+
+await CD.json(
+`/api/labs/${labId}/findings`,
+{
+method:"POST",
+headers:{
+"Content-Type":
+"application/json"
+},
+body:JSON.stringify({
+target_id:null,
+title:title,
+severity:
+findingSeverity.value,
+description:
+"Captured with CyberDeck Recon Browser from "
++
+(
+lastRender.final_url
+|| ""
+),
+evidence:evidence,
+remediation:
+findingRemediation.value.trim()
+})
+}
+);
+
+findingMessage.textContent =
+"finding saved";
+
+findingTitle.value =
+"";
+
+findingRemediation.value =
+"";
+
+}catch(error){
+
+findingMessage.textContent =
+error.message;
+
+}
+
+findingSave.disabled =
+false;
+
+}
+
+
+loadFindingLabs();
 
 
 browserUrl.addEventListener(
