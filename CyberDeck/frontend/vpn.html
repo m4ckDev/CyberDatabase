@@ -209,6 +209,37 @@ placeholder="Tokyo 01"
 <div>
 
 <div class="label">
+VPN SERVICE USERNAME
+</div>
+
+<input
+id="vpn-username"
+autocomplete="off"
+placeholder="manual VPN service username"
+>
+
+</div>
+
+
+<div>
+
+<div class="label">
+VPN SERVICE PASSWORD
+</div>
+
+<input
+id="vpn-password"
+type="password"
+autocomplete="new-password"
+placeholder="manual VPN service password"
+>
+
+</div>
+
+
+<div>
+
+<div class="label">
 CONFIG FILE
 </div>
 
@@ -535,6 +566,20 @@ protocol.value
 );
 
 form.append(
+"vpn_username",
+document.getElementById(
+"vpn-username"
+).value
+);
+
+form.append(
+"vpn_password",
+document.getElementById(
+"vpn-password"
+).value
+);
+
+form.append(
 "upload",
 file
 );
@@ -581,6 +626,14 @@ document.getElementById(
 label.value="";
 country.value="";
 city.value="";
+
+document.getElementById(
+"vpn-username"
+).value="";
+
+document.getElementById(
+"vpn-password"
+).value="";
 
 await loadProfiles();
 

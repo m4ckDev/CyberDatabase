@@ -35,8 +35,14 @@ def install_vpn(app, current_user):
     )
 
     profiles_root = vpn_root / "profiles"
+    credentials_root = vpn_root / "credentials"
 
     profiles_root.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    credentials_root.mkdir(
         parents=True,
         exist_ok=True,
     )
@@ -62,6 +68,26 @@ def install_vpn(app, current_user):
 
         path = (
             profiles_root
+            / str(user_id)
+        )
+
+        path.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        try:
+            os.chmod(path, 0o700)
+        except Exception:
+            pass
+
+        return path
+
+
+    def credential_directory(user_id):
+
+        path = (
+            credentials_root
             / str(user_id)
         )
 
@@ -294,7 +320,6 @@ def install_vpn(app, current_user):
             r"client-disconnect|"
             r"plugin|"
             r"management|"
-            r"auth-user-pass|"
             r"auth-user-pass-verify|"
             r"askpass"
             r")(\s|$)"
@@ -309,6 +334,26 @@ def install_vpn(app, current_user):
                     "unsupported scripts or credentials"
                 ),
             )
+
+
+        for line in content.splitlines():
+
+            parts = line.strip().split()
+
+            if (
+                parts
+                and parts[0].lower()
+                == "auth-user-pass"
+                and len(parts) > 1
+            ):
+
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        "External OpenVPN credential "
+                        "files are not accepted"
+                    ),
+                )
 
 
         external_files = re.compile(
@@ -382,6 +427,8 @@ def install_vpn(app, current_user):
         city: str = Form(""),
         label: str = Form(""),
         protocol: str = Form(...),
+        vpn_username: str = Form(""),
+        vpn_password: str = Form(""),
         upload: UploadFile = File(...),
         user=Depends(current_user),
     ):
@@ -444,6 +491,55 @@ def install_vpn(app, current_user):
             )
 
 
+        vpn_username = (
+            vpn_username.strip()
+        )
+
+        if (
+            "\n" in vpn_username
+            or "\r" in vpn_username
+            or "\n" in vpn_password
+            or "\r" in vpn_password
+        ):
+
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid VPN credentials",
+            )
+
+
+        requires_credentials = (
+            protocol == "openvpn"
+            and any(
+                line.strip().lower()
+                == "auth-user-pass"
+                for line
+                in content.splitlines()
+            )
+        )
+
+
+        has_credentials = (
+            protocol == "openvpn"
+            and bool(vpn_username)
+            and bool(vpn_password)
+        )
+
+
+        if (
+            requires_credentials
+            and not has_credentials
+        ):
+
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "This OpenVPN profile requires "
+                    "service credentials"
+                ),
+            )
+
+
         profile_id = (
             secrets.token_hex(5)
         )
@@ -464,6 +560,29 @@ def install_vpn(app, current_user):
         )
 
 
+        if has_credentials:
+
+            credential_path = (
+                credential_directory(
+                    user_id
+                )
+                / f"{profile_id}.auth"
+            )
+
+            credential_path.write_text(
+                vpn_username
+                + "\n"
+                + vpn_password
+                + "\n",
+                encoding="utf-8",
+            )
+
+            os.chmod(
+                credential_path,
+                0o600,
+            )
+
+
         profile = {
             "id": profile_id,
             "provider":
@@ -482,6 +601,8 @@ def install_vpn(app, current_user):
                     ).name[:100]
                 ),
             "protocol": protocol,
+            "has_credentials":
+                has_credentials,
         }
 
 
@@ -546,6 +667,18 @@ def install_vpn(app, current_user):
         )
 
         path.unlink(
+            missing_ok=True
+        )
+
+
+        credential_path = (
+            credential_directory(
+                user_id
+            )
+            / f"{profile_id}.auth"
+        )
+
+        credential_path.unlink(
             missing_ok=True
         )
 

@@ -5,6 +5,7 @@ umask 077
 
 BASE="/opt/cyberdeck/vpn"
 PROFILE_ROOT="$BASE/profiles"
+CRED_ROOT="$BASE/credentials"
 STATE_ROOT="/run/cyberdeck-vpn"
 
 mkdir -p "$STATE_ROOT"
@@ -532,6 +533,25 @@ connect_openvpn(){
     runtime_conf="$runtime/${profile_id}.ovpn"
     logfile="$runtime/openvpn.log"
     pidfile="$runtime/openvpn.pid"
+    authfile="$CRED_ROOT/$uid/${profile_id}.auth"
+
+
+    needs_auth=false
+
+    if grep -Eiq \
+        '^[[:space:]]*auth-user-pass([[:space:]]|$)' \
+        "$profile"
+    then
+        needs_auth=true
+    fi
+
+
+    if [[ "$needs_auth" == true && ! -f "$authfile" ]]; then
+
+        disconnect_impl "$uid"
+
+        die "OpenVPN service credentials missing"
+    fi
 
 
     awk \
@@ -543,6 +563,10 @@ connect_openvpn(){
         tolower($1)=="remote" && !changed {
             $2=ip
             changed=1
+        }
+
+        tolower($1)=="auth-user-pass" {
+            next
         }
 
         {
@@ -557,9 +581,22 @@ connect_openvpn(){
         "$runtime_conf"
 
 
+    auth_args=()
+
+    if [[ -f "$authfile" ]]; then
+
+        auth_args=(
+            --auth-user-pass "$authfile"
+            --auth-nocache
+        )
+
+    fi
+
+
     ip netns exec "$ns" \
         openvpn \
         --config "$runtime_conf" \
+        "${auth_args[@]}" \
         --daemon "cdvpn-${uid}" \
         --writepid "$pidfile" \
         --log "$logfile"
@@ -819,7 +856,7 @@ case "$ACTION" in
         else
 
             if grep -Eiq \
-                '^[[:space:]]*(script-security|up|down|route-up|route-pre-down|ipchange|learn-address|client-connect|client-disconnect|plugin|management|auth-user-pass|auth-user-pass-verify|askpass)([[:space:]]|$)' \
+                '^[[:space:]]*(script-security|up|down|route-up|route-pre-down|ipchange|learn-address|client-connect|client-disconnect|plugin|management|auth-user-pass-verify|askpass)([[:space:]]|$)' \
                 "$profile"
             then
 
