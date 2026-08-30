@@ -38,6 +38,40 @@ press ctrl+k to jump anywhere.
 <div class="small" id="clock"></div>
 </div>
 
+<h2>THIS DEVICE</h2>
+
+<div class="stats">
+
+<div class="stat">
+<div class="stat-name">DEVICE</div>
+<div class="stat-value" id="device-name">...</div>
+</div>
+
+<div class="stat">
+<div class="stat-name">CPU</div>
+<div class="stat-value" id="device-cpu">...</div>
+</div>
+
+<div class="stat">
+<div class="stat-name">MEMORY</div>
+<div class="stat-value" id="device-memory">...</div>
+</div>
+
+<div class="stat">
+<div class="stat-name">STORAGE</div>
+<div class="stat-value" id="device-storage">...</div>
+</div>
+
+<div class="stat">
+<div class="stat-name">SCREEN</div>
+<div class="stat-value" id="device-screen">...</div>
+</div>
+
+</div>
+
+
+<h2>CYBERDECK NODE</h2>
+
 <div class="stats">
 
 <div class="stat">
@@ -259,6 +293,104 @@ text.textContent=label+" "+state;
 dot.dataset.state=state;
 }
 
+function detectDevice(){
+
+const ua =
+navigator.userAgent || "";
+
+let name = "browser";
+
+if(/iPhone/i.test(ua)){
+name = "iPhone";
+}
+else if(/iPad/i.test(ua)){
+name = "iPad";
+}
+else if(/Android/i.test(ua)){
+name = "Android";
+}
+else if(/Windows/i.test(ua)){
+name = "Windows PC";
+}
+else if(/Macintosh|Mac OS X/i.test(ua)){
+name = "Mac";
+}
+else if(/Linux/i.test(ua)){
+name = "Linux";
+}
+
+device_name.textContent =
+name;
+
+const cores =
+navigator.hardwareConcurrency;
+
+device_cpu.textContent =
+cores
+? cores + " threads"
+: "unavailable";
+
+const ram =
+navigator.deviceMemory;
+
+device_memory.textContent =
+ram
+? ram + " GB"
+: "restricted";
+
+device_screen.textContent =
+screen.width
++ "x"
++ screen.height;
+
+
+if(
+navigator.storage
+&&
+navigator.storage.estimate
+){
+
+navigator.storage
+.estimate()
+.then(info=>{
+
+const used =
+Number(info.usage || 0);
+
+const quota =
+Number(info.quota || 0);
+
+if(!quota){
+
+device_storage.textContent =
+"restricted";
+
+return;
+}
+
+device_storage.textContent =
+CD.fmtBytes(used)
++ " / "
++ CD.fmtBytes(quota);
+
+})
+.catch(()=>{
+
+device_storage.textContent =
+"restricted";
+
+});
+
+}else{
+
+device_storage.textContent =
+"restricted";
+
+}
+
+}
+
+
 async function loadSystem(){
 
 try{
@@ -354,6 +486,7 @@ new Date().toLocaleString();
 }
 
 
+detectDevice();
 loadAccount();
 loadSystem();
 loadNotifications();
