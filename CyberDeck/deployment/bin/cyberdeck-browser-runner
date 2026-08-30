@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -Eeuo pipefail
+umask 077
+
+UID_VALUE="${1:-}"
+URL="${2:-}"
+
+[[ "$UID_VALUE" =~ ^[0-9]+$ ]] || {
+    echo "invalid user id" >&2
+    exit 2
+}
+
+[[ "$URL" == http://* || "$URL" == https://* ]] || {
+    echo "only http and https URLs are allowed" >&2
+    exit 2
+}
+
+NS="cdvpn-${UID_VALUE}"
+
+ip netns list |
+grep -q "^${NS}\b" || {
+    echo "VPN namespace is not active" >&2
+    exit 3
+}
+
+exec ip netns exec "$NS" \
+    /opt/cyberdeck/venv/bin/python \
+    /opt/cyberdeck/api/browser_render.py \
+    "$URL"

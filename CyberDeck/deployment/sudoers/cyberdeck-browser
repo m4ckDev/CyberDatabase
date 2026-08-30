@@ -1,0 +1,1 @@
+cyberdeck ALL=(root) NOPASSWD: /usr/local/sbin/cyberdeck-browser-runner *
