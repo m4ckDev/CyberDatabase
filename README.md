@@ -20,6 +20,7 @@ CyberDatabase is the central m4ckDev repository for cybersecurity work. It combi
 
 | Area | Purpose |
 |---|---|
+| `AI/` | AI, LLM, agent-skill and AI-assisted security tooling, including the Claude Skills collection |
 | `CyberDeck/` | CyberDeck platform, API, UI, deployment and operations |
 | `RaspberryCommandCenter/` | Raspberry Pi command-center and security tooling |
 | `wifi-sentinel/` | Wireless/network monitoring project |
@@ -30,6 +31,15 @@ CyberDatabase is the central m4ckDev repository for cybersecurity work. It combi
 | `imports/` | Complete snapshots of related public m4ckDev cybersecurity, scripting and automation repositories |
 | `references/hacktricks-upstream/` | Full upstream HackTricks source mirror with provenance kept intact |
 | `CYBERDATABASE_MANIFEST.md` | Consolidation scope, source list and repository policy |
+
+## AI Hub
+
+`AI/` is the dedicated home for artificial-intelligence and LLM-related CyberDatabase material.
+
+- `AI/Claude-Skills/` contains a complete synchronized snapshot of `m4ckDev/Claude-skills`.
+- The synchronization preserves the original skill definitions, plugin metadata, templates, README files, per-skill licenses, and `THIRD_PARTY_NOTICES.md`.
+- `imports/multi-llm-router/` remains available as related multi-provider LLM infrastructure.
+- CyberDatabase-authored AI/LLM security research belongs under `knowledge-base/ai-security/` or in an appropriate original project under `AI/`.
 
 ## Knowledge Base Coverage
 
@@ -65,7 +75,9 @@ The automated synchronization workflow keeps complete snapshots of the following
 - 01-cyber-range-blue-team
 - 02-soc-analyst-simulator
 
-Their local README, notice and license files remain with each imported project.
+The Claude Skills repository is synchronized separately to `AI/Claude-Skills/` so AI material has a dedicated top-level location.
+
+Local README, notice and license files remain with each synchronized project.
 
 ## HackTricks Reference Mirror
 
