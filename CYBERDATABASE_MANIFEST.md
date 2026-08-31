@@ -48,6 +48,17 @@ Each imported repository remains in its own directory so its documentation, noti
 
 CyberDatabase-specific additions and rewritten material should go under `knowledge-base/` rather than modifying the upstream mirror directly.
 
+## External security research sources
+
+Curated third-party research sources are maintained under `references/security-research/` as source-specific subdirectories rather than copied into CyberDatabase-owned documentation.
+
+Current sources:
+
+- `references/security-research/payloads-site/` — Payloads.site web application payload library reference and mapping to `knowledge-base/web-security/`.
+- `references/security-research/vx-underground/` — vx-underground papers, platform research, malware-defense material, YARA resources, threat-analysis archives, and research mapping to `knowledge-base/malware-analysis/`, forensics, detection, incident response, Windows, and Linux topics.
+
+Live malware binaries and large malware-sample archives are not mirrored into CyberDatabase. Research indexes, papers, defensive material, source links, and CyberDatabase-authored analysis workflows are kept instead.
+
 ## Private repositories intentionally not copied into this public repository
 
 These cybersecurity-related repositories were detected but are private and therefore are not automatically copied into public CyberDatabase:
@@ -107,7 +118,11 @@ CyberDatabase/
 │   ├── 01-cyber-range-blue-team/
 │   └── 02-soc-analyst-simulator/
 ├── references/
-│   └── hacktricks-upstream/
+│   ├── hacktricks-upstream/
+│   └── security-research/
+│       ├── README.md
+│       ├── payloads-site/
+│       └── vx-underground/
 ├── replit-cyberops/
 └── wifi-sentinel/
 ```
