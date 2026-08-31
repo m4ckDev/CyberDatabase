@@ -15,6 +15,16 @@ The following existing areas remain in place and are treated as first-class Cybe
 - `replit-cyberops/`
 - `wifi-sentinel/`
 
+## Direct-link resource directory
+
+External training and personal-security links supplied from the CYBERSEC TOOLS board are maintained under `references/resource-directory/`.
+
+- `TRAINING.md` includes every visible training label: CYBERSEC CERT ROADMAP, TryHackMe, Hack The Box, OverTheWire, LetsDefend, WiFiChallenge, PortSwigger Academy, W3Schools, CompTIA, OffSec, PECB, BBRadar and TIDE.
+- `PERSONAL_SECURITY.md` includes every visible personal-security label: Privacy.Sexy, Schiffer Soft, Defensive Computing Checklist, Security List, Awesome Privacy, Search Engine Party, Secure Messaging Apps, Should I Remove It, JustDeleteMe, Surveillance Self-Defense, Emailnator, Searx, YourDigitalRights, SMS Verification, SMSTEMP, PrivacyTools, Opt Out Broker, DoNotPay, MailTicking and Temp Mail.
+- Confirmed resources use direct links. Where a Start.me bookmark destination could not be independently verified, the original label and source-board URL are retained instead of guessing.
+
+The underground labels shown in the supplied Dark Web panel are tracked under `references/threat-intelligence/DARK_WEB_WATCHLIST.md`. That file includes Exploit.in, DarkNet Army, Verified and BHF using public defensive threat-intelligence/research references rather than operational criminal-forum access links.
+
 ## Hardware directory
 
 `hardware/README.md` is the centralized purchasing and source directory for security-lab hardware represented in the CYBERSEC TOOLS source and related CyberDatabase research.
@@ -155,10 +165,16 @@ CyberDatabase/
 │   └── 02-soc-analyst-simulator/
 ├── references/
 │   ├── hacktricks-upstream/
-│   └── security-research/
-│       ├── README.md
-│       ├── payloads-site/
-│       └── vx-underground/
+│   ├── resource-directory/
+│   │   ├── README.md
+│   │   ├── TRAINING.md
+│   │   └── PERSONAL_SECURITY.md
+│   ├── security-research/
+│   │   ├── README.md
+│   │   ├── payloads-site/
+│   │   └── vx-underground/
+│   └── threat-intelligence/
+│       └── DARK_WEB_WATCHLIST.md
 ├── replit-cyberops/
 └── wifi-sentinel/
 ```
