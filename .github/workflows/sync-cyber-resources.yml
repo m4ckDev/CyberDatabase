@@ -1,0 +1,94 @@
+name: Sync Cyber Resources
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * 1'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/sync-cyber-resources.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout CyberDatabase
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare directories
+        run: |
+          set -euo pipefail
+          mkdir -p imports references/hacktricks-upstream
+
+      - name: Sync public m4ckDev cybersecurity repositories
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          sync_repo() {
+            local repo="$1"
+            local dest="$2"
+            local tmp
+            tmp="$(mktemp -d)"
+            git clone --depth 1 "https://github.com/${repo}.git" "$tmp/repo"
+            rm -rf "$dest"
+            mkdir -p "$dest"
+            rsync -a --delete --exclude='.git/' "$tmp/repo/" "$dest/"
+            rm -rf "$tmp"
+          }
+
+          sync_repo "m4ckDev/Offensive-Security" "imports/Offensive-Security"
+          sync_repo "m4ckDev/deepdarkCTI" "imports/deepdarkCTI"
+          sync_repo "m4ckDev/waasa-hacker-tool" "imports/waasa-hacker-tool"
+          sync_repo "m4ckDev/PowerShell-OpsKit" "imports/PowerShell-OpsKit"
+          sync_repo "m4ckDev/cyber-games-powershell" "imports/cyber-games-powershell"
+          sync_repo "m4ckDev/01-cyber-range-blue-team" "imports/01-cyber-range-blue-team"
+          sync_repo "m4ckDev/02-soc-analyst-simulator" "imports/02-soc-analyst-simulator"
+
+      - name: Mirror HackTricks source
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"
+          git clone --depth 1 https://github.com/HackTricks-wiki/hacktricks.git "$tmp/hacktricks"
+          rm -rf references/hacktricks-upstream
+          mkdir -p references/hacktricks-upstream
+          rsync -a --delete --exclude='.git/' "$tmp/hacktricks/" references/hacktricks-upstream/
+          rm -rf "$tmp"
+
+      - name: Add provenance note
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > references/hacktricks-upstream/CYBERDATABASE_MIRROR_NOTE.md <<'EOF'
+          # CyberDatabase Mirror Note
+
+          This directory is a source mirror of the public `HackTricks-wiki/hacktricks` repository and is kept separate from CyberDatabase-authored material.
+
+          Original project: https://github.com/HackTricks-wiki/hacktricks
+
+          Preserve and follow the upstream licensing and attribution requirements contained in this mirrored source. CyberDatabase-specific additions should be placed under `/knowledge-base` rather than represented as upstream HackTricks content.
+          EOF
+
+      - name: Commit synchronized content
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add imports references/hacktricks-upstream
+          if git diff --cached --quiet; then
+            echo "No synchronization changes detected."
+            exit 0
+          fi
+          git commit -m "Sync cybersecurity resources and HackTricks mirror"
+          git push
