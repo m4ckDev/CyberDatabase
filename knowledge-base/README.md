@@ -2,7 +2,7 @@
 
 This directory contains CyberDatabase-owned cybersecurity documentation, field notes, checklists, methodology, lab guidance, defensive references, and authorized testing material.
 
-Use the topic folders below for original or substantially rewritten CyberDatabase material. Keep third-party source mirrors under `../references/` and imported projects under `../imports/` so provenance and licensing remain clear.
+Use the topic folders below for original or substantially rewritten CyberDatabase material. Keep third-party source mirrors and external research indexes under `../references/` and imported projects under `../imports/` so provenance and licensing remain clear.
 
 ## Start here
 
@@ -11,10 +11,11 @@ Use the topic folders below for original or substantially rewritten CyberDatabas
 - `methodology/README.md` — repeatable assessment workflow from scope through retest.
 - `networking/host-discovery-and-scanning.md` — host discovery, TCP/UDP scanning, evidence, and defensive interpretation.
 - `services-and-protocols/README.md` — service triage and protocol review workflow.
-- `web-security/README.md` — web application and API assessment structure.
+- `web-security/README.md` — web application and API assessment structure, including the Payloads.site external reference.
 - `linux/README.md` — Linux security, privilege boundaries, hardening, and detection.
 - `windows/README.md` — Windows security, privilege boundaries, hardening, and telemetry.
 - `forensics/README.md` — disk, memory, network, host, container, and file-analysis workflow.
+- `malware-analysis/README.md` — static/dynamic malware analysis, defensive outputs, and vx-underground research mapping.
 - `ai-security/README.md` — LLM, agent, MCP, model-supply-chain, prompt-injection, and AI security guidance.
 
 ## Coverage map
@@ -32,7 +33,7 @@ Use the topic folders below for original or substantially rewritten CyberDatabas
 - `reverse-engineering/` — static and dynamic analysis
 - `binary-exploitation/` — memory corruption concepts and controlled lab research
 - `forensics/` — disk, memory, host and network forensics
-- `malware-analysis/` — safe malware triage and analysis methodology
+- `malware-analysis/` — safe malware triage, behavior analysis, detection engineering inputs, and reporting
 - `osint/` — open-source intelligence methodology and tools
 - `threat-intelligence/` — CTI, indicators, ATT&CK mapping and research
 - `blue-team/` — monitoring, hardening and defensive operations
@@ -44,6 +45,15 @@ Use the topic folders below for original or substantially rewritten CyberDatabas
 - `wireless/` — Wi-Fi, Bluetooth and wireless security
 - `ai-security/` — LLM, agent, prompt-injection and AI-system security
 - `reporting-remediation/` — findings, evidence, severity, remediation and retesting
+
+## External research sources
+
+External sources with dedicated CyberDatabase subdirectories are indexed under `../references/security-research/`.
+
+Current sources include:
+
+- `payloads-site/` — web payload and encoding reference mapped into `web-security/`.
+- `vx-underground/` — malware papers, defensive research, YARA resources, platform research, threat-analysis archives, and malware-analysis material mapped into `malware-analysis/`, `forensics/`, `windows/`, `linux/`, and detection/IR topics.
 
 ## Source relationship
 
