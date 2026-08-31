@@ -16,6 +16,7 @@ Use the topic folders below for original or substantially rewritten CyberDatabas
 - `windows/README.md` — Windows security, privilege boundaries, hardening, and telemetry.
 - `forensics/README.md` — disk, memory, network, host, container, and file-analysis workflow.
 - `malware-analysis/README.md` — static/dynamic malware analysis, defensive outputs, and vx-underground research mapping.
+- `hardware-iot/README.md` — embedded, hardware, RFID/NFC, SDR, USB and IoT security; links to the CyberDatabase hardware purchasing directory.
 - `ai-security/README.md` — LLM, agent, MCP, model-supply-chain, prompt-injection, and AI security guidance.
 
 ## Coverage map
@@ -41,10 +42,14 @@ Use the topic folders below for original or substantially rewritten CyberDatabas
 - `detection-engineering/` — SIEM, Sigma, YARA, telemetry and detection development
 - `incident-response/` — preparation, triage, containment, eradication and recovery
 - `cryptography/` — hashing, encryption, PKI and certificate concepts
-- `hardware-iot/` — embedded, hardware and IoT security
+- `hardware-iot/` — embedded, hardware, RFID/NFC, SDR, USB and IoT security; purchasing links are maintained in `../hardware/README.md`
 - `wireless/` — Wi-Fi, Bluetooth and wireless security
 - `ai-security/` — LLM, agent, prompt-injection and AI-system security
 - `reporting-remediation/` — findings, evidence, severity, remediation and retesting
+
+## Hardware directory
+
+The top-level `../hardware/README.md` contains manufacturer and reseller links for the hardware represented in the CYBERSEC TOOLS source, including Hak5, KSEC, Hacker Warehouse, Biscuit Shop, OzHack, Raspberry Pi, M5Stack, ESP32, Proxmark3, WiFi Pineapple, ALFA adapters, USB Rubber Ducky, Bash Bunny, Shark Jack, Packet Squirrel, LAN Turtle, O.MG Cable, Flipper Zero, HackRF, iCopy-XS, hardware keyloggers, USBKill and physical-security training equipment.
 
 ## External research sources
 
