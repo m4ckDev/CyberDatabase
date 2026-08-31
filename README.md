@@ -14,7 +14,7 @@
 
 ---
 
-CyberDatabase is the central m4ckDev repository for cybersecurity work. It combines original projects, scripts, labs, defensive and offensive-security references, threat intelligence, automation, AI/security tooling, training material, CyberDeck development, a maintained HackTricks source mirror, and curated external security-research sources.
+CyberDatabase is the central m4ckDev repository for cybersecurity work. It combines original projects, scripts, labs, defensive and offensive-security references, threat intelligence, automation, AI/security tooling, training material, CyberDeck development, hardware references, a maintained HackTricks source mirror, curated external security-research sources, and direct-link resource directories for training and personal security.
 
 ## Repository Map
 
@@ -23,6 +23,7 @@ CyberDatabase is the central m4ckDev repository for cybersecurity work. It combi
 | `AI/` | AI, LLM, agent-skill and AI-assisted security tooling, including the Claude Skills collection |
 | `CyberDeck/` | CyberDeck platform, API, UI, deployment and operations |
 | `RaspberryCommandCenter/` | Raspberry Pi command-center and security tooling |
+| `hardware/` | Cybersecurity hardware purchasing/reference directory covering vendors and specific lab/security devices |
 | `wifi-sentinel/` | Wireless/network monitoring project |
 | `replit-cyberops/` | Cyber operations development material |
 | `cheatsheets/` | Fast command, protocol and tool references |
@@ -31,8 +32,37 @@ CyberDatabase is the central m4ckDev repository for cybersecurity work. It combi
 | `imports/` | Complete snapshots of related public m4ckDev cybersecurity, scripting and automation repositories |
 | `references/hacktricks-upstream/` | Full upstream HackTricks source mirror with provenance kept intact |
 | `references/security-research/` | Curated external research sources, including Payloads.site and vx-underground |
+| `references/resource-directory/` | Direct-link training and personal-security resource indexes |
+| `references/threat-intelligence/` | Defensive threat-intelligence watchlists and public reporting references |
 | `scripts/build_hacktricks_index.py` | Builds complete CyberDatabase navigation from the upstream HackTricks table of contents |
 | `CYBERDATABASE_MANIFEST.md` | Consolidation scope, source list and repository policy |
+
+## Resource Directory
+
+The CYBERSEC TOOLS links supplied for training and personal security are organized under `references/resource-directory/`.
+
+- `TRAINING.md` includes the certification roadmap, TryHackMe, Hack The Box, OverTheWire, LetsDefend, WiFiChallenge, PortSwigger Academy, W3Schools, CompTIA, OffSec, PECB, BBRadar and the TIDE source-board entry.
+- `PERSONAL_SECURITY.md` includes Privacy.Sexy, Defensive Computing Checklist, Security List, Awesome Privacy, Search Engine Party, Secure Messaging Apps, Should I Remove It, JustDeleteMe, EFF Surveillance Self-Defense, Emailnator, Searx, YourDigitalRights, PrivacyTools, DoNotPay, MailTicking and every other label visible in the supplied Personal Security panel.
+- Verified external destinations are stored as direct links. Where the original Start.me destination could not be independently verified, the label is retained with the source-board link rather than inventing a destination.
+
+The supplied underground-forum labels are tracked defensively in `references/threat-intelligence/DARK_WEB_WATCHLIST.md` using public threat-intelligence/research references rather than operational criminal-forum access links.
+
+## Hardware Directory
+
+`hardware/README.md` is the CyberDatabase purchasing/reference index for security-lab hardware. It includes direct manufacturer or reseller links for every hardware item captured from the CYBERSEC TOOLS source list, including:
+
+- The Hacker's Hardware Toolkit, Hak5, KSEC, Hacker Warehouse, Biscuit Shop and OzHack
+- Raspberry Pi 4, M5Stack Cardputer and ESP32 development hardware
+- Proxmark3, iCopy-XS, Flipper Zero and RFID/NFC research hardware
+- WiFi Pineapple and ALFA AWUS036ACM wireless hardware
+- USB Rubber Ducky, Bash Bunny, Shark Jack, Packet Squirrel Mark II and LAN Turtle
+- O.MG Cable and related Hak5 hardware
+- HackRF One / HackRF bundles and SDR purchasing references
+- KeyGrabber and hardware-keylogger purchasing references
+- USBKill electrical stress-testing equipment
+- Sparrows, SouthOrd and KSEC physical-security training equipment, practice locks, disc-detainer tools, bypass tools, air wedges and lock-pick kits
+
+The associated technical material lives under `knowledge-base/hardware-iot/`.
 
 ## AI Hub
 
@@ -110,6 +140,7 @@ CyberDatabase extracts and reorganizes the synchronized source into practical gu
 - `knowledge-base/windows/` — Windows hardening and telemetry
 - `knowledge-base/forensics/` — host, memory, network, container, and file evidence
 - `knowledge-base/malware-analysis/` — malware triage, behavior analysis, and defensive outputs
+- `knowledge-base/hardware-iot/` — embedded, RFID/NFC, SDR, USB and IoT security
 - `knowledge-base/ai-security/` — LLM, agent, MCP, prompt-injection, model, and AI-system security
 
 The synchronization workflow regenerates `knowledge-base/hacktricks-derived/UPSTREAM_INDEX.md` from the current HackTricks `src/SUMMARY.md`, providing a complete navigable map as upstream content changes.
@@ -158,7 +189,7 @@ References / Attribution
 
 ## Responsible Use
 
-CyberDatabase is intended for cybersecurity education, administration, defense, research, lab work, and authorized security testing. Only assess systems, networks, accounts and applications you own or have explicit permission to test.
+CyberDatabase is intended for cybersecurity education, administration, defense, research, lab work, and authorized security testing. Only assess systems, networks, accounts, applications, hardware and physical systems you own or have explicit permission to test.
 
 Third-party material remains subject to its original license and attribution requirements. Do not remove upstream copyright, attribution or license notices from synchronized content.
 

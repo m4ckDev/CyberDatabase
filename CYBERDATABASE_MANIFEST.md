@@ -1,6 +1,6 @@
 # CyberDatabase Consolidation Manifest
 
-CyberDatabase is the primary repository for m4ckDev cybersecurity material: research, scripts, labs, tools, defensive and offensive-security references, threat intelligence, automation, training projects, AI/security tooling, and the CyberDeck platform.
+CyberDatabase is the primary repository for m4ckDev cybersecurity material: research, scripts, labs, tools, defensive and offensive-security references, threat intelligence, automation, training projects, AI/security tooling, hardware references, and the CyberDeck platform.
 
 ## Existing CyberDatabase content
 
@@ -11,8 +11,52 @@ The following existing areas remain in place and are treated as first-class Cybe
 - `RaspberryCommandCenter/`
 - `cheatsheets/`
 - `docs/`
+- `hardware/`
 - `replit-cyberops/`
 - `wifi-sentinel/`
+
+## Direct-link resource directory
+
+External training and personal-security links supplied from the CYBERSEC TOOLS board are maintained under `references/resource-directory/`.
+
+- `TRAINING.md` includes every visible training label: CYBERSEC CERT ROADMAP, TryHackMe, Hack The Box, OverTheWire, LetsDefend, WiFiChallenge, PortSwigger Academy, W3Schools, CompTIA, OffSec, PECB, BBRadar and TIDE.
+- `PERSONAL_SECURITY.md` includes every visible personal-security label: Privacy.Sexy, Schiffer Soft, Defensive Computing Checklist, Security List, Awesome Privacy, Search Engine Party, Secure Messaging Apps, Should I Remove It, JustDeleteMe, Surveillance Self-Defense, Emailnator, Searx, YourDigitalRights, SMS Verification, SMSTEMP, PrivacyTools, Opt Out Broker, DoNotPay, MailTicking and Temp Mail.
+- Confirmed resources use direct links. Where a Start.me bookmark destination could not be independently verified, the original label and source-board URL are retained instead of guessing.
+
+The underground labels shown in the supplied Dark Web panel are tracked under `references/threat-intelligence/DARK_WEB_WATCHLIST.md`. That file includes Exploit.in, DarkNet Army, Verified and BHF using public defensive threat-intelligence/research references rather than operational criminal-forum access links.
+
+## Hardware directory
+
+`hardware/README.md` is the centralized purchasing and source directory for security-lab hardware represented in the CYBERSEC TOOLS source and related CyberDatabase research.
+
+It includes manufacturer or reseller links for:
+
+- The Hacker's Hardware Toolkit catalog
+- Hak5
+- KSEC
+- Hacker Warehouse
+- Biscuit Shop
+- OzHack
+- Raspberry Pi 4
+- M5Stack Cardputer
+- ESP32 development boards
+- Proxmark3
+- WiFi Pineapple
+- ALFA AWUS036ACM
+- USB Rubber Ducky
+- Bash Bunny
+- Shark Jack
+- Packet Squirrel Mark II
+- LAN Turtle
+- O.MG Cable
+- Flipper Zero
+- HackRF One and HackRF bundles
+- iCopy-XS
+- KeyGrabber / hardware keyloggers
+- USBKill electrical stress-testing hardware
+- Sparrows, SouthOrd and KSEC physical-security training tools, practice cylinders, disc-detainer tools, bypass tools, air wedges and lock-pick kits
+
+Technical hardware/IoT notes belong under `knowledge-base/hardware-iot/`. The hardware directory should favor manufacturer stores and authorized distributors where possible, while retaining historical links for discontinued lab devices.
 
 ## AI consolidation
 
@@ -80,6 +124,8 @@ CyberDatabase/
 ├── RaspberryCommandCenter/
 ├── cheatsheets/
 ├── docs/
+├── hardware/
+│   └── README.md
 ├── knowledge-base/
 │   ├── README.md
 │   ├── methodology/
@@ -119,10 +165,16 @@ CyberDatabase/
 │   └── 02-soc-analyst-simulator/
 ├── references/
 │   ├── hacktricks-upstream/
-│   └── security-research/
-│       ├── README.md
-│       ├── payloads-site/
-│       └── vx-underground/
+│   ├── resource-directory/
+│   │   ├── README.md
+│   │   ├── TRAINING.md
+│   │   └── PERSONAL_SECURITY.md
+│   ├── security-research/
+│   │   ├── README.md
+│   │   ├── payloads-site/
+│   │   └── vx-underground/
+│   └── threat-intelligence/
+│       └── DARK_WEB_WATCHLIST.md
 ├── replit-cyberops/
 └── wifi-sentinel/
 ```

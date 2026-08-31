@@ -2,7 +2,7 @@
 
 This directory contains CyberDatabase-owned cybersecurity documentation, field notes, checklists, methodology, lab guidance, defensive references, and authorized testing material.
 
-Use the topic folders below for original or substantially rewritten CyberDatabase material. Keep third-party source mirrors and external research indexes under `../references/` and imported projects under `../imports/` so provenance and licensing remain clear.
+Use the topic folders below for original or substantially rewritten CyberDatabase material. Keep third-party source mirrors, link directories, and external research indexes under `../references/` and imported projects under `../imports/` so provenance and licensing remain clear.
 
 ## Start here
 
@@ -16,6 +16,7 @@ Use the topic folders below for original or substantially rewritten CyberDatabas
 - `windows/README.md` — Windows security, privilege boundaries, hardening, and telemetry.
 - `forensics/README.md` — disk, memory, network, host, container, and file-analysis workflow.
 - `malware-analysis/README.md` — static/dynamic malware analysis, defensive outputs, and vx-underground research mapping.
+- `hardware-iot/README.md` — embedded, hardware, RFID/NFC, SDR, USB and IoT security; links to the CyberDatabase hardware purchasing directory.
 - `ai-security/README.md` — LLM, agent, MCP, model-supply-chain, prompt-injection, and AI security guidance.
 
 ## Coverage map
@@ -41,10 +42,22 @@ Use the topic folders below for original or substantially rewritten CyberDatabas
 - `detection-engineering/` — SIEM, Sigma, YARA, telemetry and detection development
 - `incident-response/` — preparation, triage, containment, eradication and recovery
 - `cryptography/` — hashing, encryption, PKI and certificate concepts
-- `hardware-iot/` — embedded, hardware and IoT security
+- `hardware-iot/` — embedded, hardware, RFID/NFC, SDR, USB and IoT security; purchasing links are maintained in `../hardware/README.md`
 - `wireless/` — Wi-Fi, Bluetooth and wireless security
 - `ai-security/` — LLM, agent, prompt-injection and AI-system security
 - `reporting-remediation/` — findings, evidence, severity, remediation and retesting
+
+## Resource directories
+
+External links from the supplied CYBERSEC TOOLS panels are maintained outside the authored knowledge base:
+
+- `../references/resource-directory/TRAINING.md` — certification roadmap, TryHackMe, Hack The Box, OverTheWire, LetsDefend, WiFiChallenge, PortSwigger Academy, W3Schools, CompTIA, OffSec, PECB, BBRadar, TIDE and related direct links.
+- `../references/resource-directory/PERSONAL_SECURITY.md` — privacy, hardening, account deletion, secure messaging, search privacy, surveillance defense, disposable email and data-removal resources from the supplied screenshot.
+- `../references/threat-intelligence/DARK_WEB_WATCHLIST.md` — defensive public-intelligence references for Exploit.in, DarkNet Army, Verified and BHF.
+
+## Hardware directory
+
+The top-level `../hardware/README.md` contains manufacturer and reseller links for the hardware represented in the CYBERSEC TOOLS source, including Hak5, KSEC, Hacker Warehouse, Biscuit Shop, OzHack, Raspberry Pi, M5Stack, ESP32, Proxmark3, WiFi Pineapple, ALFA adapters, USB Rubber Ducky, Bash Bunny, Shark Jack, Packet Squirrel, LAN Turtle, O.MG Cable, Flipper Zero, HackRF, iCopy-XS, hardware keyloggers, USBKill and physical-security training equipment.
 
 ## External research sources
 
