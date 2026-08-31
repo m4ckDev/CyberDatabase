@@ -2,7 +2,7 @@
 
 This directory contains CyberDatabase-owned cybersecurity documentation, field notes, checklists, methodology, lab guidance, defensive references, and authorized testing material.
 
-Use the topic folders below for original or substantially rewritten CyberDatabase material. Keep third-party source mirrors and external research indexes under `../references/` and imported projects under `../imports/` so provenance and licensing remain clear.
+Use the topic folders below for original or substantially rewritten CyberDatabase material. Keep third-party source mirrors, link directories, and external research indexes under `../references/` and imported projects under `../imports/` so provenance and licensing remain clear.
 
 ## Start here
 
@@ -46,6 +46,14 @@ Use the topic folders below for original or substantially rewritten CyberDatabas
 - `wireless/` — Wi-Fi, Bluetooth and wireless security
 - `ai-security/` — LLM, agent, prompt-injection and AI-system security
 - `reporting-remediation/` — findings, evidence, severity, remediation and retesting
+
+## Resource directories
+
+External links from the supplied CYBERSEC TOOLS panels are maintained outside the authored knowledge base:
+
+- `../references/resource-directory/TRAINING.md` — certification roadmap, TryHackMe, Hack The Box, OverTheWire, LetsDefend, WiFiChallenge, PortSwigger Academy, W3Schools, CompTIA, OffSec, PECB, BBRadar, TIDE and related direct links.
+- `../references/resource-directory/PERSONAL_SECURITY.md` — privacy, hardening, account deletion, secure messaging, search privacy, surveillance defense, disposable email and data-removal resources from the supplied screenshot.
+- `../references/threat-intelligence/DARK_WEB_WATCHLIST.md` — defensive public-intelligence references for Exploit.in, DarkNet Army, Verified and BHF.
 
 ## Hardware directory
 
