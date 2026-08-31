@@ -93,4 +93,5 @@ jobs:
             exit 0
           fi
           git commit -m "Sync cybersecurity resources and HackTricks mirror"
-          git push
+          git pull --rebase origin main
+          git push origin main
