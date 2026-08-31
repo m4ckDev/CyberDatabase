@@ -1,6 +1,6 @@
 # CyberDatabase Consolidation Manifest
 
-CyberDatabase is the primary repository for m4ckDev cybersecurity material: research, scripts, labs, tools, defensive and offensive-security references, threat intelligence, automation, training projects, AI/security tooling, and the CyberDeck platform.
+CyberDatabase is the primary repository for m4ckDev cybersecurity material: research, scripts, labs, tools, defensive and offensive-security references, threat intelligence, automation, training projects, AI/security tooling, hardware references, and the CyberDeck platform.
 
 ## Existing CyberDatabase content
 
@@ -11,8 +11,42 @@ The following existing areas remain in place and are treated as first-class Cybe
 - `RaspberryCommandCenter/`
 - `cheatsheets/`
 - `docs/`
+- `hardware/`
 - `replit-cyberops/`
 - `wifi-sentinel/`
+
+## Hardware directory
+
+`hardware/README.md` is the centralized purchasing and source directory for security-lab hardware represented in the CYBERSEC TOOLS source and related CyberDatabase research.
+
+It includes manufacturer or reseller links for:
+
+- The Hacker's Hardware Toolkit catalog
+- Hak5
+- KSEC
+- Hacker Warehouse
+- Biscuit Shop
+- OzHack
+- Raspberry Pi 4
+- M5Stack Cardputer
+- ESP32 development boards
+- Proxmark3
+- WiFi Pineapple
+- ALFA AWUS036ACM
+- USB Rubber Ducky
+- Bash Bunny
+- Shark Jack
+- Packet Squirrel Mark II
+- LAN Turtle
+- O.MG Cable
+- Flipper Zero
+- HackRF One and HackRF bundles
+- iCopy-XS
+- KeyGrabber / hardware keyloggers
+- USBKill electrical stress-testing hardware
+- Sparrows, SouthOrd and KSEC physical-security training tools, practice cylinders, disc-detainer tools, bypass tools, air wedges and lock-pick kits
+
+Technical hardware/IoT notes belong under `knowledge-base/hardware-iot/`. The hardware directory should favor manufacturer stores and authorized distributors where possible, while retaining historical links for discontinued lab devices.
 
 ## AI consolidation
 
@@ -80,6 +114,8 @@ CyberDatabase/
 ├── RaspberryCommandCenter/
 ├── cheatsheets/
 ├── docs/
+├── hardware/
+│   └── README.md
 ├── knowledge-base/
 │   ├── README.md
 │   ├── methodology/
