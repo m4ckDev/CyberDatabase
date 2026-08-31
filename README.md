@@ -14,7 +14,7 @@
 
 ---
 
-CyberDatabase is the central m4ckDev repository for cybersecurity work. It combines original projects, scripts, labs, defensive and offensive-security references, threat intelligence, automation, AI/security tooling, training material, CyberDeck development, and a maintained HackTricks source mirror.
+CyberDatabase is the central m4ckDev repository for cybersecurity work. It combines original projects, scripts, labs, defensive and offensive-security references, threat intelligence, automation, AI/security tooling, training material, CyberDeck development, a maintained HackTricks source mirror, and curated external security-research sources.
 
 ## Repository Map
 
@@ -30,6 +30,7 @@ CyberDatabase is the central m4ckDev repository for cybersecurity work. It combi
 | `knowledge-base/` | Original and expanded CyberDatabase cybersecurity field manual |
 | `imports/` | Complete snapshots of related public m4ckDev cybersecurity, scripting and automation repositories |
 | `references/hacktricks-upstream/` | Full upstream HackTricks source mirror with provenance kept intact |
+| `references/security-research/` | Curated external research sources, including Payloads.site and vx-underground |
 | `scripts/build_hacktricks_index.py` | Builds complete CyberDatabase navigation from the upstream HackTricks table of contents |
 | `CYBERDATABASE_MANIFEST.md` | Consolidation scope, source list and repository policy |
 
@@ -44,7 +45,7 @@ CyberDatabase is the central m4ckDev repository for cybersecurity work. It combi
 
 ## Knowledge Base Coverage
 
-The CyberDatabase field manual is organized to cover the full security lifecycle and the major domains represented in HackTricks and the existing m4ckDev repositories:
+The CyberDatabase field manual is organized to cover the full security lifecycle and the major domains represented in HackTricks, external research sources, and the existing m4ckDev repositories:
 
 - Pentesting methodology, scoping, evidence and reporting
 - Networking, discovery, enumeration, routing, tunneling and packet analysis
@@ -61,6 +62,16 @@ The CyberDatabase field manual is organized to cover the full security lifecycle
 - Cryptography and PKI
 - AI/LLM security and automation
 - Remediation, retesting and security reporting
+
+## External Research Sources
+
+CyberDatabase maintains dedicated subdirectories for external resources so links, provenance, and research notes remain separate from original CyberDatabase content.
+
+- `references/security-research/payloads-site/` — links to https://payloads.site/ and maps its SQLi, XSS, LFI/RFI, command-injection, SSRF, and encoding-oriented web-testing material into the CyberDatabase web-security workflow.
+- `references/security-research/vx-underground/` — links to https://vx-underground.org/ and organizes its malware papers, Windows/Linux research, YARA material, malware-defense research, threat-analysis archives, and VXUG publications for CyberDatabase use.
+- `knowledge-base/malware-analysis/` — CyberDatabase-owned workflow for static triage, isolated dynamic analysis, detection outputs, and research notes informed by sources such as vx-underground.
+
+External malware binaries are not mirrored into CyberDatabase; research indexes, papers, defensive material, and analysis workflows are kept separate from live samples.
 
 ## Consolidated Public Projects
 
@@ -88,7 +99,7 @@ New CyberDatabase explanations, labs, defensive context, checklists and expanded
 
 ### HackTricks-Derived Field Guides
 
-CyberDatabase now extracts and reorganizes the synchronized source into practical guides instead of relying only on the raw mirror:
+CyberDatabase extracts and reorganizes the synchronized source into practical guides instead of relying only on the raw mirror:
 
 - `knowledge-base/hacktricks-derived/` — source map and automatically generated complete upstream navigation
 - `knowledge-base/methodology/` — assessment workflow
@@ -98,6 +109,7 @@ CyberDatabase now extracts and reorganizes the synchronized source into practica
 - `knowledge-base/linux/` — Linux hardening and privilege-boundary review
 - `knowledge-base/windows/` — Windows hardening and telemetry
 - `knowledge-base/forensics/` — host, memory, network, container, and file evidence
+- `knowledge-base/malware-analysis/` — malware triage, behavior analysis, and defensive outputs
 - `knowledge-base/ai-security/` — LLM, agent, MCP, prompt-injection, model, and AI-system security
 
 The synchronization workflow regenerates `knowledge-base/hacktricks-derived/UPSTREAM_INDEX.md` from the current HackTricks `src/SUMMARY.md`, providing a complete navigable map as upstream content changes.
