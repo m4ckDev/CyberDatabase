@@ -1,0 +1,15 @@
+# Local player data
+data/profiles.json
+data/leaderboard.json
+data/daily-state.json
+
+# Backups
+backups/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor junk
+.vscode/
+.idea/

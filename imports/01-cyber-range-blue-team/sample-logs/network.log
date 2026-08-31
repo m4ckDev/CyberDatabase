@@ -1,0 +1,5 @@
+2026-06-14T01:00:16Z host=blue-range src=10.10.10.20 dst=10.10.10.5 dport=443 proto=tcp state=established process=nginx
+2026-06-14T01:01:41Z host=blue-range src=10.10.10.20 dst=198.51.100.10 dport=53 proto=udp state=allowed process=systemd-resolved
+2026-06-14T01:05:40Z host=blue-range src=10.10.10.20 dst=203.0.113.45 dport=4444 proto=tcp state=attempted process=sh
+2026-06-14T01:06:15Z host=blue-range src=10.10.10.20 dst=10.10.10.1 dport=22 proto=tcp state=established process=ssh
+2026-06-14T01:09:10Z host=blue-range src=10.10.10.20 dst=10.10.10.50 dport=514 proto=udp state=allowed process=rsyslog

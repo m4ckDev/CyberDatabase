@@ -1,0 +1,6 @@
+{
+  "host": "win-eng-07",
+  "process": "powershell.exe",
+  "command": "<simulated-redacted-placeholder>",
+  "parent": "office_app.exe"
+}

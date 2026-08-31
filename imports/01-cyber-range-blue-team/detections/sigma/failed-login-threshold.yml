@@ -1,0 +1,26 @@
+title: Repeated Failed SSH Login Events
+id: BT-AUTH-001
+status: experimental
+description: Detects repeated failed SSH login events from the same source in sample authentication logs.
+author: Blue Team Cyber Range
+references:
+  - Local lab sample data only
+logsource:
+  product: linux
+  service: sshd
+detection:
+  selection:
+    event: Failed
+    service: ssh
+  condition: selection
+fields:
+  - timestamp
+  - host
+  - user
+  - src
+falsepositives:
+  - User mistyped password repeatedly in a local lab
+level: medium
+tags:
+  - attack.initial_access
+  - blue_team_lab

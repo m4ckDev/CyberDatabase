@@ -1,0 +1,8 @@
+{
+  "incident_id": "INC-CAP-9001",
+  "user": "cfo.mason",
+  "events": [
+    "failed-login-spike",
+    "successful-login-after-failures"
+  ]
+}

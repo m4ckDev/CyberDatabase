@@ -1,0 +1,5 @@
+2026-06-14T01:00:00Z host=blue-range path=/var/www/html/index.html action=modified user=deploy hash=changed
+2026-06-14T01:02:00Z host=blue-range path=/tmp/training-note.txt action=created user=analyst hash=new
+2026-06-14T01:05:45Z host=blue-range path=/etc/ssh/sshd_config action=modified user=root hash=changed
+2026-06-14T01:07:01Z host=blue-range path=/var/log/app.log action=modified user=www-data hash=changed
+2026-06-14T01:12:33Z host=blue-range path=/opt/blue-range/readme.txt action=modified user=analyst hash=changed

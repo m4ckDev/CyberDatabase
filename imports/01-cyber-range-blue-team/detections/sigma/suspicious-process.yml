@@ -1,0 +1,30 @@
+title: Suspicious Shell-Like Process Event
+id: BT-PROC-001
+status: experimental
+description: Detects shell-like process activity in the sample process log.
+author: Blue Team Cyber Range
+logsource:
+  product: linux
+  category: process_creation
+detection:
+  selection:
+    process:
+      - sh
+      - bash
+    cmd_contains:
+      - whoami
+      - id
+  condition: selection
+fields:
+  - timestamp
+  - host
+  - user
+  - process
+  - cmd
+falsepositives:
+  - Administrator troubleshooting
+  - Training lab commands
+level: high
+tags:
+  - attack.execution
+  - blue_team_lab

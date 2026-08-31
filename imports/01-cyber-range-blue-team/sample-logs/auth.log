@@ -1,0 +1,10 @@
+2026-06-14T01:00:04Z host=blue-range sshd event=Accepted user=analyst src=10.10.10.15 service=ssh
+2026-06-14T01:03:11Z host=blue-range sshd event=Failed user=admin src=203.0.113.45 service=ssh
+2026-06-14T01:03:14Z host=blue-range sshd event=Failed user=root src=203.0.113.45 service=ssh
+2026-06-14T01:03:17Z host=blue-range sshd event=Failed user=backup src=203.0.113.45 service=ssh
+2026-06-14T01:03:20Z host=blue-range sshd event=Failed user=admin src=203.0.113.45 service=ssh
+2026-06-14T01:03:24Z host=blue-range sshd event=Failed user=service-web src=203.0.113.45 service=ssh
+2026-06-14T01:04:00Z host=blue-range sshd event=Failed user=test src=198.51.100.77 service=ssh
+2026-06-14T01:05:42Z host=blue-range sshd event=Accepted user=jdoe src=10.10.10.23 service=ssh
+2026-06-14T01:07:31Z host=blue-range sudo event=Command user=analyst src=local command="journalctl -u ssh"
+2026-06-14T01:12:10Z host=blue-range sshd event=Failed user=admin src=203.0.113.45 service=ssh

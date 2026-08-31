@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blue Team Cyber Range Dashboard</title>
+  <style>
+    :root { --bg:#08111f; --panel:#101c2f; --text:#eef4ff; --muted:#8ea3bd; --gold:#ffd166; --red:#ef476f; --green:#06d6a0; }
+    body { margin:0; font-family:Arial, sans-serif; background:radial-gradient(circle at top, #152642, var(--bg)); color:var(--text); }
+    header { padding:32px; border-bottom:1px solid #22314d; }
+    h1 { margin:0; font-size:34px; }
+    .sub { color:var(--muted); margin-top:8px; }
+    main { padding:32px; display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px; }
+    .card { background:linear-gradient(180deg,#13233b,var(--panel)); border:1px solid #263b5d; border-radius:18px; padding:22px; box-shadow:0 16px 40px rgba(0,0,0,.25); }
+    .metric { font-size:34px; font-weight:bold; color:var(--gold); }
+    .label { color:var(--muted); }
+    .pill { display:inline-block; padding:6px 10px; border-radius:999px; background:#1c3152; color:#bcd0eb; font-size:12px; }
+    footer { padding:32px; color:var(--muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="pill">LOCAL DEFENSIVE TRAINING ONLY</span>
+    <h1>01 Cyber Range Blue Team</h1>
+    <div class="sub">Dashboard placeholder for future SIEM-style visualization.</div>
+  </header>
+  <main>
+    <section class="card"><div class="metric">10</div><div class="label">Hands-on labs</div></section>
+    <section class="card"><div class="metric">5+</div><div class="label">Sample log sources</div></section>
+    <section class="card"><div class="metric">3</div><div class="label">Detection formats</div></section>
+    <section class="card"><div class="metric">1</div><div class="label">Final capstone investigation</div></section>
+    <section class="card"><h2>Next Step</h2><p>Open the repository and begin with <strong>labs/01-linux-log-review.md</strong>.</p></section>
+    <section class="card"><h2>Alert Output</h2><p>Run the monitor container or execute <code>python scripts/run_all_detections.py</code>.</p></section>
+  </main>
+  <footer>This page is static. It does not collect data or connect to external systems.</footer>
+</body>
+</html>

@@ -1,0 +1,49 @@
+[
+  {
+    "timestamp": "2026-06-14T01:03:24Z",
+    "rule_id": "BT-AUTH-001",
+    "title": "Repeated Failed SSH Login Events",
+    "severity": "medium",
+    "confidence": "high",
+    "source_log": "auth.log",
+    "evidence": {
+      "src": "203.0.113.45",
+      "count": 5,
+      "users": [
+        "admin",
+        "root",
+        "backup",
+        "service-web"
+      ]
+    },
+    "recommendation": "Review source IP, targeted users, and related login activity."
+  },
+  {
+    "timestamp": "2026-06-14T01:05:35Z",
+    "rule_id": "BT-PROC-001",
+    "title": "Suspicious Shell-Like Process Event",
+    "severity": "high",
+    "confidence": "medium",
+    "source_log": "process.log",
+    "evidence": {
+      "user": "www-data",
+      "process": "sh",
+      "cmd": "sh -c whoami"
+    },
+    "recommendation": "Correlate with web logs and file integrity events."
+  },
+  {
+    "timestamp": "2026-06-14T01:05:45Z",
+    "rule_id": "BT-FIM-001",
+    "title": "Sensitive File Change Event",
+    "severity": "high",
+    "confidence": "medium",
+    "source_log": "fim.log",
+    "evidence": {
+      "path": "/etc/ssh/sshd_config",
+      "action": "modified",
+      "user": "root"
+    },
+    "recommendation": "Validate authorization for the file change."
+  }
+]
