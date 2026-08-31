@@ -4,6 +4,19 @@ This directory contains CyberDatabase-owned cybersecurity documentation, field n
 
 Use the topic folders below for original or substantially rewritten CyberDatabase material. Keep third-party source mirrors under `../references/` and imported projects under `../imports/` so provenance and licensing remain clear.
 
+## Start here
+
+- `hacktricks-derived/README.md` — mapping between the upstream HackTricks source and the CyberDatabase field manual.
+- `hacktricks-derived/UPSTREAM_INDEX.md` — automatically generated complete navigation map of the synchronized HackTricks table of contents.
+- `methodology/README.md` — repeatable assessment workflow from scope through retest.
+- `networking/host-discovery-and-scanning.md` — host discovery, TCP/UDP scanning, evidence, and defensive interpretation.
+- `services-and-protocols/README.md` — service triage and protocol review workflow.
+- `web-security/README.md` — web application and API assessment structure.
+- `linux/README.md` — Linux security, privilege boundaries, hardening, and detection.
+- `windows/README.md` — Windows security, privilege boundaries, hardening, and telemetry.
+- `forensics/README.md` — disk, memory, network, host, container, and file-analysis workflow.
+- `ai-security/README.md` — LLM, agent, MCP, model-supply-chain, prompt-injection, and AI security guidance.
+
 ## Coverage map
 
 - `methodology/` — assessment planning, scoping, workflow, evidence, reporting
@@ -34,4 +47,6 @@ Use the topic folders below for original or substantially rewritten CyberDatabas
 
 ## Source relationship
 
-The full upstream HackTricks source mirror is maintained separately at `../references/hacktricks-upstream/`. CyberDatabase can use that source as a reference while building cleaner navigation, expanded explanations, defensive context, lab notes, and original material here.
+The full upstream HackTricks source mirror is maintained separately at `../references/hacktricks-upstream/`. CyberDatabase uses that source as a reference while building cleaner navigation, expanded explanations, defensive context, lab notes, and original material here.
+
+`scripts/build_hacktricks_index.py` parses the synchronized HackTricks `src/SUMMARY.md` and regenerates `hacktricks-derived/UPSTREAM_INDEX.md` during the repository synchronization workflow. This keeps the CyberDatabase navigation map aligned with upstream additions without rewriting upstream files.
