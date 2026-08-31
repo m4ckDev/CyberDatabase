@@ -14,7 +14,7 @@
 
 ---
 
-CyberDatabase is the central m4ckDev repository for cybersecurity work. It combines original projects, scripts, labs, defensive and offensive-security references, threat intelligence, automation, AI/security tooling, training material, CyberDeck development, hardware references, a maintained HackTricks source mirror, and curated external security-research sources.
+CyberDatabase is the central m4ckDev repository for cybersecurity work. It combines original projects, scripts, labs, defensive and offensive-security references, threat intelligence, automation, AI/security tooling, training material, CyberDeck development, hardware references, a maintained HackTricks source mirror, curated external security-research sources, and direct-link resource directories for training and personal security.
 
 ## Repository Map
 
@@ -32,8 +32,20 @@ CyberDatabase is the central m4ckDev repository for cybersecurity work. It combi
 | `imports/` | Complete snapshots of related public m4ckDev cybersecurity, scripting and automation repositories |
 | `references/hacktricks-upstream/` | Full upstream HackTricks source mirror with provenance kept intact |
 | `references/security-research/` | Curated external research sources, including Payloads.site and vx-underground |
+| `references/resource-directory/` | Direct-link training and personal-security resource indexes |
+| `references/threat-intelligence/` | Defensive threat-intelligence watchlists and public reporting references |
 | `scripts/build_hacktricks_index.py` | Builds complete CyberDatabase navigation from the upstream HackTricks table of contents |
 | `CYBERDATABASE_MANIFEST.md` | Consolidation scope, source list and repository policy |
+
+## Resource Directory
+
+The CYBERSEC TOOLS links supplied for training and personal security are organized under `references/resource-directory/`.
+
+- `TRAINING.md` includes the certification roadmap, TryHackMe, Hack The Box, OverTheWire, LetsDefend, WiFiChallenge, PortSwigger Academy, W3Schools, CompTIA, OffSec, PECB, BBRadar and the TIDE source-board entry.
+- `PERSONAL_SECURITY.md` includes Privacy.Sexy, Defensive Computing Checklist, Security List, Awesome Privacy, Search Engine Party, Secure Messaging Apps, Should I Remove It, JustDeleteMe, EFF Surveillance Self-Defense, Emailnator, Searx, YourDigitalRights, PrivacyTools, DoNotPay, MailTicking and every other label visible in the supplied Personal Security panel.
+- Verified external destinations are stored as direct links. Where the original Start.me destination could not be independently verified, the label is retained with the source-board link rather than inventing a destination.
+
+The supplied underground-forum labels are tracked defensively in `references/threat-intelligence/DARK_WEB_WATCHLIST.md` using public threat-intelligence/research references rather than operational criminal-forum access links.
 
 ## Hardware Directory
 
