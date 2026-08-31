@@ -1,0 +1,39 @@
+services:
+  web-service:
+    build: ./web-service
+    container_name: blue-team-web-service
+    ports:
+      - "8080:5000"
+    volumes:
+      - ../sample-logs/generated:/app/logs
+    environment:
+      - LOG_PATH=/app/logs/web-access.log
+    restart: unless-stopped
+
+  log-generator:
+    build: ./log-generator
+    container_name: blue-team-log-generator
+    volumes:
+      - ../sample-logs/generated:/data/logs
+    restart: unless-stopped
+
+  monitor:
+    build: ./monitor
+    container_name: blue-team-monitor
+    depends_on:
+      - log-generator
+      - web-service
+    volumes:
+      - ../sample-logs/generated:/data/logs
+      - ../reports:/data/reports
+    environment:
+      - LOG_DIR=/data/logs
+      - ALERT_PATH=/data/reports/generated-alerts.jsonl
+    restart: unless-stopped
+
+  dashboard:
+    build: ./dashboard
+    container_name: blue-team-dashboard
+    ports:
+      - "8088:80"
+    restart: unless-stopped

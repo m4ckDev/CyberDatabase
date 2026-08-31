@@ -1,0 +1,11 @@
+2026-06-14T01:03:11Z source=auth host=blue-range sshd event=Failed user=admin src=203.0.113.45 service=ssh
+2026-06-14T01:03:14Z source=auth host=blue-range sshd event=Failed user=root src=203.0.113.45 service=ssh
+2026-06-14T01:03:17Z source=auth host=blue-range sshd event=Failed user=backup src=203.0.113.45 service=ssh
+2026-06-14T01:03:20Z source=auth host=blue-range sshd event=Failed user=admin src=203.0.113.45 service=ssh
+2026-06-14T01:03:24Z source=auth host=blue-range sshd event=Failed user=service-web src=203.0.113.45 service=ssh
+2026-06-14T01:05:21Z source=web src=198.51.100.77 method=GET path="/search?q=%27%20OR%20%271%27%3D%271" status=200
+2026-06-14T01:05:30Z source=web src=198.51.100.77 method=GET path="/../../etc/passwd" status=404
+2026-06-14T01:05:35Z source=process host=blue-range pid=1888 user=www-data process=sh cmd="sh -c whoami"
+2026-06-14T01:05:40Z source=network host=blue-range src=10.10.10.20 dst=203.0.113.45 dport=4444 proto=tcp state=attempted process=sh
+2026-06-14T01:05:45Z source=fim host=blue-range path=/etc/ssh/sshd_config action=modified user=root hash=changed
+2026-06-14T01:06:00Z source=syslog host=blue-range service=monitor message="Alert review recommended"

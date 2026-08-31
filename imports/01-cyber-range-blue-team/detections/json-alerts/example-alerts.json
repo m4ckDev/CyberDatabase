@@ -1,0 +1,48 @@
+[
+  {
+    "timestamp": "2026-06-14T01:03:24Z",
+    "rule_id": "BT-AUTH-001",
+    "title": "Repeated Failed SSH Login Events",
+    "severity": "medium",
+    "confidence": "high",
+    "source_log": "auth.log",
+    "evidence": {
+      "src": "203.0.113.45",
+      "failed_count": 5,
+      "users": [
+        "admin",
+        "root",
+        "backup",
+        "service-web"
+      ]
+    },
+    "analyst_question": "Is this source expected in the local lab?"
+  },
+  {
+    "timestamp": "2026-06-14T01:05:21Z",
+    "rule_id": "BT-WEB-001",
+    "title": "Suspicious Web Request Pattern",
+    "severity": "medium",
+    "confidence": "medium",
+    "source_log": "web-access.log",
+    "evidence": {
+      "src": "198.51.100.77",
+      "path": "/search?q=%27%20OR%20%271%27%3D%271"
+    },
+    "analyst_question": "Are there related requests from the same source?"
+  },
+  {
+    "timestamp": "2026-06-14T01:05:45Z",
+    "rule_id": "BT-FIM-001",
+    "title": "Sensitive File Change Event",
+    "severity": "high",
+    "confidence": "medium",
+    "source_log": "fim.log",
+    "evidence": {
+      "path": "/etc/ssh/sshd_config",
+      "action": "modified",
+      "user": "root"
+    },
+    "analyst_question": "Was this change authorized?"
+  }
+]

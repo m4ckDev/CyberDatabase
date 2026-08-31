@@ -1,0 +1,31 @@
+title: Sensitive File Change Event
+id: BT-FIM-001
+status: experimental
+description: Detects simulated modifications to sensitive paths in sample file integrity logs.
+author: Blue Team Cyber Range
+logsource:
+  product: linux
+  category: file_event
+detection:
+  selection:
+    path:
+      - /etc/ssh/sshd_config
+      - /etc/passwd
+      - /etc/shadow
+    action:
+      - modified
+      - created
+      - deleted
+  condition: selection
+fields:
+  - timestamp
+  - host
+  - path
+  - action
+  - user
+falsepositives:
+  - Authorized system administration
+level: high
+tags:
+  - attack.defense_evasion
+  - blue_team_lab

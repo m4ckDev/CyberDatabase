@@ -1,0 +1,1 @@
+This folder contains placeholder evidence file names only. No malicious content or real telemetry is included.

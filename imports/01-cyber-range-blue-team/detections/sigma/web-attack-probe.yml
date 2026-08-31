@@ -1,0 +1,28 @@
+title: Suspicious Web Request Pattern
+id: BT-WEB-001
+status: experimental
+description: Detects suspicious web request strings in sample web access logs.
+author: Blue Team Cyber Range
+logsource:
+  category: webserver
+detection:
+  selection:
+    path_contains:
+      - "%27"
+      - "../"
+      - "/admin/debug"
+      - "passwd"
+  condition: selection
+fields:
+  - timestamp
+  - src
+  - method
+  - path
+  - status
+falsepositives:
+  - Security testing inside authorized lab
+  - Broken application links
+level: medium
+tags:
+  - attack.initial_access
+  - blue_team_lab

@@ -1,0 +1,29 @@
+title: Unusual Network Destination Port
+id: BT-NET-001
+status: experimental
+description: Detects unusual destination ports in sample network connection logs.
+author: Blue Team Cyber Range
+logsource:
+  product: linux
+  category: network_connection
+detection:
+  selection:
+    dport:
+      - 4444
+      - 1337
+      - 6667
+  condition: selection
+fields:
+  - timestamp
+  - host
+  - src
+  - dst
+  - dport
+  - process
+falsepositives:
+  - Local lab testing
+  - Non-standard internal services
+level: medium
+tags:
+  - attack.command_and_control
+  - blue_team_lab

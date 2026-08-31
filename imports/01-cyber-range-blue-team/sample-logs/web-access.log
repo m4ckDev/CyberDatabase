@@ -1,0 +1,8 @@
+2026-06-14T01:00:10Z src=10.10.10.15 method=GET path="/" status=200 ua="Mozilla/5.0 training" note="normal"
+2026-06-14T01:00:15Z src=10.10.10.15 method=GET path="/api/status" status=200 ua="Mozilla/5.0 training" note="normal"
+2026-06-14T01:02:42Z src=203.0.113.45 method=GET path="/login" status=200 ua="training-browser" note="login-page"
+2026-06-14T01:03:09Z src=203.0.113.45 method=POST path="/login" status=401 ua="training-browser" note="disabled-login"
+2026-06-14T01:05:21Z src=198.51.100.77 method=GET path="/search?q=%27%20OR%20%271%27%3D%271" status=200 ua="training-generator" note="synthetic suspicious string"
+2026-06-14T01:05:30Z src=198.51.100.77 method=GET path="/../../etc/passwd" status=404 ua="training-generator" note="synthetic path pattern"
+2026-06-14T01:06:02Z src=198.51.100.77 method=GET path="/admin/debug" status=403 ua="training-generator" note="synthetic admin probe"
+2026-06-14T01:10:11Z src=10.10.10.23 method=GET path="/search?q=training" status=200 ua="Mozilla/5.0 training" note="normal"

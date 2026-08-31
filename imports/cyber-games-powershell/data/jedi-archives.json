@@ -1,0 +1,2402 @@
+[
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Basics",
+    "Command": "Get-Help",
+    "Purpose": "Shows help for a command",
+    "Example": "Get-Help Get-Process -Examples",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Basics",
+    "Command": "Get-Command",
+    "Purpose": "Lists available commands",
+    "Example": "Get-Command",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Basics",
+    "Command": "Get-Alias",
+    "Purpose": "Shows aliases",
+    "Example": "Get-Alias",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Basics",
+    "Command": "Get-Host",
+    "Purpose": "Shows PowerShell host info",
+    "Example": "Get-Host",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Basics",
+    "Command": "$PSVersionTable",
+    "Purpose": "Shows PowerShell version information",
+    "Example": "$PSVersionTable",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Navigation",
+    "Command": "Get-Location",
+    "Purpose": "Shows current path",
+    "Example": "Get-Location",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Navigation",
+    "Command": "Set-Location",
+    "Purpose": "Changes current path",
+    "Example": "Set-Location $HOME",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Navigation",
+    "Command": "Push-Location",
+    "Purpose": "Saves current path and moves",
+    "Example": "Push-Location C:\\",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Navigation",
+    "Command": "Pop-Location",
+    "Purpose": "Returns to saved path",
+    "Example": "Pop-Location",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "Get-ChildItem",
+    "Purpose": "Lists files and folders",
+    "Example": "Get-ChildItem",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "New-Item",
+    "Purpose": "Creates files or folders",
+    "Example": "New-Item -ItemType Directory -Name Lab",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "Remove-Item",
+    "Purpose": "Deletes files or folders",
+    "Example": "Remove-Item old.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "Copy-Item",
+    "Purpose": "Copies files or folders",
+    "Example": "Copy-Item a.txt b.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "Move-Item",
+    "Purpose": "Moves or renames items",
+    "Example": "Move-Item a.txt archive.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "Rename-Item",
+    "Purpose": "Renames an item",
+    "Example": "Rename-Item old.txt new.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "Get-Content",
+    "Purpose": "Reads file content",
+    "Example": "Get-Content notes.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "Set-Content",
+    "Purpose": "Writes file content",
+    "Example": "Set-Content notes.txt 'hello'",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "Add-Content",
+    "Purpose": "Appends file content",
+    "Example": "Add-Content notes.txt 'more'",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "Clear-Content",
+    "Purpose": "Clears file contents",
+    "Example": "Clear-Content notes.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "Test-Path",
+    "Purpose": "Checks if path exists",
+    "Example": "Test-Path C:\\Windows",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "Resolve-Path",
+    "Purpose": "Resolves a path",
+    "Example": "Resolve-Path .",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "Split-Path",
+    "Purpose": "Splits path components",
+    "Example": "Split-Path C:\\Temp\\a.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "Join-Path",
+    "Purpose": "Combines path components",
+    "Example": "Join-Path C:\\Temp a.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "Get-Item",
+    "Purpose": "Gets a file or folder object",
+    "Example": "Get-Item .\\notes.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Files",
+    "Command": "Get-ItemProperty",
+    "Purpose": "Gets item properties",
+    "Example": "Get-ItemProperty .\\notes.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Processes",
+    "Command": "Get-Process",
+    "Purpose": "Lists running processes",
+    "Example": "Get-Process",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Processes",
+    "Command": "Stop-Process",
+    "Purpose": "Stops a process",
+    "Example": "Stop-Process -Name notepad",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Processes",
+    "Command": "Start-Process",
+    "Purpose": "Starts a process",
+    "Example": "Start-Process notepad.exe",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Processes",
+    "Command": "Wait-Process",
+    "Purpose": "Waits for a process to stop",
+    "Example": "Wait-Process -Name notepad",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Services",
+    "Command": "Get-Service",
+    "Purpose": "Lists services",
+    "Example": "Get-Service",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Services",
+    "Command": "Start-Service",
+    "Purpose": "Starts a service",
+    "Example": "Start-Service Spooler",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Services",
+    "Command": "Stop-Service",
+    "Purpose": "Stops a service",
+    "Example": "Stop-Service Spooler",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Services",
+    "Command": "Restart-Service",
+    "Purpose": "Restarts a service",
+    "Example": "Restart-Service Spooler",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Services",
+    "Command": "Set-Service",
+    "Purpose": "Changes service settings",
+    "Example": "Set-Service Spooler -StartupType Manual",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "System",
+    "Command": "Get-ComputerInfo",
+    "Purpose": "Shows computer information",
+    "Example": "Get-ComputerInfo",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "System",
+    "Command": "Get-LocalUser",
+    "Purpose": "Lists local users",
+    "Example": "Get-LocalUser",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "System",
+    "Command": "Get-LocalGroup",
+    "Purpose": "Lists local groups",
+    "Example": "Get-LocalGroup",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "System",
+    "Command": "Get-LocalGroupMember",
+    "Purpose": "Lists local group members",
+    "Example": "Get-LocalGroupMember Administrators",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "System",
+    "Command": "New-LocalUser",
+    "Purpose": "Creates local user",
+    "Example": "New-LocalUser testuser",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "System",
+    "Command": "Disable-LocalUser",
+    "Purpose": "Disables local user",
+    "Example": "Disable-LocalUser testuser",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "System",
+    "Command": "Enable-LocalUser",
+    "Purpose": "Enables local user",
+    "Example": "Enable-LocalUser testuser",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Networking",
+    "Command": "Get-NetIPAddress",
+    "Purpose": "Shows IP addresses",
+    "Example": "Get-NetIPAddress",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Networking",
+    "Command": "Get-NetAdapter",
+    "Purpose": "Shows network adapters",
+    "Example": "Get-NetAdapter",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Networking",
+    "Command": "Get-NetIPConfiguration",
+    "Purpose": "Shows IP configuration",
+    "Example": "Get-NetIPConfiguration",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Networking",
+    "Command": "Get-NetRoute",
+    "Purpose": "Shows routes",
+    "Example": "Get-NetRoute",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Networking",
+    "Command": "Test-NetConnection",
+    "Purpose": "Tests network connection",
+    "Example": "Test-NetConnection google.com",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Networking",
+    "Command": "Resolve-DnsName",
+    "Purpose": "Queries DNS",
+    "Example": "Resolve-DnsName example.com",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Networking",
+    "Command": "Get-NetTCPConnection",
+    "Purpose": "Shows TCP connections",
+    "Example": "Get-NetTCPConnection",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Networking",
+    "Command": "Get-NetUDPEndpoint",
+    "Purpose": "Shows UDP endpoints",
+    "Example": "Get-NetUDPEndpoint",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Firewall",
+    "Command": "Get-NetFirewallRule",
+    "Purpose": "Lists firewall rules",
+    "Example": "Get-NetFirewallRule",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Firewall",
+    "Command": "Enable-NetFirewallRule",
+    "Purpose": "Enables firewall rule",
+    "Example": "Enable-NetFirewallRule -DisplayName 'Rule'",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Firewall",
+    "Command": "Disable-NetFirewallRule",
+    "Purpose": "Disables firewall rule",
+    "Example": "Disable-NetFirewallRule -DisplayName 'Rule'",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Firewall",
+    "Command": "New-NetFirewallRule",
+    "Purpose": "Creates firewall rule",
+    "Example": "New-NetFirewallRule -DisplayName Test -Direction Inbound -Action Allow",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Security",
+    "Command": "Get-MpComputerStatus",
+    "Purpose": "Shows Defender status",
+    "Example": "Get-MpComputerStatus",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Security",
+    "Command": "Start-MpScan",
+    "Purpose": "Starts Defender scan",
+    "Example": "Start-MpScan -ScanType QuickScan",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Security",
+    "Command": "Update-MpSignature",
+    "Purpose": "Updates Defender signatures",
+    "Example": "Update-MpSignature",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Security",
+    "Command": "Get-MpPreference",
+    "Purpose": "Shows Defender preferences",
+    "Example": "Get-MpPreference",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Security",
+    "Command": "Set-MpPreference",
+    "Purpose": "Changes Defender preferences",
+    "Example": "Set-MpPreference",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Security",
+    "Command": "Get-FileHash",
+    "Purpose": "Calculates file hash",
+    "Example": "Get-FileHash file.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Events",
+    "Command": "Get-WinEvent",
+    "Purpose": "Reads Windows event logs",
+    "Example": "Get-WinEvent -LogName Security -MaxEvents 10",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Events",
+    "Command": "Get-EventLog",
+    "Purpose": "Reads classic event logs",
+    "Example": "Get-EventLog -LogName System -Newest 10",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Events",
+    "Command": "Clear-EventLog",
+    "Purpose": "Clears classic event log",
+    "Example": "Clear-EventLog -LogName Application",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Objects",
+    "Command": "Select-Object",
+    "Purpose": "Selects object properties",
+    "Example": "Get-Process | Select-Object Name,Id",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Objects",
+    "Command": "Where-Object",
+    "Purpose": "Filters objects",
+    "Example": "Get-Process | Where-Object CPU -gt 10",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Objects",
+    "Command": "Sort-Object",
+    "Purpose": "Sorts objects",
+    "Example": "Get-Process | Sort-Object CPU",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Objects",
+    "Command": "Group-Object",
+    "Purpose": "Groups objects",
+    "Example": "Get-Service | Group-Object Status",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Objects",
+    "Command": "Measure-Object",
+    "Purpose": "Measures objects",
+    "Example": "Get-Process | Measure-Object",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Objects",
+    "Command": "ForEach-Object",
+    "Purpose": "Runs action for each object",
+    "Example": "Get-Service | ForEach-Object Name",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Output",
+    "Command": "Out-File",
+    "Purpose": "Writes output to file",
+    "Example": "Get-Process | Out-File proc.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Output",
+    "Command": "Export-Csv",
+    "Purpose": "Exports CSV",
+    "Example": "Get-Process | Export-Csv proc.csv",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Output",
+    "Command": "Import-Csv",
+    "Purpose": "Imports CSV",
+    "Example": "Import-Csv proc.csv",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Output",
+    "Command": "ConvertTo-Json",
+    "Purpose": "Converts object to JSON",
+    "Example": "Get-Process | Select -First 1 | ConvertTo-Json",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Output",
+    "Command": "ConvertFrom-Json",
+    "Purpose": "Converts JSON to object",
+    "Example": "Get-Content data.json | ConvertFrom-Json",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Scripting",
+    "Command": "New-Variable",
+    "Purpose": "Creates variable",
+    "Example": "New-Variable -Name x -Value 1",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Scripting",
+    "Command": "Set-Variable",
+    "Purpose": "Sets variable",
+    "Example": "Set-Variable -Name x -Value 2",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Scripting",
+    "Command": "Get-Variable",
+    "Purpose": "Gets variables",
+    "Example": "Get-Variable",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Scripting",
+    "Command": "Remove-Variable",
+    "Purpose": "Removes variable",
+    "Example": "Remove-Variable x",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Scripting",
+    "Command": "Read-Host",
+    "Purpose": "Reads user input",
+    "Example": "Read-Host 'Name'",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Scripting",
+    "Command": "Write-Host",
+    "Purpose": "Prints text to screen",
+    "Example": "Write-Host 'Ready'",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Scripting",
+    "Command": "Write-Output",
+    "Purpose": "Writes pipeline output",
+    "Example": "Write-Output 'Ready'",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Scripting",
+    "Command": "Start-Sleep",
+    "Purpose": "Pauses script",
+    "Example": "Start-Sleep -Seconds 2",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Jobs",
+    "Command": "Start-Job",
+    "Purpose": "Starts background job",
+    "Example": "Start-Job { Get-Process }",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Jobs",
+    "Command": "Get-Job",
+    "Purpose": "Lists jobs",
+    "Example": "Get-Job",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Jobs",
+    "Command": "Receive-Job",
+    "Purpose": "Gets job results",
+    "Example": "Receive-Job 1",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Jobs",
+    "Command": "Stop-Job",
+    "Purpose": "Stops job",
+    "Example": "Stop-Job 1",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Jobs",
+    "Command": "Remove-Job",
+    "Purpose": "Removes job",
+    "Example": "Remove-Job 1",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Modules",
+    "Command": "Get-Module",
+    "Purpose": "Lists modules",
+    "Example": "Get-Module -ListAvailable",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Modules",
+    "Command": "Import-Module",
+    "Purpose": "Loads module",
+    "Example": "Import-Module NetSecurity",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Modules",
+    "Command": "Remove-Module",
+    "Purpose": "Unloads module",
+    "Example": "Remove-Module ModuleName",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Remoting",
+    "Command": "Enter-PSSession",
+    "Purpose": "Starts remote session",
+    "Example": "Enter-PSSession -ComputerName PC01",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Remoting",
+    "Command": "Invoke-Command",
+    "Purpose": "Runs remote command",
+    "Example": "Invoke-Command -ComputerName PC01 -ScriptBlock { hostname }",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Remoting",
+    "Command": "New-PSSession",
+    "Purpose": "Creates session",
+    "Example": "New-PSSession -ComputerName PC01",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Remoting",
+    "Command": "Get-PSSession",
+    "Purpose": "Lists sessions",
+    "Example": "Get-PSSession",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Remoting",
+    "Command": "Remove-PSSession",
+    "Purpose": "Removes session",
+    "Example": "Remove-PSSession 1",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Registry",
+    "Command": "Get-ItemProperty HKLM:",
+    "Purpose": "Reads registry properties",
+    "Example": "Get-ItemProperty HKLM:\\Software",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Registry",
+    "Command": "New-ItemProperty",
+    "Purpose": "Creates registry property",
+    "Example": "New-ItemProperty",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Registry",
+    "Command": "Set-ItemProperty",
+    "Purpose": "Sets registry property",
+    "Example": "Set-ItemProperty",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Registry",
+    "Command": "Remove-ItemProperty",
+    "Purpose": "Removes registry property",
+    "Example": "Remove-ItemProperty",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Errors",
+    "Command": "Try/Catch",
+    "Purpose": "Handles errors",
+    "Example": "try { Get-Item bad } catch { Write-Host 'failed' }",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows PowerShell",
+    "Category": "Errors",
+    "Command": "$Error",
+    "Purpose": "Shows error list",
+    "Example": "$Error[0]",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Basics",
+    "Command": "help",
+    "Purpose": "Shows command help",
+    "Example": "help",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Basics",
+    "Command": "cls",
+    "Purpose": "Clears screen",
+    "Example": "cls",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Basics",
+    "Command": "echo",
+    "Purpose": "Prints text",
+    "Example": "echo hello",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Basics",
+    "Command": "ver",
+    "Purpose": "Shows Windows version",
+    "Example": "ver",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Basics",
+    "Command": "date",
+    "Purpose": "Shows or sets date",
+    "Example": "date /t",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Basics",
+    "Command": "time",
+    "Purpose": "Shows or sets time",
+    "Example": "time /t",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Navigation",
+    "Command": "cd",
+    "Purpose": "Changes directory",
+    "Example": "cd C:\\Users",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Navigation",
+    "Command": "dir",
+    "Purpose": "Lists files and folders",
+    "Example": "dir",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Navigation",
+    "Command": "tree",
+    "Purpose": "Shows folder tree",
+    "Example": "tree /f",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Navigation",
+    "Command": "pushd",
+    "Purpose": "Saves path and changes directory",
+    "Example": "pushd C:\\Temp",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Navigation",
+    "Command": "popd",
+    "Purpose": "Returns to saved path",
+    "Example": "popd",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "type",
+    "Purpose": "Reads file content",
+    "Example": "type notes.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "copy",
+    "Purpose": "Copies files",
+    "Example": "copy a.txt b.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "xcopy",
+    "Purpose": "Copies files and directories",
+    "Example": "xcopy source dest /E",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "robocopy",
+    "Purpose": "Advanced file copy",
+    "Example": "robocopy source dest /MIR",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "move",
+    "Purpose": "Moves files",
+    "Example": "move a.txt C:\\Temp",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "ren",
+    "Purpose": "Renames files",
+    "Example": "ren old.txt new.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "del",
+    "Purpose": "Deletes files",
+    "Example": "del old.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "erase",
+    "Purpose": "Deletes files",
+    "Example": "erase old.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "mkdir",
+    "Purpose": "Creates directory",
+    "Example": "mkdir lab",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "rmdir",
+    "Purpose": "Removes directory",
+    "Example": "rmdir lab",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "attrib",
+    "Purpose": "Views or changes attributes",
+    "Example": "attrib +h secret.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "fc",
+    "Purpose": "Compares files",
+    "Example": "fc a.txt b.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "find",
+    "Purpose": "Searches text",
+    "Example": "find 'error' log.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "findstr",
+    "Purpose": "Searches text with patterns",
+    "Example": "findstr /i error log.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "where",
+    "Purpose": "Finds executable path",
+    "Example": "where python",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "compact",
+    "Purpose": "Shows or changes compression",
+    "Example": "compact /c file.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Files",
+    "Command": "cipher",
+    "Purpose": "Encryption and wipe utility",
+    "Example": "cipher /w:C:\\Temp",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "hostname",
+    "Purpose": "Shows computer name",
+    "Example": "hostname",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "whoami",
+    "Purpose": "Shows current user",
+    "Example": "whoami",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "systeminfo",
+    "Purpose": "Shows system info",
+    "Example": "systeminfo",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "set",
+    "Purpose": "Shows environment variables",
+    "Example": "set",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "path",
+    "Purpose": "Shows or sets path",
+    "Example": "path",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "wmic",
+    "Purpose": "Windows Management Instrumentation CLI",
+    "Example": "wmic os get caption",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "driverquery",
+    "Purpose": "Lists drivers",
+    "Example": "driverquery",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "tasklist",
+    "Purpose": "Lists running processes",
+    "Example": "tasklist",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "taskkill",
+    "Purpose": "Kills process",
+    "Example": "taskkill /PID 1234 /F",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "shutdown",
+    "Purpose": "Shuts down or restarts",
+    "Example": "shutdown /r /t 0",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "logoff",
+    "Purpose": "Logs off user",
+    "Example": "logoff",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "gpupdate",
+    "Purpose": "Updates group policy",
+    "Example": "gpupdate /force",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "gpresult",
+    "Purpose": "Shows group policy result",
+    "Example": "gpresult /r",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "sfc",
+    "Purpose": "System file checker",
+    "Example": "sfc /scannow",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "dism",
+    "Purpose": "Windows image servicing",
+    "Example": "dism /online /cleanup-image /restorehealth",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "chkdsk",
+    "Purpose": "Checks disk",
+    "Example": "chkdsk C: /f",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "System",
+    "Command": "fsutil",
+    "Purpose": "File system utility",
+    "Example": "fsutil fsinfo drives",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Users",
+    "Command": "net user",
+    "Purpose": "Lists or manages users",
+    "Example": "net user",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Users",
+    "Command": "net localgroup",
+    "Purpose": "Lists or manages groups",
+    "Example": "net localgroup",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Users",
+    "Command": "net accounts",
+    "Purpose": "Shows account policy",
+    "Example": "net accounts",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Users",
+    "Command": "runas",
+    "Purpose": "Runs command as another user",
+    "Example": "runas /user:Admin cmd",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "ipconfig",
+    "Purpose": "Shows IP configuration",
+    "Example": "ipconfig /all",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "ping",
+    "Purpose": "Tests connectivity",
+    "Example": "ping 8.8.8.8",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "tracert",
+    "Purpose": "Traces route",
+    "Example": "tracert google.com",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "pathping",
+    "Purpose": "Trace and packet loss tool",
+    "Example": "pathping google.com",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "nslookup",
+    "Purpose": "DNS lookup",
+    "Example": "nslookup example.com",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "netstat",
+    "Purpose": "Shows network connections",
+    "Example": "netstat -ano",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "arp",
+    "Purpose": "Shows ARP table",
+    "Example": "arp -a",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "route",
+    "Purpose": "Shows or edits routes",
+    "Example": "route print",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "nbtstat",
+    "Purpose": "NetBIOS over TCP/IP info",
+    "Example": "nbtstat -n",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "getmac",
+    "Purpose": "Shows MAC addresses",
+    "Example": "getmac",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "netsh",
+    "Purpose": "Network shell",
+    "Example": "netsh advfirewall show allprofiles",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "telnet",
+    "Purpose": "Tests TCP services if enabled",
+    "Example": "telnet host 80",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "ftp",
+    "Purpose": "FTP client",
+    "Example": "ftp server",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "tftp",
+    "Purpose": "TFTP client if enabled",
+    "Example": "tftp",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "net view",
+    "Purpose": "Views network resources",
+    "Example": "net view",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "net use",
+    "Purpose": "Maps network drives",
+    "Example": "net use Z: \\\\server\\share",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "net share",
+    "Purpose": "Manages shares",
+    "Example": "net share",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "net session",
+    "Purpose": "Shows sessions",
+    "Example": "net session",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Networking",
+    "Command": "net file",
+    "Purpose": "Shows open shared files",
+    "Example": "net file",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Firewall",
+    "Command": "netsh advfirewall show",
+    "Purpose": "Shows firewall profiles",
+    "Example": "netsh advfirewall show allprofiles",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Firewall",
+    "Command": "netsh advfirewall set",
+    "Purpose": "Changes firewall state",
+    "Example": "netsh advfirewall set allprofiles state on",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Firewall",
+    "Command": "netsh advfirewall firewall add rule",
+    "Purpose": "Adds firewall rule",
+    "Example": "netsh advfirewall firewall add rule name=Test dir=in action=allow protocol=TCP localport=8080",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Services",
+    "Command": "sc query",
+    "Purpose": "Queries services",
+    "Example": "sc query",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Services",
+    "Command": "sc start",
+    "Purpose": "Starts service",
+    "Example": "sc start Spooler",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Services",
+    "Command": "sc stop",
+    "Purpose": "Stops service",
+    "Example": "sc stop Spooler",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Services",
+    "Command": "sc config",
+    "Purpose": "Configures service",
+    "Example": "sc config Spooler start= demand",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Services",
+    "Command": "net start",
+    "Purpose": "Lists or starts services",
+    "Example": "net start",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Services",
+    "Command": "net stop",
+    "Purpose": "Stops service",
+    "Example": "net stop Spooler",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Events",
+    "Command": "wevtutil el",
+    "Purpose": "Lists event logs",
+    "Example": "wevtutil el",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Events",
+    "Command": "wevtutil qe",
+    "Purpose": "Queries event log",
+    "Example": "wevtutil qe Security /c:10 /f:text",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Events",
+    "Command": "eventcreate",
+    "Purpose": "Creates event log entry",
+    "Example": "eventcreate /T INFORMATION /ID 100 /L APPLICATION /D test",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Scheduling",
+    "Command": "schtasks",
+    "Purpose": "Manages scheduled tasks",
+    "Example": "schtasks /query",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Scheduling",
+    "Command": "at",
+    "Purpose": "Legacy task scheduler command",
+    "Example": "at",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Disks",
+    "Command": "diskpart",
+    "Purpose": "Disk partition tool",
+    "Example": "diskpart",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Disks",
+    "Command": "mountvol",
+    "Purpose": "Manages volume mount points",
+    "Example": "mountvol",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Disks",
+    "Command": "vol",
+    "Purpose": "Shows volume label",
+    "Example": "vol C:",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Disks",
+    "Command": "label",
+    "Purpose": "Changes volume label",
+    "Example": "label C: DATA",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Power",
+    "Command": "powercfg",
+    "Purpose": "Power configuration",
+    "Example": "powercfg /batteryreport",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Security",
+    "Command": "whoami /priv",
+    "Purpose": "Shows privileges",
+    "Example": "whoami /priv",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Security",
+    "Command": "whoami /groups",
+    "Purpose": "Shows groups",
+    "Example": "whoami /groups",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Security",
+    "Command": "certutil",
+    "Purpose": "Certificate and hashing utility",
+    "Example": "certutil -hashfile file.txt SHA256",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Security",
+    "Command": "icacls",
+    "Purpose": "Views or changes ACLs",
+    "Example": "icacls file.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Security",
+    "Command": "takeown",
+    "Purpose": "Takes file ownership",
+    "Example": "takeown /f file.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Security",
+    "Command": "auditpol",
+    "Purpose": "Shows audit policy",
+    "Example": "auditpol /get /category:*",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Troubleshooting",
+    "Command": "assoc",
+    "Purpose": "Shows file associations",
+    "Example": "assoc .txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Troubleshooting",
+    "Command": "ftype",
+    "Purpose": "Shows file type commands",
+    "Example": "ftype",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Troubleshooting",
+    "Command": "clip",
+    "Purpose": "Copies output to clipboard",
+    "Example": "ipconfig | clip",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Troubleshooting",
+    "Command": "more",
+    "Purpose": "Pages output",
+    "Example": "type log.txt | more",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Troubleshooting",
+    "Command": "sort",
+    "Purpose": "Sorts text",
+    "Example": "sort names.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Troubleshooting",
+    "Command": "choice",
+    "Purpose": "Prompts for choice",
+    "Example": "choice /C YN",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Windows CMD",
+    "Category": "Troubleshooting",
+    "Command": "timeout",
+    "Purpose": "Waits seconds",
+    "Example": "timeout /t 5",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Basics",
+    "Command": "pwd",
+    "Purpose": "Shows current directory",
+    "Example": "pwd",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Basics",
+    "Command": "ls",
+    "Purpose": "Lists files",
+    "Example": "ls -la",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Basics",
+    "Command": "cd",
+    "Purpose": "Changes directory",
+    "Example": "cd /var/log",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Basics",
+    "Command": "clear",
+    "Purpose": "Clears terminal",
+    "Example": "clear",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Basics",
+    "Command": "history",
+    "Purpose": "Shows command history",
+    "Example": "history",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Basics",
+    "Command": "man",
+    "Purpose": "Shows manual page",
+    "Example": "man ls",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Basics",
+    "Command": "whatis",
+    "Purpose": "One-line command description",
+    "Example": "whatis ls",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Basics",
+    "Command": "apropos",
+    "Purpose": "Searches manual page names",
+    "Example": "apropos network",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Basics",
+    "Command": "which",
+    "Purpose": "Shows command path",
+    "Example": "which python3",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Basics",
+    "Command": "whereis",
+    "Purpose": "Locates binary/source/man",
+    "Example": "whereis bash",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "touch",
+    "Purpose": "Creates empty file",
+    "Example": "touch notes.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "cat",
+    "Purpose": "Reads file",
+    "Example": "cat notes.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "less",
+    "Purpose": "Pages through file",
+    "Example": "less /var/log/syslog",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "more",
+    "Purpose": "Pages through file",
+    "Example": "more file.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "head",
+    "Purpose": "Shows first lines",
+    "Example": "head file.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "tail",
+    "Purpose": "Shows last lines",
+    "Example": "tail -f /var/log/syslog",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "cp",
+    "Purpose": "Copies files",
+    "Example": "cp a.txt b.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "mv",
+    "Purpose": "Moves or renames",
+    "Example": "mv old.txt new.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "rm",
+    "Purpose": "Removes files",
+    "Example": "rm old.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "mkdir",
+    "Purpose": "Creates directory",
+    "Example": "mkdir lab",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "rmdir",
+    "Purpose": "Removes empty directory",
+    "Example": "rmdir lab",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "ln",
+    "Purpose": "Creates links",
+    "Example": "ln -s target link",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "file",
+    "Purpose": "Identifies file type",
+    "Example": "file unknown.bin",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "stat",
+    "Purpose": "Shows file metadata",
+    "Example": "stat file.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "du",
+    "Purpose": "Shows disk usage",
+    "Example": "du -sh .",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Files",
+    "Command": "df",
+    "Purpose": "Shows filesystem free space",
+    "Example": "df -h",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Search",
+    "Command": "find",
+    "Purpose": "Finds files",
+    "Example": "find . -name '*.log'",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Search",
+    "Command": "locate",
+    "Purpose": "Finds files via database",
+    "Example": "locate passwd",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Search",
+    "Command": "grep",
+    "Purpose": "Searches text",
+    "Example": "grep -R error .",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Search",
+    "Command": "egrep",
+    "Purpose": "Extended grep",
+    "Example": "egrep 'error|fail' log.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Search",
+    "Command": "awk",
+    "Purpose": "Text processing",
+    "Example": "awk '{print $1}' file.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Search",
+    "Command": "sed",
+    "Purpose": "Stream editor",
+    "Example": "sed 's/old/new/g' file.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Search",
+    "Command": "cut",
+    "Purpose": "Cuts columns",
+    "Example": "cut -d: -f1 /etc/passwd",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Search",
+    "Command": "sort",
+    "Purpose": "Sorts lines",
+    "Example": "sort names.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Search",
+    "Command": "uniq",
+    "Purpose": "Filters repeated lines",
+    "Example": "sort file | uniq",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Search",
+    "Command": "wc",
+    "Purpose": "Counts lines/words/bytes",
+    "Example": "wc -l file.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Permissions",
+    "Command": "chmod",
+    "Purpose": "Changes permissions",
+    "Example": "chmod 600 secret.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Permissions",
+    "Command": "chown",
+    "Purpose": "Changes owner",
+    "Example": "sudo chown user file.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Permissions",
+    "Command": "chgrp",
+    "Purpose": "Changes group",
+    "Example": "chgrp group file.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Permissions",
+    "Command": "umask",
+    "Purpose": "Shows default permissions",
+    "Example": "umask",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Permissions",
+    "Command": "id",
+    "Purpose": "Shows user/group IDs",
+    "Example": "id",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Permissions",
+    "Command": "whoami",
+    "Purpose": "Shows current user",
+    "Example": "whoami",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Permissions",
+    "Command": "groups",
+    "Purpose": "Shows groups",
+    "Example": "groups",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Permissions",
+    "Command": "sudo",
+    "Purpose": "Runs as elevated user",
+    "Example": "sudo apt update",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Users",
+    "Command": "useradd",
+    "Purpose": "Adds user",
+    "Example": "sudo useradd testuser",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Users",
+    "Command": "usermod",
+    "Purpose": "Modifies user",
+    "Example": "sudo usermod -aG sudo testuser",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Users",
+    "Command": "userdel",
+    "Purpose": "Deletes user",
+    "Example": "sudo userdel testuser",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Users",
+    "Command": "passwd",
+    "Purpose": "Changes password",
+    "Example": "passwd",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Users",
+    "Command": "su",
+    "Purpose": "Switches user",
+    "Example": "su -",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Users",
+    "Command": "who",
+    "Purpose": "Shows logged-in users",
+    "Example": "who",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Users",
+    "Command": "w",
+    "Purpose": "Shows logged-in users/activity",
+    "Example": "w",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Users",
+    "Command": "last",
+    "Purpose": "Shows login history",
+    "Example": "last",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Processes",
+    "Command": "ps",
+    "Purpose": "Lists processes",
+    "Example": "ps aux",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Processes",
+    "Command": "top",
+    "Purpose": "Live process viewer",
+    "Example": "top",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Processes",
+    "Command": "htop",
+    "Purpose": "Better live process viewer",
+    "Example": "htop",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Processes",
+    "Command": "kill",
+    "Purpose": "Kills by PID",
+    "Example": "kill 1234",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Processes",
+    "Command": "killall",
+    "Purpose": "Kills by name",
+    "Example": "killall firefox",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Processes",
+    "Command": "pkill",
+    "Purpose": "Kills by pattern",
+    "Example": "pkill -f script.py",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Processes",
+    "Command": "pgrep",
+    "Purpose": "Finds process IDs",
+    "Example": "pgrep ssh",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Processes",
+    "Command": "nice",
+    "Purpose": "Runs with priority",
+    "Example": "nice -n 10 command",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Processes",
+    "Command": "renice",
+    "Purpose": "Changes process priority",
+    "Example": "renice 5 -p 1234",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Networking",
+    "Command": "ip",
+    "Purpose": "Shows/manages network",
+    "Example": "ip a",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Networking",
+    "Command": "ping",
+    "Purpose": "Tests connectivity",
+    "Example": "ping 8.8.8.8",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Networking",
+    "Command": "ss",
+    "Purpose": "Shows sockets",
+    "Example": "ss -tulnp",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Networking",
+    "Command": "netstat",
+    "Purpose": "Legacy sockets/routes",
+    "Example": "netstat -tulnp",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Networking",
+    "Command": "curl",
+    "Purpose": "Makes web requests",
+    "Example": "curl https://example.com",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Networking",
+    "Command": "wget",
+    "Purpose": "Downloads files",
+    "Example": "wget https://example.com/file",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Networking",
+    "Command": "dig",
+    "Purpose": "DNS query",
+    "Example": "dig example.com",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Networking",
+    "Command": "nslookup",
+    "Purpose": "DNS lookup",
+    "Example": "nslookup example.com",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Networking",
+    "Command": "traceroute",
+    "Purpose": "Traces route",
+    "Example": "traceroute example.com",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Networking",
+    "Command": "tracepath",
+    "Purpose": "Traces route",
+    "Example": "tracepath example.com",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Networking",
+    "Command": "hostname",
+    "Purpose": "Shows/sets hostname",
+    "Example": "hostname",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Networking",
+    "Command": "resolvectl",
+    "Purpose": "DNS resolver status",
+    "Example": "resolvectl status",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Networking",
+    "Command": "nmcli",
+    "Purpose": "NetworkManager CLI",
+    "Example": "nmcli device status",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Networking",
+    "Command": "scp",
+    "Purpose": "Secure copy over SSH",
+    "Example": "scp file user@host:/tmp",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Networking",
+    "Command": "ssh",
+    "Purpose": "Secure shell remote login",
+    "Example": "ssh user@host",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Services",
+    "Command": "systemctl",
+    "Purpose": "Controls services",
+    "Example": "systemctl status ssh",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Services",
+    "Command": "service",
+    "Purpose": "Legacy service command",
+    "Example": "service ssh status",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Services",
+    "Command": "journalctl",
+    "Purpose": "Reads systemd logs",
+    "Example": "journalctl -xe",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Services",
+    "Command": "dmesg",
+    "Purpose": "Kernel ring buffer",
+    "Example": "dmesg",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Services",
+    "Command": "crontab",
+    "Purpose": "Schedules jobs",
+    "Example": "crontab -e",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Packages",
+    "Command": "apt",
+    "Purpose": "Debian/Ubuntu package tool",
+    "Example": "sudo apt update",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Packages",
+    "Command": "apt-cache",
+    "Purpose": "Searches package cache",
+    "Example": "apt-cache search nginx",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Packages",
+    "Command": "dpkg",
+    "Purpose": "Debian package manager",
+    "Example": "dpkg -l",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Packages",
+    "Command": "snap",
+    "Purpose": "Snap package manager",
+    "Example": "snap list",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Archives",
+    "Command": "tar",
+    "Purpose": "Archives/extracts files",
+    "Example": "tar -xzf archive.tar.gz",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Archives",
+    "Command": "gzip",
+    "Purpose": "Compresses files",
+    "Example": "gzip file.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Archives",
+    "Command": "gunzip",
+    "Purpose": "Decompresses gzip",
+    "Example": "gunzip file.txt.gz",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Archives",
+    "Command": "zip",
+    "Purpose": "Creates zip archive",
+    "Example": "zip files.zip *.txt",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "Archives",
+    "Command": "unzip",
+    "Purpose": "Extracts zip",
+    "Example": "unzip files.zip",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "System",
+    "Command": "uname",
+    "Purpose": "Shows system info",
+    "Example": "uname -a",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "System",
+    "Command": "uptime",
+    "Purpose": "Shows uptime/load",
+    "Example": "uptime",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "System",
+    "Command": "free",
+    "Purpose": "Shows memory",
+    "Example": "free -h",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "System",
+    "Command": "lscpu",
+    "Purpose": "Shows CPU info",
+    "Example": "lscpu",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "System",
+    "Command": "lsblk",
+    "Purpose": "Shows block devices",
+    "Example": "lsblk",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "System",
+    "Command": "blkid",
+    "Purpose": "Shows block IDs",
+    "Example": "blkid",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "System",
+    "Command": "mount",
+    "Purpose": "Shows/mounts filesystems",
+    "Example": "mount",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "System",
+    "Command": "umount",
+    "Purpose": "Unmounts filesystem",
+    "Example": "umount /mnt/usb",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "System",
+    "Command": "env",
+    "Purpose": "Shows environment",
+    "Example": "env",
+    "Tier": "Beginner"
+  },
+  {
+    "Track": "Linux Terminal",
+    "Category": "System",
+    "Command": "printenv",
+    "Purpose": "Prints env variable",
+    "Example": "printenv PATH",
+    "Tier": "Beginner"
+  }
+]

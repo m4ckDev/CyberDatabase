@@ -1,0 +1,7 @@
+2026-06-14T01:00:01Z host=blue-range pid=1 user=root process=systemd cmd="/sbin/init"
+2026-06-14T01:00:08Z host=blue-range pid=801 user=root process=cron cmd="/usr/sbin/cron -f"
+2026-06-14T01:01:14Z host=blue-range pid=1440 user=www-data process=python cmd="python app.py"
+2026-06-14T01:05:35Z host=blue-range pid=1888 user=www-data process=sh cmd="sh -c whoami"
+2026-06-14T01:05:38Z host=blue-range pid=1889 user=www-data process=id cmd="id"
+2026-06-14T01:06:10Z host=blue-range pid=1900 user=backup process=tar cmd="tar -czf /backup/site.tgz /var/www"
+2026-06-14T01:11:44Z host=blue-range pid=2010 user=analyst process=grep cmd="grep Failed sample-logs/auth.log"
