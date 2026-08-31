@@ -14,7 +14,7 @@
 
 ---
 
-CyberDatabase is the central m4ckDev repository for cybersecurity work. It combines original projects, scripts, labs, defensive and offensive-security references, threat intelligence, automation, training material, CyberDeck development, and a maintained HackTricks source mirror.
+CyberDatabase is the central m4ckDev repository for cybersecurity work. It combines original projects, scripts, labs, defensive and offensive-security references, threat intelligence, automation, AI/security tooling, training material, CyberDeck development, and a maintained HackTricks source mirror.
 
 ## Repository Map
 
@@ -27,7 +27,7 @@ CyberDatabase is the central m4ckDev repository for cybersecurity work. It combi
 | `cheatsheets/` | Fast command, protocol and tool references |
 | `docs/` | CyberDatabase documentation |
 | `knowledge-base/` | Original and expanded CyberDatabase cybersecurity field manual |
-| `imports/` | Complete snapshots of related public m4ckDev cybersecurity repositories |
+| `imports/` | Complete snapshots of related public m4ckDev cybersecurity, scripting and automation repositories |
 | `references/hacktricks-upstream/` | Full upstream HackTricks source mirror with provenance kept intact |
 | `CYBERDATABASE_MANIFEST.md` | Consolidation scope, source list and repository policy |
 
@@ -48,7 +48,7 @@ The CyberDatabase field manual is organized to cover the full security lifecycle
 - Blue-team operations, detection engineering and incident response
 - Red-team and authorized adversary-emulation references
 - Cryptography and PKI
-- AI/LLM security
+- AI/LLM security and automation
 - Remediation, retesting and security reporting
 
 ## Consolidated Public Projects
@@ -58,7 +58,9 @@ The automated synchronization workflow keeps complete snapshots of the following
 - Offensive-Security
 - deepdarkCTI
 - waasa-hacker-tool
+- Pycharm-projects
 - PowerShell-OpsKit
+- multi-llm-router
 - cyber-games-powershell
 - 01-cyber-range-blue-team
 - 02-soc-analyst-simulator
