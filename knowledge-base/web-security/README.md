@@ -84,6 +84,10 @@ Review all attacker-controlled input channels:
 
 Potential weakness classes include injection, path traversal, unsafe deserialization, server-side request behavior, template processing, parser differentials, and unsafe file handling.
 
+External payload reference: `../../references/security-research/payloads-site/README.md`
+
+The Payloads.site reference maps SQL injection, XSS, LFI/RFI, command injection, SSRF, and common encoding/transformation options into the CyberDatabase web-testing workflow without mixing third-party payload material into CyberDatabase-owned documentation.
+
 ## Browser-side security
 
 Review:
@@ -165,3 +169,5 @@ The complete synchronized HackTricks web reference is available at:
 `../../references/hacktricks-upstream/src/pentesting-web/`
 
 Use `../hacktricks-derived/UPSTREAM_INDEX.md` for the current full upstream topic map after synchronization.
+
+Additional external research references are indexed under `../../references/security-research/`.
