@@ -6,12 +6,23 @@ CyberDatabase is the primary repository for m4ckDev cybersecurity material: rese
 
 The following existing areas remain in place and are treated as first-class CyberDatabase projects:
 
+- `AI/`
 - `CyberDeck/`
 - `RaspberryCommandCenter/`
 - `cheatsheets/`
 - `docs/`
 - `replit-cyberops/`
 - `wifi-sentinel/`
+
+## AI consolidation
+
+The synchronization workflow imports the complete public `m4ckDev/Claude-skills` repository into:
+
+- `AI/Claude-Skills/`
+
+This location preserves the original repository structure, skill definitions, plugin metadata, templates, README files, per-skill licenses, and `THIRD_PARTY_NOTICES.md`. The synchronized source should remain intact so attribution and third-party licensing stay associated with the relevant files.
+
+Related AI material includes `imports/multi-llm-router/` and CyberDatabase-authored AI security material under `knowledge-base/ai-security/`.
 
 ## Public repositories consolidated automatically
 
@@ -51,6 +62,9 @@ This prevents accidental publication of material that was intentionally stored p
 
 ```text
 CyberDatabase/
+├── AI/
+│   ├── README.md
+│   └── Claude-Skills/
 ├── CyberDeck/
 ├── RaspberryCommandCenter/
 ├── cheatsheets/
@@ -100,4 +114,4 @@ CyberDatabase/
 
 ## Synchronization
 
-`.github/workflows/sync-cyber-resources.yml` refreshes the public project snapshots and HackTricks mirror. Generated synchronization commits are made by GitHub Actions and are prevented from recursively re-running the same import job.
+`.github/workflows/sync-cyber-resources.yml` refreshes the Claude Skills snapshot, public project snapshots, and HackTricks mirror. Generated synchronization commits are made by GitHub Actions and are prevented from recursively re-running the same import job.
