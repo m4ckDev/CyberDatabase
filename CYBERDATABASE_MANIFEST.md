@@ -1,6 +1,6 @@
 # CyberDatabase Consolidation Manifest
 
-CyberDatabase is the primary repository for m4ckDev cybersecurity material: research, scripts, labs, tools, defensive and offensive-security references, threat intelligence, automation, training projects, and the CyberDeck platform.
+CyberDatabase is the primary repository for m4ckDev cybersecurity material: research, scripts, labs, tools, defensive and offensive-security references, threat intelligence, automation, training projects, AI/security tooling, and the CyberDeck platform.
 
 ## Existing CyberDatabase content
 
@@ -20,12 +20,16 @@ The synchronization workflow imports complete snapshots of these public reposito
 - `m4ckDev/Offensive-Security`
 - `m4ckDev/deepdarkCTI`
 - `m4ckDev/waasa-hacker-tool`
+- `m4ckDev/Pycharm-projects`
 - `m4ckDev/PowerShell-OpsKit`
+- `m4ckDev/multi-llm-router`
 - `m4ckDev/cyber-games-powershell`
 - `m4ckDev/01-cyber-range-blue-team`
 - `m4ckDev/02-soc-analyst-simulator`
 
 Each imported repository remains in its own directory so its documentation, notices, and license files remain associated with the original project.
+
+`Pycharm-projects` is retained because it contains scripting, automation, log-analysis and cybersecurity learning material. `multi-llm-router` is retained as AI/automation infrastructure that can support security research and CyberDatabase workflows.
 
 ## HackTricks mirror
 
@@ -79,7 +83,15 @@ CyberDatabase/
 │   ├── ai-security/
 │   └── reporting-remediation/
 ├── imports/
-│   └── <public project snapshots>
+│   ├── Offensive-Security/
+│   ├── deepdarkCTI/
+│   ├── waasa-hacker-tool/
+│   ├── Pycharm-projects/
+│   ├── PowerShell-OpsKit/
+│   ├── multi-llm-router/
+│   ├── cyber-games-powershell/
+│   ├── 01-cyber-range-blue-team/
+│   └── 02-soc-analyst-simulator/
 ├── references/
 │   └── hacktricks-upstream/
 ├── replit-cyberops/
