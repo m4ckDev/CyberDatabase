@@ -27,7 +27,7 @@ jobs:
       - name: Prepare directories
         run: |
           set -euo pipefail
-          mkdir -p imports references/hacktricks-upstream
+          mkdir -p AI/Claude-Skills imports references/hacktricks-upstream
 
       - name: Sync public m4ckDev cybersecurity repositories
         shell: bash
@@ -46,6 +46,7 @@ jobs:
             rm -rf "$tmp"
           }
 
+          sync_repo "m4ckDev/Claude-skills" "AI/Claude-Skills"
           sync_repo "m4ckDev/Offensive-Security" "imports/Offensive-Security"
           sync_repo "m4ckDev/deepdarkCTI" "imports/deepdarkCTI"
           sync_repo "m4ckDev/waasa-hacker-tool" "imports/waasa-hacker-tool"
@@ -87,11 +88,11 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add imports references/hacktricks-upstream
+          git add AI imports references/hacktricks-upstream
           if git diff --cached --quiet; then
             echo "No synchronization changes detected."
             exit 0
           fi
-          git commit -m "Sync cybersecurity resources and HackTricks mirror"
+          git commit -m "Sync cybersecurity resources, AI skills, and HackTricks mirror"
           git pull --rebase origin main
           git push origin main
