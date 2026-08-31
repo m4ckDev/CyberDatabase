@@ -30,6 +30,7 @@ CyberDatabase is the central m4ckDev repository for cybersecurity work. It combi
 | `knowledge-base/` | Original and expanded CyberDatabase cybersecurity field manual |
 | `imports/` | Complete snapshots of related public m4ckDev cybersecurity, scripting and automation repositories |
 | `references/hacktricks-upstream/` | Full upstream HackTricks source mirror with provenance kept intact |
+| `scripts/build_hacktricks_index.py` | Builds complete CyberDatabase navigation from the upstream HackTricks table of contents |
 | `CYBERDATABASE_MANIFEST.md` | Consolidation scope, source list and repository policy |
 
 ## AI Hub
@@ -84,6 +85,22 @@ Local README, notice and license files remain with each synchronized project.
 CyberDatabase maintains a source mirror of `HackTricks-wiki/hacktricks` under `references/hacktricks-upstream/`. The mirror is intentionally isolated from CyberDatabase-authored material so attribution, provenance and upstream licensing remain clear.
 
 New CyberDatabase explanations, labs, defensive context, checklists and expanded material belong under `knowledge-base/`.
+
+### HackTricks-Derived Field Guides
+
+CyberDatabase now extracts and reorganizes the synchronized source into practical guides instead of relying only on the raw mirror:
+
+- `knowledge-base/hacktricks-derived/` — source map and automatically generated complete upstream navigation
+- `knowledge-base/methodology/` — assessment workflow
+- `knowledge-base/networking/` — host discovery and scanning
+- `knowledge-base/services-and-protocols/` — protocol/service triage
+- `knowledge-base/web-security/` — application and API testing workflow
+- `knowledge-base/linux/` — Linux hardening and privilege-boundary review
+- `knowledge-base/windows/` — Windows hardening and telemetry
+- `knowledge-base/forensics/` — host, memory, network, container, and file evidence
+- `knowledge-base/ai-security/` — LLM, agent, MCP, prompt-injection, model, and AI-system security
+
+The synchronization workflow regenerates `knowledge-base/hacktricks-derived/UPSTREAM_INDEX.md` from the current HackTricks `src/SUMMARY.md`, providing a complete navigable map as upstream content changes.
 
 ## Private Repositories
 
