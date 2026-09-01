@@ -16,6 +16,7 @@ Use the topic folders below for original or substantially rewritten CyberDatabas
 - `windows/README.md` — Windows security, privilege boundaries, hardening, and telemetry.
 - `forensics/README.md` — disk, memory, network, host, container, and file-analysis workflow.
 - `malware-analysis/README.md` — static/dynamic malware analysis, defensive outputs, and vx-underground research mapping.
+- `osint/README.md` — OSINT methodology, evidence handling, passive collection, verification, and OSINT4ALL integration.
 - `hardware-iot/README.md` — embedded, hardware, RFID/NFC, SDR, USB and IoT security; links to the CyberDatabase hardware purchasing directory.
 - `ai-security/README.md` — LLM, agent, MCP, model-supply-chain, prompt-injection, and AI security guidance.
 
@@ -35,7 +36,7 @@ Use the topic folders below for original or substantially rewritten CyberDatabas
 - `binary-exploitation/` — memory corruption concepts and controlled lab research
 - `forensics/` — disk, memory, host and network forensics
 - `malware-analysis/` — safe malware triage, behavior analysis, detection engineering inputs, and reporting
-- `osint/` — open-source intelligence methodology and tools
+- `osint/` — open-source intelligence methodology, tools, verification, public-source research, and evidence handling
 - `threat-intelligence/` — CTI, indicators, ATT&CK mapping and research
 - `blue-team/` — monitoring, hardening and defensive operations
 - `red-team/` — authorized adversary emulation and validation
@@ -49,10 +50,11 @@ Use the topic folders below for original or substantially rewritten CyberDatabas
 
 ## Resource directories
 
-External links from the supplied CYBERSEC TOOLS panels are maintained outside the authored knowledge base:
+External links from the supplied CYBERSEC TOOLS panels and reviewed external directories are maintained outside the authored knowledge base:
 
 - `../references/resource-directory/TRAINING.md` — certification roadmap, TryHackMe, Hack The Box, OverTheWire, LetsDefend, WiFiChallenge, PortSwigger Academy, W3Schools, CompTIA, OffSec, PECB, BBRadar, TIDE and related direct links.
 - `../references/resource-directory/PERSONAL_SECURITY.md` — privacy, hardening, account deletion, secure messaging, search privacy, surveillance defense, disposable email and data-removal resources from the supplied screenshot.
+- `../references/resource-directory/OSINT.md` — OSINT4ALL Start.me board, OSINT4ALL directory, direct investigation workflows, tool categories, comparison/review links, and evidence-handling guidance.
 - `../references/threat-intelligence/DARK_WEB_WATCHLIST.md` — defensive public-intelligence references for Exploit.in, DarkNet Army, Verified and BHF.
 
 ## Hardware directory
