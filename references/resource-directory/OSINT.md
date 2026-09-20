@@ -11,6 +11,15 @@ Curated open-source intelligence references centered on the OSINT4ALL Start.me b
 - Reviews and field notes: https://osint4all.com/review/
 - Editorial standards: https://osint4all.com/editorial-standards/
 
+## Supplied Start.me collections
+
+- The Ultimate OSINT Collection: https://start.me/p/DPYPMz/the-ultimate-osint-collection
+  - Recovered 2022-03-26 inventory: [../startme/ULTIMATE_OSINT_COLLECTION_2022-03-26.md](../startme/ULTIMATE_OSINT_COLLECTION_2022-03-26.md)
+- OSINT: Darkweb & Russia: https://start.me/p/kx5qL5/osint-darkweb-russia
+  - Source record: [../startme/OSINT_DARKWEB_RUSSIA.md](../startme/OSINT_DARKWEB_RUSSIA.md)
+- CYBERSEC TOOLS: https://start.me/p/bpjxDe/cybersec-tools
+  - Source coverage map: [../startme/CYBERSEC_TOOLS.md](../startme/CYBERSEC_TOOLS.md)
+
 ## Investigation lanes represented by OSINT4ALL
 
 OSINT4ALL currently organizes tools and workflows around practical investigation jobs rather than one long unvetted bookmark list. The directory includes areas such as:
