@@ -198,6 +198,14 @@ Mitigation / Hardening
 References / Attribution
 ```
 
+## Support the work
+
+If CyberDatabase or the other m4ckDev projects are useful to you, you can support continued development through **GitHub Sponsors**:
+
+**[Sponsor m4ckDev](https://github.com/sponsors/m4ckDev)**
+
+Sponsorship helps support open-source security research, lab hardware, test devices, infrastructure, hosting, and technical documentation. See [SPONSORING.md](SPONSORING.md) for details.
+
 ## Responsible Use
 
 CyberDatabase is intended for cybersecurity education, administration, defense, research, lab work, and authorized security testing. Only assess systems, networks, accounts, applications, hardware and physical systems you own or have explicit permission to test.
