@@ -32,7 +32,8 @@ CyberDatabase is the central m4ckDev repository for cybersecurity work. It combi
 | `imports/` | Complete snapshots of related public m4ckDev cybersecurity, scripting and automation repositories |
 | `references/hacktricks-upstream/` | Full upstream HackTricks source mirror with provenance kept intact |
 | `references/security-research/` | Curated external research sources, including Payloads.site and vx-underground |
-| `references/resource-directory/` | Direct-link training, personal-security, and OSINT resource indexes |\n| `references/startme/` | Provenance-preserving indexes/mirrors of supplied Start.me cybersecurity and OSINT collections |
+| `references/resource-directory/` | Direct-link training, personal-security, and OSINT resource indexes |
+| `references/startme/` | Provenance-preserving indexes/mirrors of supplied Start.me cybersecurity and OSINT collections |
 | `references/threat-intelligence/` | Defensive threat-intelligence watchlists and public reporting references |
 | `scripts/build_hacktricks_index.py` | Builds complete CyberDatabase navigation from the upstream HackTricks table of contents |
 | `CYBERDATABASE_MANIFEST.md` | Consolidation scope, source list and repository policy |
@@ -46,6 +47,16 @@ The CYBERSEC TOOLS links supplied for training and personal security are organiz
 - Verified external destinations are stored as direct links. Where the original Start.me destination could not be independently verified, the label is retained with the source-board link rather than inventing a destination.
 
 The supplied underground-forum labels are tracked defensively in `references/threat-intelligence/DARK_WEB_WATCHLIST.md` using public threat-intelligence/research references rather than operational criminal-forum access links.
+
+### Start.me source collections
+
+The supplied Start.me collections are tracked under `references/startme/` so provenance is not lost when individual links are reorganized into topical CyberDatabase directories.
+
+- **CYBERSEC TOOLS:** https://start.me/p/bpjxDe/cybersec-tools — source-level coverage map plus the existing training, privacy, hardware, and CTI directories.
+- **OSINT: Darkweb & Russia:** https://start.me/p/kx5qL5/osint-darkweb-russia — canonical source record linked to CyberDatabase OSINT/CTI material.
+- **The Ultimate OSINT Collection:** https://start.me/p/DPYPMz/the-ultimate-osint-collection — 245 resource entries recovered from the rendered 2022-03-26 archive and preserved by section.
+
+Start.me's current public application is JavaScript-driven, so CyberDatabase also includes `scripts/import_startme_export.py` for lossless ingestion of Start.me's official bookmark HTML export when an authenticated current export is available.
 
 ## Hardware Directory
 
