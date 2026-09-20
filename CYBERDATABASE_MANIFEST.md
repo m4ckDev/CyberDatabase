@@ -25,6 +25,18 @@ External training and personal-security links supplied from the CYBERSEC TOOLS b
 
 The underground labels shown in the supplied Dark Web panel are tracked under `references/threat-intelligence/DARK_WEB_WATCHLIST.md`. That file includes Exploit.in, DarkNet Army, Verified and BHF using public defensive threat-intelligence/research references rather than operational criminal-forum access links.
 
+## Supplied Start.me collections
+
+Source-level provenance and recovered bookmark inventories are maintained under `references/startme/` for:
+
+- https://start.me/p/bpjxDe/cybersec-tools — CYBERSEC TOOLS
+- https://start.me/p/kx5qL5/osint-darkweb-russia — OSINT: Darkweb & Russia
+- https://start.me/p/DPYPMz/the-ultimate-osint-collection — The Ultimate OSINT Collection
+
+The Ultimate OSINT Collection has a rendered archive captured on 2022-03-26; CyberDatabase recovered and grouped 245 displayed resource entries from that snapshot in `references/startme/ULTIMATE_OSINT_COLLECTION_2022-03-26.md`.
+
+Start.me's current public application does not expose a complete bookmark payload to the static client used for repository consolidation. Exact current authenticated HTML exports can be converted without URL normalization or deduplication using `scripts/import_startme_export.py`. Unknown destinations are never guessed.
+
 ## Hardware directory
 
 `hardware/README.md` is the centralized purchasing and source directory for security-lab hardware represented in the CYBERSEC TOOLS source and related CyberDatabase research.
@@ -169,6 +181,12 @@ CyberDatabase/
 │   │   ├── README.md
 │   │   ├── TRAINING.md
 │   │   └── PERSONAL_SECURITY.md
+│   ├── startme/
+│   │   ├── README.md
+│   │   ├── SOURCES.json
+│   │   ├── CYBERSEC_TOOLS.md
+│   │   ├── OSINT_DARKWEB_RUSSIA.md
+│   │   └── ULTIMATE_OSINT_COLLECTION_2022-03-26.md
 │   ├── security-research/
 │   │   ├── README.md
 │   │   ├── payloads-site/
