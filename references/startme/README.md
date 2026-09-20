@@ -8,7 +8,7 @@ This directory preserves and indexes the Start.me collections supplied for Cyber
 |---|---|---|---|
 | CYBERSEC TOOLS | https://start.me/p/bpjxDe/cybersec-tools | [CYBERSEC_TOOLS.md](CYBERSEC_TOOLS.md) plus existing training, personal-security, hardware, and threat-intelligence directories | Existing CyberDatabase captures indexed; current Start.me public app is JavaScript-only to static clients |
 | OSINT: Darkweb & Russia | https://start.me/p/kx5qL5/osint-darkweb-russia | [OSINT_DARKWEB_RUSSIA.md](OSINT_DARKWEB_RUSSIA.md) | Canonical source preserved; current bookmark payload is not exposed to the available static client |
-| The Ultimate OSINT Collection | https://start.me/p/DPYPMz/the-ultimate-osint-collection | [ULTIMATE_OSINT_COLLECTION_2022-03-26.md](ULTIMATE_OSINT_COLLECTION_2022-03-26.md) | Resource inventory recovered from the 2022-03-26 archived rendered page |
+| The Ultimate OSINT Collection | https://start.me/p/DPYPMz/the-ultimate-osint-collection | [ULTIMATE_OSINT_COLLECTION_2022-03-26.md](ULTIMATE_OSINT_COLLECTION_2022-03-26.md) | 245 resource entries recovered and grouped from the 2022-03-26 archived rendered page |
 
 ## Why these files exist
 
