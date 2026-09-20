@@ -32,7 +32,7 @@ CyberDatabase is the central m4ckDev repository for cybersecurity work. It combi
 | `imports/` | Complete snapshots of related public m4ckDev cybersecurity, scripting and automation repositories |
 | `references/hacktricks-upstream/` | Full upstream HackTricks source mirror with provenance kept intact |
 | `references/security-research/` | Curated external research sources, including Payloads.site and vx-underground |
-| `references/resource-directory/` | Direct-link training and personal-security resource indexes |
+| `references/resource-directory/` | Direct-link training, personal-security, and OSINT resource indexes |\n| `references/startme/` | Provenance-preserving indexes/mirrors of supplied Start.me cybersecurity and OSINT collections |
 | `references/threat-intelligence/` | Defensive threat-intelligence watchlists and public reporting references |
 | `scripts/build_hacktricks_index.py` | Builds complete CyberDatabase navigation from the upstream HackTricks table of contents |
 | `CYBERDATABASE_MANIFEST.md` | Consolidation scope, source list and repository policy |
