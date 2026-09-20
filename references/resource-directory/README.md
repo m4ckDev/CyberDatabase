@@ -11,6 +11,8 @@ Curated external links from the CYBERSEC TOOLS reference board and other reviewe
 
 The OSINT section includes the OSINT4ALL Start.me board, the current OSINT4ALL moderated directory, investigation workflows, comparisons, reviews, and direct links for domain/DNS, threat triage, people/social, public-records, geolocation, archive, verification, and cybersecurity OSINT research.
 
+The dedicated `../startme/` source area preserves provenance for CYBERSEC TOOLS, OSINT: Darkweb & Russia, and The Ultimate OSINT Collection. The archived Ultimate OSINT inventory contains 245 recovered resource entries grouped by the source page's displayed sections.
+
 Links are kept separate from CyberDatabase-owned technical content so external ownership, availability, and risk remain clear. Verify third-party sites before entering credentials, downloading executables, or providing personal information.
 
 Note: A VPN may be required to access some of these resources because availability can vary by region, ISP, or network restrictions.
